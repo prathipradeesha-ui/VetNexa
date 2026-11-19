@@ -41,15 +41,17 @@ docker compose up -d db                      # start MySQL on port 3307
 cp apps/api/.env.example apps/api/.env       # local configuration
 npm run db:migrate -w @vetnexa/api           # create the tables
 npm run db:seed -w @vetnexa/api              # load demo data
-npm run dev -w @vetnexa/api                  # start the API on http://localhost:4100
+npm run dev -w @vetnexa/api                  # terminal 1: API on http://localhost:4100
+npm run dev -w @vetnexa/web                  # terminal 2: website on http://localhost:5173
 ```
 
-Check the API is running: http://localhost:4100/api/health
+Open http://localhost:5173 for the website. The API health check is at http://localhost:4100/api/health.
 
 ### Local ports
 
 | Service        | Port |
 | -------------- | ---- |
+| Website (Vite) | 5173 |
 | API            | 4100 |
 | MySQL (Docker) | 3307 |
 
