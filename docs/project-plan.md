@@ -14,7 +14,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 6   | Authentication and RBAC           | Register, login, logout, current user, role guards, tests                          | Done    |
 | 7   | Front-end foundation              | Vite app, design tokens, layout, navigation, public pages                          | Done    |
 | 8   | Pet profiles                      | CRUD API + UI, photo upload                                                        | Done    |
-| 9   | Health records                    | Vaccinations, treatments, medical history timeline                                 | Planned |
+| 9   | Health records                    | Vaccinations, treatments, medical history timeline                                 | Done    |
 | 10  | Clinic discovery                  | Search, filters, clinic detail page, reviews and ratings                           | Planned |
 | 11  | Veterinary portal                 | Consultations, vet dashboard, treatment notes                                      | Planned |
 | 12  | Rescue and adoption               | Rescue reports, adoption listings, applications                                    | Planned |

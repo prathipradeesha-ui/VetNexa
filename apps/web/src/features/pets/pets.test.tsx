@@ -123,6 +123,7 @@ describe('pet profile', () => {
     mockApi({
       'GET /api/auth/me': signedInOwner,
       'GET /api/pets/pet-1': { status: 200, body: { pet: { ...bruno, color: null } } },
+      'GET /api/pets/pet-1/records': { status: 200, body: { records: [] } },
     });
     renderRoute('/dashboard/pets/pet-1');
 
@@ -136,6 +137,7 @@ describe('pet profile', () => {
     const fetchMock = mockApi({
       'GET /api/auth/me': signedInOwner,
       'GET /api/pets/pet-1': { status: 200, body: { pet: bruno } },
+      'GET /api/pets/pet-1/records': { status: 200, body: { records: [] } },
       'DELETE /api/pets/pet-1': { status: 204 },
       'GET /api/pets': { status: 200, body: { pets: [] } },
     });
@@ -156,6 +158,7 @@ describe('pet profile', () => {
     const fetchMock = mockApi({
       'GET /api/auth/me': signedInOwner,
       'GET /api/pets/pet-1': { status: 200, body: { pet: bruno } },
+      'GET /api/pets/pet-1/records': { status: 200, body: { records: [] } },
     });
     renderRoute('/dashboard/pets/pet-1');
 

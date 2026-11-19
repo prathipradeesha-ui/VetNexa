@@ -112,6 +112,30 @@ pet ID returns `404`, so the API does not reveal that it exists.
 800 × 800 WebP, which rejects files that are not real images and removes location (EXIF)
 data from phone photos. Files get random names and are served from `/uploads/...`.
 
+## Health records
+
+`OWNER` role, own pets only. Records are always looked up through their pet.
+
+| Method | Path                             | Description                               |
+| ------ | -------------------------------- | ----------------------------------------- |
+| GET    | `/pets/:petId/records`           | The pet's history, newest first.          |
+| POST   | `/pets/:petId/records`           | Add a record.                             |
+| PUT    | `/pets/:petId/records/:recordId` | Update a record the owner entered.        |
+| DELETE | `/pets/:petId/records/:recordId` | Delete a record the owner entered.        |
+| GET    | `/reminders`                     | Overdue care and care due within 60 days. |
+
+**Body:** `type` (`VACCINATION`, `TREATMENT`, `CHECKUP`, `MEDICATION`, `ALLERGY`, `SURGERY`),
+`title`, `recordDate` (not in the future), optional `nextDueDate` (after `recordDate`),
+`description`, `vetName`, `clinicName`.
+
+**Rules**
+
+- Each record stores who created it. Records written by a veterinarian return `canEdit: false`
+  and owners receive `403` if they try to change them, so the clinical history stays accurate.
+- Reminders and the pet card's `nextDue` use the same rule: for each pet, type and title
+  (case-insensitive) only the latest entry counts. Recording this year's vaccine therefore
+  clears last year's overdue reminder.
+
 ## Administration
 
 All routes require the `ADMIN` role.
