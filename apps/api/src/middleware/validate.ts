@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import type { ZodTypeAny } from 'zod';
+import type { ZodType } from 'zod';
 import { HttpError } from '../lib/http-error';
 
 type RequestPart = 'body' | 'query' | 'params';
@@ -10,7 +10,7 @@ type RequestPart = 'body' | 'query' | 'params';
  * so controllers always work with clean data. On failure a 422 response lists every
  * invalid field, e.g. { field: "email", message: "Enter a valid email address" }.
  */
-export function validate(schema: ZodTypeAny, part: RequestPart = 'body'): RequestHandler {
+export function validate(schema: ZodType, part: RequestPart = 'body'): RequestHandler {
   return (req, res, next) => {
     const result = schema.safeParse(req[part]);
     if (!result.success) {

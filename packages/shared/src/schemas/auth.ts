@@ -10,10 +10,10 @@ import { SELF_REGISTER_ROLES } from '../enums';
 export const emailSchema = z
   .string()
   .trim()
+  .toLowerCase()
   .min(1, 'Email is required')
-  .email('Enter a valid email address')
   .max(191, 'Email is too long')
-  .transform((value) => value.toLowerCase());
+  .pipe(z.email('Enter a valid email address'));
 
 export const passwordSchema = z
   .string()

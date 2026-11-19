@@ -9,7 +9,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4100),
-  DATABASE_URL: z.string().url().startsWith('mysql://'),
+  DATABASE_URL: z.url({ protocol: /^mysql$/, error: 'DATABASE_URL must be a mysql:// URL' }),
   // Comma-separated list of front-end origins allowed to call the API with cookies.
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   // Secret used to sign login tokens. Must be long and random; never commit the real value.
