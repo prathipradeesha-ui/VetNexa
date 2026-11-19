@@ -10,7 +10,7 @@ export function authService(prisma: PrismaClient) {
     async register(data: RegisterData) {
       const existing = await prisma.user.findUnique({ where: { email: data.email } });
       if (existing) {
-        throw HttpError.conflict('An account with this email already exists');
+        throw HttpError.conflict('An account with this email already exists', 'email');
       }
 
       if (data.role === 'VET' && data.licenseNumber) {
@@ -18,7 +18,7 @@ export function authService(prisma: PrismaClient) {
           where: { licenseNumber: data.licenseNumber },
         });
         if (licenceTaken) {
-          throw HttpError.conflict('This licence number is already registered');
+          throw HttpError.conflict('This licence number is already registered', 'licenseNumber');
         }
       }
 

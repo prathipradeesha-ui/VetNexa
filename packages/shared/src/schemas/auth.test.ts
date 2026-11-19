@@ -52,6 +52,8 @@ describe('registerSchema', () => {
       licenseNumber: ' slvc-2020-0101 ',
     });
     expect(vet.licenseNumber).toBe('SLVC-2020-0101');
+    // A blank optional field is treated as "not provided", not saved as an empty string.
+    expect(registerSchema.parse({ ...vet, specialization: '   ' }).specialization).toBeUndefined();
   });
 
   it('accepts local and international mobile numbers and an empty phone', () => {

@@ -29,6 +29,15 @@ export const phoneSchema = z
   .trim()
   .regex(/^(?:\+94|0)7\d{8}$/, 'Enter a valid mobile number, for example 0771234567');
 
+/** Optional text input: blank or whitespace-only becomes `undefined` instead of "". */
+export const optionalText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .optional()
+    .transform((value) => (value ? value : undefined));
+
 export const registerSchema = z
   .object({
     firstName: z.string().trim().min(1, 'First name is required').max(60),
@@ -47,7 +56,7 @@ export const registerSchema = z
       .regex(/^[A-Z0-9-]{5,40}$/, 'Enter your licence number as shown on your certificate')
       .optional()
       .or(z.literal('').transform(() => undefined)),
-    specialization: z.string().trim().max(120).optional(),
+    specialization: optionalText(120),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {

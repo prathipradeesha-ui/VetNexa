@@ -76,6 +76,9 @@ describe('POST /api/auth/register', () => {
 
     expect(res.status).toBe(409);
     expect(res.body.error.message).toBe('An account with this email already exists');
+    expect(res.body.error.details).toEqual([
+      { field: 'email', message: 'An account with this email already exists' },
+    ]);
   });
 
   it('refuses to create administrator accounts through sign-up', async () => {

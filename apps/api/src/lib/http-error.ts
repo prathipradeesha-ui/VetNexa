@@ -36,8 +36,9 @@ export class HttpError extends Error {
     return new HttpError(404, 'NOT_FOUND', message);
   }
 
-  static conflict(message: string) {
-    return new HttpError(409, 'CONFLICT', message);
+  /** `field` lets the front end show the message next to the input that caused it. */
+  static conflict(message: string, field?: string) {
+    return new HttpError(409, 'CONFLICT', message, field ? [{ field, message }] : undefined);
   }
 
   static tooManyRequests(message = 'Too many requests, please try again later') {
