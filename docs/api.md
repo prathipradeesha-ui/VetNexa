@@ -26,7 +26,7 @@ Every error has the same shape:
 | 401    | `UNAUTHORIZED`      | Not signed in, or the session expired                             |
 | 403    | `FORBIDDEN`         | Signed in but not allowed (wrong role, suspended, unverified vet) |
 | 404    | `NOT_FOUND`         | Route or record does not exist                                    |
-| 409    | `CONFLICT`          | Duplicate record, e.g. email already registered                   |
+| 409    | `CONFLICT`          | Duplicate record, e.g. email already registered (with `details`)  |
 | 422    | `VALIDATION_ERROR`  | Field validation failed; see `details`                            |
 | 429    | `TOO_MANY_REQUESTS` | Rate limit reached                                                |
 | 500    | `INTERNAL_ERROR`    | Unexpected server error (details are logged, not returned)        |
@@ -82,6 +82,16 @@ Sign-in and sign-up allow 10 failed attempts per 15 minutes per IP address.
   }
 }
 ```
+
+## Contact
+
+| Method | Path       | Access | Description                                                                                    |
+| ------ | ---------- | ------ | ---------------------------------------------------------------------------------------------- |
+| POST   | `/contact` | Public | Send a message from the Contact page. Linked to the account when signed in. 5 per hour per IP. |
+
+Body: `name`, `email`, optional `phone`, `topic` (`GENERAL`, `ACCOUNT_SUPPORT`, `VET_PARTNERSHIP`,
+`CLINIC_LISTING`, `RESCUE_ADOPTION`, `FEEDBACK`) and `message` (20–2000 characters).
+Returns `201` with a short `reference` the sender can quote.
 
 ## Administration
 

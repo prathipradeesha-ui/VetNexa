@@ -29,6 +29,7 @@ const yearsAgo = (years: number, months = 0) =>
 
 async function clearDatabase() {
   // Delete children before parents so foreign keys are never violated.
+  await prisma.contactMessage.deleteMany();
   await prisma.chatMessage.deleteMany();
   await prisma.adoptionApplication.deleteMany();
   await prisma.adoptionListing.deleteMany();

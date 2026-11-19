@@ -11,6 +11,7 @@ import { logger } from './lib/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import { contactRouter } from './modules/contact/contact.routes';
 import { healthRouter } from './modules/health/health.routes';
 
 export interface AppDependencies {
@@ -84,10 +85,22 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
       next(HttpError.tooManyRequests('Too many sign-in attempts. Please wait 15 minutes.')),
   });
 
+  // Contact form: 5 messages per hour per IP address.
+  const contactLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 5,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) =>
+      next(HttpError.tooManyRequests('You have sent several messages. Please try again later.')),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
   app.use('/api/auth', authRouter(prisma, loginLimiter));
   app.use('/api/admin', adminRouter(prisma));
+  app.use('/api/contact', contactRouter(prisma, contactLimiter));
 
   // ── Errors (must be registered last) ──
   app.use(notFoundHandler);

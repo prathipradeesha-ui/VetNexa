@@ -15,6 +15,7 @@ export const TEST_PASSWORD = 'Password123';
 
 /** Empties every table, children first, so each test starts from a known state. */
 export async function resetDatabase() {
+  await testPrisma.contactMessage.deleteMany();
   await testPrisma.chatMessage.deleteMany();
   await testPrisma.adoptionApplication.deleteMany();
   await testPrisma.adoptionListing.deleteMany();

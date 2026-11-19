@@ -413,3 +413,36 @@ model ChatMessage {
 
   @@index([userId, createdAt])
 }
+
+// ─────────────────────────────── Contact messages ───────────────────────────────
+
+enum ContactTopic {
+  GENERAL
+  ACCOUNT_SUPPORT
+  VET_PARTNERSHIP
+  CLINIC_LISTING
+  RESCUE_ADOPTION
+  FEEDBACK
+}
+
+enum ContactStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
+/// Messages sent through the public Contact page, answered by administrators.
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String        @db.VarChar(120)
+  email     String        @db.VarChar(191)
+  phone     String?       @db.VarChar(20)
+  topic     ContactTopic
+  message   String        @db.Text
+  status    ContactStatus @default(NEW)
+  userId    String? // set when the sender was signed in
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status, createdAt])
+}
