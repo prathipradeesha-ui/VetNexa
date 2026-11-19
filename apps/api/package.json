@@ -5,6 +5,8 @@
   "type": "module",
   "description": "VetNexa REST API (Express + Prisma)",
   "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
     "pretypecheck": "prisma generate",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -16,8 +18,13 @@
     "db:studio": "prisma studio"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^26.6.6",
+    "@types/supertest": "^7.2.1",
     "prisma": "^7.10.1",
+    "supertest": "^7.3.2",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^5.1.1"
@@ -27,6 +34,15 @@
     "@prisma/client": "^7.10.1",
     "@vetnexa/shared": "^0.1.0",
     "bcryptjs": "^3.0.3",
-    "dotenv": "^17.4.2"
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "helmet": "^8.3.0",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
+    "pino-pretty": "^13.2.0",
+    "zod": "^3.25.76"
   }
 }
