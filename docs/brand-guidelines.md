@@ -19,14 +19,14 @@ The mark is a paw print whose main pad carries a medical cross, set inside a rou
 
 ### Files (`/brand`)
 
-| File | Use |
-| --- | --- |
-| `logo-full.svg` | Default horizontal logo: website header, documents. |
-| `logo-full-reversed.svg` | On Deep Teal or Navy backgrounds: footer, login hero panel. |
-| `logo-stacked.svg` | Centred layouts: login and registration pages, splash screens. |
-| `logo-mark.svg` | Icon only: mobile header, app icon, social avatars. |
-| `favicon.svg` | Browser tab icon (simplified, no connection dot so it stays crisp at 16 px). |
-| `logo-mono.svg` | Single colour (Navy) for print, stamps and certificates. |
+| File                     | Use                                                                          |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `logo-full.svg`          | Default horizontal logo: website header, documents.                          |
+| `logo-full-reversed.svg` | On Deep Teal or Navy backgrounds: footer, login hero panel.                  |
+| `logo-stacked.svg`       | Centred layouts: login and registration pages, splash screens.               |
+| `logo-mark.svg`          | Icon only: mobile header, app icon, social avatars.                          |
+| `favicon.svg`            | Browser tab icon (simplified, no connection dot so it stays crisp at 16 px). |
+| `logo-mono.svg`          | Single colour (Navy) for print, stamps and certificates.                     |
 
 ### Usage rules
 
@@ -37,28 +37,28 @@ The mark is a paw print whose main pad carries a medical cross, set inside a rou
 
 ## 3. Colour palette
 
-| Token | Name | Hex | Use |
-| --- | --- | --- | --- |
-| `--color-primary` | Deep Teal | `#0A6C6C` | Dominant brand colour: primary buttons, active navigation, links, key UI. |
-| `--color-primary-dark` | Deep Teal (hover) | `#08595A` | Hover and pressed states. |
-| `--color-navy` | Navy Blue | `#13294B` | Headings, sidebar, strong text, footer. |
-| `--color-white` | White | `#FFFFFF` | Page backgrounds, cards, forms. |
-| `--color-mint` | Soft Mint | `#DDF3EC` | Subtle highlighted backgrounds, success badges, selected rows. |
-| `--color-mint-strong` | Mint accent | `#7FD6C2` | Accent on dark backgrounds, logo connection dot. |
-| `--color-turquoise` | Muted Turquoise | `#4FB3AE` | Secondary interactive details, charts, focus rings. |
-| `--color-surface` | Mist | `#F4F8F8` | App background behind cards. |
-| `--color-text` | Ink | `#1C2B3A` | Body text. |
-| `--color-text-muted` | Slate | `#4A5B73` | Secondary text and labels. |
-| `--color-border` | Line | `#DCE5E8` | Borders and dividers. |
+| Token                  | Name              | Hex       | Use                                                                       |
+| ---------------------- | ----------------- | --------- | ------------------------------------------------------------------------- |
+| `--color-primary`      | Deep Teal         | `#0A6C6C` | Dominant brand colour: primary buttons, active navigation, links, key UI. |
+| `--color-primary-dark` | Deep Teal (hover) | `#08595A` | Hover and pressed states.                                                 |
+| `--color-navy`         | Navy Blue         | `#13294B` | Headings, sidebar, strong text, footer.                                   |
+| `--color-white`        | White             | `#FFFFFF` | Page backgrounds, cards, forms.                                           |
+| `--color-mint`         | Soft Mint         | `#DDF3EC` | Subtle highlighted backgrounds, success badges, selected rows.            |
+| `--color-mint-strong`  | Mint accent       | `#7FD6C2` | Accent on dark backgrounds, logo connection dot.                          |
+| `--color-turquoise`    | Muted Turquoise   | `#4FB3AE` | Secondary interactive details, charts, focus rings.                       |
+| `--color-surface`      | Mist              | `#F4F8F8` | App background behind cards.                                              |
+| `--color-text`         | Ink               | `#1C2B3A` | Body text.                                                                |
+| `--color-text-muted`   | Slate             | `#4A5B73` | Secondary text and labels.                                                |
+| `--color-border`       | Line              | `#DCE5E8` | Borders and dividers.                                                     |
 
 **Status colours** (used sparingly, always with an icon or text, never colour alone):
 
-| Status | Hex |
-| --- | --- |
-| Success | `#1E8E5A` |
-| Warning | `#B7791F` |
+| Status          | Hex       |
+| --------------- | --------- |
+| Success         | `#1E8E5A` |
+| Warning         | `#B7791F` |
 | Danger / urgent | `#C2412D` |
-| Info | `#2B6CB0` |
+| Info            | `#2B6CB0` |
 
 Contrast checks: white text on Deep Teal is about 6.1 : 1 and Navy on white about 14 : 1, both above the WCAG AA requirement of 4.5 : 1.
 
@@ -68,14 +68,14 @@ Contrast checks: white text on Deep Teal is about 6.1 : 1 and Navy on white abou
 - System fallback: `'Segoe UI', Roboto, Arial, sans-serif`.
 - Base size 16 px, line height 1.55 for body text.
 
-| Style | Size / weight |
-| --- | --- |
+| Style          | Size / weight                 |
+| -------------- | ----------------------------- |
 | Display (hero) | 44 px / 800 (30 px on mobile) |
-| H1 | 32 px / 700 |
-| H2 | 24 px / 700 |
-| H3 | 19 px / 600 |
-| Body | 16 px / 400 |
-| Small / labels | 14 px / 500 |
+| H1             | 32 px / 700                   |
+| H2             | 24 px / 700                   |
+| H3             | 19 px / 600                   |
+| Body           | 16 px / 400                   |
+| Small / labels | 14 px / 500                   |
 
 ## 5. Interface style
 

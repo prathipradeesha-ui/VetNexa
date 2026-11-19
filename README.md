@@ -21,15 +21,15 @@ VetNexa connects pet owners, veterinarians, veterinary clinics, animal rescuers 
 
 ## Technology
 
-| Area | Technology |
-| --- | --- |
-| Front end | React, TypeScript, Vite |
-| Back end | Node.js, Express, TypeScript |
-| Database | MySQL with Prisma ORM |
-| AI | Python, PyTorch, OpenCV |
-| Testing | Vitest, Supertest, pytest |
-| Quality | ESLint, Prettier |
-| DevOps | Docker, Docker Compose, GitHub Actions |
+| Area      | Technology                             |
+| --------- | -------------------------------------- |
+| Front end | React, TypeScript, Vite                |
+| Back end  | Node.js, Express, TypeScript           |
+| Database  | MySQL with Prisma ORM                  |
+| AI        | Python, PyTorch, OpenCV                |
+| Testing   | Vitest, Supertest, pytest              |
+| Quality   | ESLint, Prettier                       |
+| DevOps    | Docker, Docker Compose, GitHub Actions |
 
 ## Documentation
 

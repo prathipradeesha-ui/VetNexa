@@ -48,12 +48,12 @@ VetNexa/
 
 ## 3. User roles
 
-| Role | Main capabilities |
-| --- | --- |
-| `OWNER` | Manage own profile and pets, health records, wound assessments, book consultations, adopt, review clinics. |
-| `VET` | View pets of owners who granted access / booked consultations, manage consultations, write treatment records and vaccinations. Account must be verified by an admin. |
-| `RESCUER` | Report animals needing rescue, create adoption listings, manage adoption applications. |
-| `ADMIN` | Manage users, verify vets, manage clinics, moderate reviews and listings, view platform statistics. |
+| Role      | Main capabilities                                                                                                                                                    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OWNER`   | Manage own profile and pets, health records, wound assessments, book consultations, adopt, review clinics.                                                           |
+| `VET`     | View pets of owners who granted access / booked consultations, manage consultations, write treatment records and vaccinations. Account must be verified by an admin. |
+| `RESCUER` | Report animals needing rescue, create adoption listings, manage adoption applications.                                                                               |
+| `ADMIN`   | Manage users, verify vets, manage clinics, moderate reviews and listings, view platform statistics.                                                                  |
 
 A user has exactly one role. Adopters are regular `OWNER` accounts, which keeps the model simple.
 
@@ -135,12 +135,12 @@ Two responsibilities:
 
 ## 8. Testing and quality
 
-| Layer | Tool | What is tested |
-| --- | --- | --- |
-| API unit + integration | Vitest + Supertest | Validation, auth, RBAC, each module's endpoints against a test database |
-| Front end | Vitest + Testing Library | Key components, forms and route guards |
-| AI service | pytest | Preprocessing, inference output shape, safety thresholds |
-| Static checks | ESLint, Prettier, TypeScript | Run on every push via GitHub Actions |
+| Layer                  | Tool                         | What is tested                                                          |
+| ---------------------- | ---------------------------- | ----------------------------------------------------------------------- |
+| API unit + integration | Vitest + Supertest           | Validation, auth, RBAC, each module's endpoints against a test database |
+| Front end              | Vitest + Testing Library     | Key components, forms and route guards                                  |
+| AI service             | pytest                       | Preprocessing, inference output shape, safety thresholds                |
+| Static checks          | ESLint, Prettier, TypeScript | Run on every push via GitHub Actions                                    |
 
 ## 9. Deployment
 
