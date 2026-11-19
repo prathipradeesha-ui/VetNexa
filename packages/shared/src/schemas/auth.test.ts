@@ -41,6 +41,19 @@ describe('registerSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('requires a licence number for veterinarians and normalises it', () => {
+    const missing = registerSchema.safeParse({ ...validRegistration, role: 'VET' });
+    expect(missing.success).toBe(false);
+    expect(missing.error?.issues[0]?.path).toEqual(['licenseNumber']);
+
+    const vet = registerSchema.parse({
+      ...validRegistration,
+      role: 'VET',
+      licenseNumber: ' slvc-2020-0101 ',
+    });
+    expect(vet.licenseNumber).toBe('SLVC-2020-0101');
+  });
+
   it('accepts local and international mobile numbers and an empty phone', () => {
     for (const phone of ['0771234567', '+94771234567', '']) {
       expect(registerSchema.safeParse({ ...validRegistration, phone }).success).toBe(true);

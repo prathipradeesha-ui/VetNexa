@@ -38,10 +38,32 @@ export const registerSchema = z
     password: passwordSchema,
     confirmPassword: z.string(),
     role: z.enum(SELF_REGISTER_ROLES).default('OWNER'),
+    // Only used when role is VET. The licence is checked by an administrator before the
+    // vet can see any patient information.
+    licenseNumber: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-Z0-9-]{5,40}$/, 'Enter your licence number as shown on your certificate')
+      .optional()
+      .or(z.literal('').transform(() => undefined)),
+    specialization: z.string().trim().max(120).optional(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      });
+    }
+    if (data.role === 'VET' && !data.licenseNumber) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Veterinarians must provide a licence number',
+        path: ['licenseNumber'],
+      });
+    }
   });
 
 export const loginSchema = z.object({
