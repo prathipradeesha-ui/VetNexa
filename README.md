@@ -31,6 +31,32 @@ VetNexa connects pet owners, veterinarians, veterinary clinics, animal rescuers 
 | Quality   | ESLint, Prettier                       |
 | DevOps    | Docker, Docker Compose, GitHub Actions |
 
+## Getting started
+
+Requirements: Node.js 20+, Docker Desktop.
+
+```bash
+npm install                                  # install all workspaces
+docker compose up -d db                      # start MySQL on port 3307
+cp apps/api/.env.example apps/api/.env       # local configuration
+npm run db:migrate -w @vetnexa/api           # create the tables
+npm run db:seed -w @vetnexa/api              # load demo data
+```
+
+Useful commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run db:studio -w @vetnexa/api` (browse the database).
+
+### Demo accounts
+
+All demo accounts use the password `VetNexa@2026` (defined in `apps/api/prisma/seed.ts`). Development use only.
+
+| Role                                 | Email                          |
+| ------------------------------------ | ------------------------------ |
+| Administrator                        | admin@vetnexa.lk               |
+| Pet owner                            | nimali.perera@example.com      |
+| Veterinarian (verified)              | dr.anjali@example.com          |
+| Veterinarian (awaiting verification) | dr.shalini@example.com         |
+| Rescuer                              | rescue@helpingpaws.example.com |
+
 ## Documentation
 
 - [Architecture](docs/architecture.md)
