@@ -72,6 +72,7 @@ All demo accounts use the password `VetNexa@2026` (defined in `apps/api/prisma/s
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [API reference](docs/api.md)
 - [Project plan](docs/project-plan.md)
 - [Brand guidelines](docs/brand-guidelines.md)
 

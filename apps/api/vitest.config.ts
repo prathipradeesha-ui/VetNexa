@@ -16,6 +16,7 @@ export default defineConfig({
       NODE_ENV: 'test',
       DATABASE_URL: TEST_DATABASE_URL,
       CORS_ORIGIN: 'http://localhost:5173',
+      JWT_SECRET: 'test-only-secret-that-is-long-enough-1234567890',
     },
     // Integration tests share one database, so test files run one after another.
     fileParallelism: false,
