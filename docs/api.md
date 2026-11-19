@@ -93,6 +93,25 @@ Body: `name`, `email`, optional `phone`, `topic` (`GENERAL`, `ACCOUNT_SUPPORT`, 
 `CLINIC_LISTING`, `RESCUE_ADOPTION`, `FEEDBACK`) and `message` (20–2000 characters).
 Returns `201` with a short `reference` the sender can quote.
 
+## Pets
+
+All routes require the `OWNER` role. Owners only ever see their own pets; another owner's
+pet ID returns `404`, so the API does not reveal that it exists.
+
+| Method | Path                 | Description                                                         |
+| ------ | -------------------- | ------------------------------------------------------------------- |
+| GET    | `/pets`              | My pets, each with `recordCount` and the `nextDue` health item.     |
+| POST   | `/pets`              | Add a pet. Only `name` and `species` are required.                  |
+| GET    | `/pets/:petId`       | One pet.                                                            |
+| PUT    | `/pets/:petId`       | Update a pet.                                                       |
+| DELETE | `/pets/:petId`       | Delete a pet with its photo and health records.                     |
+| PUT    | `/pets/:petId/photo` | Upload or replace the photo (`multipart/form-data`, field `photo`). |
+| DELETE | `/pets/:petId/photo` | Remove the photo.                                                   |
+
+**Photos:** JPG, PNG or WebP up to 5 MB. Every upload is decoded and re-encoded as an
+800 × 800 WebP, which rejects files that are not real images and removes location (EXIF)
+data from phone photos. Files get random names and are served from `/uploads/...`.
+
 ## Administration
 
 All routes require the `ADMIN` role.
