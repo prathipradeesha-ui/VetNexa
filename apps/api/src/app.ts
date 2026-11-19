@@ -9,10 +9,14 @@ import type { PrismaClient } from './generated/prisma/client';
 import { HttpError } from './lib/http-error';
 import { logger } from './lib/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { adminRouter } from './modules/admin/admin.routes';
+import { authRouter } from './modules/auth/auth.routes';
 import { healthRouter } from './modules/health/health.routes';
 
 export interface AppDependencies {
   prisma: PrismaClient;
+  /** Rate limiting is off by default in tests; a test can switch it on to check it works. */
+  rateLimits?: boolean;
 }
 
 /**
@@ -20,7 +24,7 @@ export interface AppDependencies {
  * Dependencies are passed in (instead of imported) so tests can supply a test database
  * or a fake client, and so Supertest can use the app without starting a real server.
  */
-export function createApp({ prisma }: AppDependencies) {
+export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppDependencies) {
   const app = express();
 
   // Behind Nginx / Docker the real client IP comes from X-Forwarded-For (needed for rate limiting).
@@ -46,8 +50,9 @@ export function createApp({ prisma }: AppDependencies) {
         autoLogging: { ignore: (req) => req.url === '/api/health' },
         // One short line per request, e.g. "GET /api/pets 200 12ms", without headers.
         customSuccessMessage: (req, res, responseTime) =>
-          `${req.method} ${req.url} ${res.statusCode} ${Math.round(responseTime)}ms`,
-        customErrorMessage: (req, res) => `${req.method} ${req.url} ${res.statusCode} failed`,
+          `${req.method} ${(req as express.Request).originalUrl} ${res.statusCode} ${Math.round(responseTime)}ms`,
+        customErrorMessage: (req, res) =>
+          `${req.method} ${(req as express.Request).originalUrl} ${res.statusCode} failed`,
         serializers: { req: () => undefined, res: () => undefined },
       }),
     );
@@ -61,13 +66,28 @@ export function createApp({ prisma }: AppDependencies) {
       limit: 600,
       standardHeaders: 'draft-8',
       legacyHeaders: false,
-      skip: () => env.NODE_ENV === 'test',
+      skip: () => !rateLimits,
       handler: (_req, _res, next) => next(HttpError.tooManyRequests()),
     }),
   );
 
+  // Strict limit on sign-in and sign-up to slow down password-guessing attacks.
+  // Successful logins do not count towards the limit.
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    skipSuccessfulRequests: true,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) =>
+      next(HttpError.tooManyRequests('Too many sign-in attempts. Please wait 15 minutes.')),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
+  app.use('/api/auth', authRouter(prisma, loginLimiter));
+  app.use('/api/admin', adminRouter(prisma));
 
   // ── Errors (must be registered last) ──
   app.use(notFoundHandler);

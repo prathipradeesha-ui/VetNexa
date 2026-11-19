@@ -26,4 +26,7 @@ const options: pino.LoggerOptions = {
 
 export const logger = isProduction
   ? pino(options)
-  : pino(options, pretty({ colorize: true, translateTime: 'HH:MM:ss', ignore: 'pid,hostname' }));
+  : pino(
+      options,
+      pretty({ colorize: true, translateTime: 'HH:MM:ss', ignore: 'pid,hostname,responseTime' }),
+    );
