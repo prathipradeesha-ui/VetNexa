@@ -2,6 +2,7 @@ import type { PetData } from '@vetnexa/shared';
 import type { Pet, PrismaClient } from '../../generated/prisma/client';
 import { HttpError } from '../../lib/http-error';
 import { deleteUpload, saveImage } from '../../lib/uploads';
+import { currentDueItems } from '../records/due-items';
 
 /** Converts database types (Decimal, Date) into plain JSON values for the API response. */
 export function toPetResponse(pet: Pet) {
@@ -62,33 +63,40 @@ export function petsService(prisma: PrismaClient) {
 
   return {
     async list(ownerId: string) {
-      const today = new Date(new Date().toISOString().slice(0, 10));
       const pets = await prisma.pet.findMany({
         where: { ownerId },
         orderBy: { createdAt: 'asc' },
         include: {
           _count: { select: { healthRecords: true } },
-          // The next upcoming vaccination, medication or check-up, for the pet cards.
+          // Records with due dates, to find the next (or overdue) item for the pet card.
           healthRecords: {
-            where: { nextDueDate: { gte: today } },
-            orderBy: { nextDueDate: 'asc' },
-            take: 1,
-            select: { title: true, type: true, nextDueDate: true },
+            where: { nextDueDate: { not: null } },
+            select: {
+              title: true,
+              type: true,
+              recordDate: true,
+              nextDueDate: true,
+              createdAt: true,
+            },
           },
         },
       });
 
-      return pets.map(({ _count, healthRecords, ...pet }) => ({
-        ...toPetResponse(pet),
-        recordCount: _count.healthRecords,
-        nextDue: healthRecords[0]
-          ? {
-              title: healthRecords[0].title,
-              type: healthRecords[0].type,
-              date: healthRecords[0].nextDueDate!.toISOString().slice(0, 10),
-            }
-          : null,
-      }));
+      return pets.map(({ _count, healthRecords, ...pet }) => {
+        // Soonest item, overdue ones included, using the same rule as the reminders.
+        const next = currentDueItems(healthRecords, () => pet.id)[0];
+        return {
+          ...toPetResponse(pet),
+          recordCount: _count.healthRecords,
+          nextDue: next
+            ? {
+                title: next.title,
+                type: next.type,
+                date: next.nextDueDate.toISOString().slice(0, 10),
+              }
+            : null,
+        };
+      });
     },
 
     async get(ownerId: string, petId: string) {

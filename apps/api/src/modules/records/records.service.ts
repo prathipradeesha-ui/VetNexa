@@ -1,6 +1,7 @@
 import type { HealthRecordData } from '@vetnexa/shared';
 import type { HealthRecord, PrismaClient, User } from '../../generated/prisma/client';
 import { HttpError } from '../../lib/http-error';
+import { currentDueItems } from './due-items';
 
 type RecordWithAuthor = HealthRecord & {
   createdBy: Pick<User, 'id' | 'firstName' | 'lastName' | 'role'> | null;
@@ -110,50 +111,42 @@ export function recordsService(prisma: PrismaClient) {
     /**
      * Upcoming and overdue care across all of an owner's pets.
      *
-     * Repeated items (e.g. yearly rabies vaccines) appear several times in a pet's history.
-     * Only the most recent entry for each pet + type + title counts: once a new rabies vaccine
-     * is recorded, the older entry's due date no longer creates a reminder.
+     * Overdue items and anything due within REMINDER_WINDOW_DAYS, soonest first.
+     * See currentDueItems for how repeated items (e.g. yearly vaccines) are handled.
      */
     async reminders(ownerId: string, today = new Date()) {
       const records = await prisma.healthRecord.findMany({
         where: { pet: { ownerId } },
-        orderBy: [{ recordDate: 'desc' }, { createdAt: 'desc' }],
         select: {
           id: true,
           type: true,
           title: true,
           recordDate: true,
           nextDueDate: true,
+          createdAt: true,
           pet: { select: { id: true, name: true, species: true, photoUrl: true } },
         },
       });
 
       const startOfToday = new Date(today.toISOString().slice(0, 10));
       const windowEnd = new Date(startOfToday.getTime() + REMINDER_WINDOW_DAYS * 86_400_000);
-      const latestSeen = new Set<string>();
-      const reminders = [];
 
-      for (const record of records) {
-        const key = `${record.pet.id}|${record.type}|${record.title.trim().toLowerCase()}`;
-        if (latestSeen.has(key)) continue; // an older entry of the same item
-        latestSeen.add(key);
-        if (!record.nextDueDate || record.nextDueDate > windowEnd) continue;
-
-        const daysUntilDue = Math.round(
-          (record.nextDueDate.getTime() - startOfToday.getTime()) / 86_400_000,
-        );
-        reminders.push({
-          recordId: record.id,
-          type: record.type,
-          title: record.title,
-          dueDate: dateOnly(record.nextDueDate)!,
-          daysUntilDue,
-          status: daysUntilDue < 0 ? ('OVERDUE' as const) : ('UPCOMING' as const),
-          pet: record.pet,
+      return currentDueItems(records, (record) => record.pet.id)
+        .filter((record) => record.nextDueDate <= windowEnd)
+        .map((record) => {
+          const daysUntilDue = Math.round(
+            (record.nextDueDate.getTime() - startOfToday.getTime()) / 86_400_000,
+          );
+          return {
+            recordId: record.id,
+            type: record.type,
+            title: record.title,
+            dueDate: dateOnly(record.nextDueDate)!,
+            daysUntilDue,
+            status: daysUntilDue < 0 ? ('OVERDUE' as const) : ('UPCOMING' as const),
+            pet: record.pet,
+          };
         });
-      }
-
-      return reminders.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
     },
   };
 }

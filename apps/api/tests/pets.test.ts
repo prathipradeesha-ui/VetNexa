@@ -64,42 +64,33 @@ describe('pet profiles', () => {
     await agent.get(`/api/pets/${id}`).expect(404);
   });
 
-  it('shows the next upcoming health item on the pet card', async () => {
+  it('shows the most urgent health item on the pet card, overdue ones first', async () => {
     const { owner, agent } = await ownerWithAgent();
     const pet = await testPrisma.pet.create({
       data: { ownerId: owner.id, name: 'Luna', species: 'CAT' },
     });
     const inDays = (days: number) => new Date(Date.now() + days * 86_400_000);
-    await testPrisma.healthRecord.createMany({
-      data: [
-        {
+    const add = (title: string, recordOffset: number, dueOffset: number) =>
+      testPrisma.healthRecord.create({
+        data: {
           petId: pet.id,
           type: 'VACCINATION',
-          title: 'Old rabies',
-          recordDate: inDays(-400),
-          nextDueDate: inDays(-30),
+          title,
+          recordDate: inDays(recordOffset),
+          nextDueDate: inDays(dueOffset),
         },
-        {
-          petId: pet.id,
-          type: 'MEDICATION',
-          title: 'Deworming',
-          recordDate: inDays(-80),
-          nextDueDate: inDays(40),
-        },
-        {
-          petId: pet.id,
-          type: 'VACCINATION',
-          title: 'FVRCP booster',
-          recordDate: inDays(-355),
-          nextDueDate: inDays(10),
-        },
-      ],
-    });
+      });
 
-    const res = await agent.get('/api/pets').expect(200);
+    await add('Rabies vaccine', -400, -30); // overdue
+    await add('FVRCP booster', -355, 10);
+    let res = await agent.get('/api/pets').expect(200);
+    expect(res.body.pets[0].nextDue).toMatchObject({ title: 'Rabies vaccine' });
 
+    // Once this year's rabies vaccine is recorded, the booster becomes the next item.
+    await add('Rabies vaccine', 0, 365);
+    res = await agent.get('/api/pets').expect(200);
     expect(res.body.pets[0].recordCount).toBe(3);
-    expect(res.body.pets[0].nextDue).toMatchObject({ title: 'FVRCP booster', type: 'VACCINATION' });
+    expect(res.body.pets[0].nextDue).toMatchObject({ title: 'FVRCP booster' });
   });
 
   it('returns field errors for invalid data', async () => {
