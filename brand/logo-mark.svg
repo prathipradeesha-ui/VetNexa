@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t">
+  <title id="t">VetNexa</title>
+  <rect width="64" height="64" rx="16" fill="#0A6C6C"/>
+  <circle cx="52.5" cy="11.5" r="3.2" fill="#7FD6C2"/>
+  <g fill="#FFFFFF">
+    <ellipse cx="17.5" cy="27" rx="4.3" ry="5.4" transform="rotate(-28 17.5 27)"/>
+    <ellipse cx="26" cy="18.5" rx="4.5" ry="5.9" transform="rotate(-9 26 18.5)"/>
+    <ellipse cx="38" cy="18.5" rx="4.5" ry="5.9" transform="rotate(9 38 18.5)"/>
+    <ellipse cx="46.5" cy="27" rx="4.3" ry="5.4" transform="rotate(28 46.5 27)"/>
+    <path d="M32 29c6 0 13.5 7 13.5 14 0 6-5 9.2-9.6 8.1-1.7-.4-2.8-.9-3.9-.9s-2.2.5-3.9.9c-4.6 1.1-9.6-2.1-9.6-8.1C18.5 36 26 29 32 29z"/>
+  </g>
+  <g fill="#0A6C6C"><rect x="30" y="35" width="4" height="12.5" rx="1.2"/><rect x="25.75" y="39.25" width="12.5" height="4" rx="1.2"/></g>
+</svg>

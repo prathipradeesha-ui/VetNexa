@@ -7,7 +7,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | # | Stage | Main deliverables | Status |
 | --- | --- | --- | --- |
 | 1 | Planning and architecture | Architecture document, project plan, repository conventions | Done |
-| 2 | Brand identity | Logo set (full, mark, mono, favicon), colour palette, typography, brand guidelines | Planned |
+| 2 | Brand identity | Logo set (full, mark, mono, favicon), colour palette, typography, brand guidelines | Done |
 | 3 | Monorepo setup | npm workspaces, TypeScript config, ESLint, Prettier, shared package | Planned |
 | 4 | Database design | Prisma schema, migrations, realistic seed data | Planned |
 | 5 | API foundation | Express app, error handling, logging, health check, test setup | Planned |

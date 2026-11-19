@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/logo-stacked.svg" alt="VetNexa" width="220"></p>
+
 # VetNexa
 
 **AI-assisted pet healthcare and animal welfare platform.**
@@ -33,6 +35,7 @@ VetNexa connects pet owners, veterinarians, veterinary clinics, animal rescuers 
 
 - [Architecture](docs/architecture.md)
 - [Project plan](docs/project-plan.md)
+- [Brand guidelines](docs/brand-guidelines.md)
 
 ## Project owner
 
