@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp.*
+
+# Build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# AI model artefacts and datasets (too large for Git)
+services/ai/data/raw/
+services/ai/data/processed/
+services/ai/models/*.pt
+services/ai/models/*.pth
+!services/ai/models/.gitkeep
+
+# Uploaded files
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
