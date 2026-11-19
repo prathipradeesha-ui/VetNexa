@@ -41,7 +41,19 @@ docker compose up -d db                      # start MySQL on port 3307
 cp apps/api/.env.example apps/api/.env       # local configuration
 npm run db:migrate -w @vetnexa/api           # create the tables
 npm run db:seed -w @vetnexa/api              # load demo data
+npm run dev -w @vetnexa/api                  # start the API on http://localhost:4100
 ```
+
+Check the API is running: http://localhost:4100/api/health
+
+### Local ports
+
+| Service        | Port |
+| -------------- | ---- |
+| API            | 4100 |
+| MySQL (Docker) | 3307 |
+
+API tests use a separate `vetnexa_test` database, which is created and migrated automatically when you run `npm test`.
 
 Useful commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run db:studio -w @vetnexa/api` (browse the database).
 
