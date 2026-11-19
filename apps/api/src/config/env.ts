@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 
 /**
@@ -16,6 +17,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   // How long a login lasts, in hours.
   SESSION_HOURS: z.coerce.number().positive().max(720).default(12),
+  // Where uploaded photos are stored. Defaults to apps/api/uploads.
+  UPLOAD_DIR: z.string().default(fileURLToPath(new URL('../../uploads', import.meta.url))),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 });
 

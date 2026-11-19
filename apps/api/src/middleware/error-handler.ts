@@ -20,6 +20,13 @@ function toHttpError(error: unknown): HttpError {
       return new HttpError(413, 'PAYLOAD_TOO_LARGE', 'Request body is too large');
   }
 
+  // Errors from Express's own middleware (e.g. a missing static file) carry a 4xx status.
+  if (typeof error === 'object' && error !== null && 'status' in error) {
+    const status = Number(error.status);
+    if (status === 404) return HttpError.notFound('File not found');
+    if (status >= 400 && status < 500) return HttpError.badRequest();
+  }
+
   // Prisma: unique constraint and missing-record errors.
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002')

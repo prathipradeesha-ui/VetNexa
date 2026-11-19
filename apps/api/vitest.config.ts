@@ -1,3 +1,5 @@
+import os from 'node:os';
+import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 /**
@@ -16,6 +18,8 @@ export default defineConfig({
       NODE_ENV: 'test',
       DATABASE_URL: TEST_DATABASE_URL,
       CORS_ORIGIN: 'http://localhost:5173',
+      // Uploaded test images go to a temporary folder, never into the real uploads folder.
+      UPLOAD_DIR: path.join(os.tmpdir(), 'vetnexa-test-uploads'),
       JWT_SECRET: 'test-only-secret-that-is-long-enough-1234567890',
     },
     // Integration tests share one database, so test files run one after another.

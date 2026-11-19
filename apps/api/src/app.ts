@@ -12,6 +12,8 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter } from './modules/auth/auth.routes';
 import { contactRouter } from './modules/contact/contact.routes';
+import { petsRouter } from './modules/pets/pets.routes';
+import { uploadRoot, UPLOADS_URL_PREFIX } from './lib/uploads';
 import { healthRouter } from './modules/health/health.routes';
 
 export interface AppDependencies {
@@ -59,6 +61,18 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
     );
   }
 
+  // Uploaded photos. Names are random and files are re-encoded images, so they are safe to serve;
+  // Helmet's nosniff header stops browsers from treating them as anything else.
+  app.use(
+    UPLOADS_URL_PREFIX,
+    express.static(uploadRoot(), {
+      index: false,
+      dotfiles: 'deny',
+      maxAge: '7d',
+      fallthrough: false,
+    }),
+  );
+
   // General limit for every API route; stricter limits are added on login and AI routes later.
   app.use(
     '/api',
@@ -101,6 +115,7 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
   app.use('/api/auth', authRouter(prisma, loginLimiter));
   app.use('/api/admin', adminRouter(prisma));
   app.use('/api/contact', contactRouter(prisma, contactLimiter));
+  app.use('/api/pets', petsRouter(prisma));
 
   // ── Errors (must be registered last) ──
   app.use(notFoundHandler);
