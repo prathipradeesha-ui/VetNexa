@@ -46,7 +46,15 @@ export function PetsPage() {
       {pets.isSuccess && pets.data.length > 0 && (
         <ul className="pet-grid">
           {pets.data.map((pet) => {
-            const dueSoon = pet.nextDue && daysUntil(pet.nextDue.date) <= 30;
+            const dueIn = pet.nextDue ? daysUntil(pet.nextDue.date) : null;
+            const dueClass =
+              dueIn === null
+                ? ''
+                : dueIn < 0
+                  ? 'pet-card__due pet-card__due--overdue'
+                  : dueIn <= 30
+                    ? 'pet-card__due pet-card__due--soon'
+                    : 'pet-card__due';
             return (
               <li key={pet.id}>
                 <Link to={`/dashboard/pets/${pet.id}`} className="card pet-card">
@@ -64,9 +72,7 @@ export function PetsPage() {
                       {pet.recordCount} health record{pet.recordCount === 1 ? '' : 's'}
                     </span>
                     {pet.nextDue ? (
-                      <span
-                        className={dueSoon ? 'pet-card__due pet-card__due--soon' : 'pet-card__due'}
-                      >
+                      <span className={dueClass}>
                         <CalendarClock size={16} aria-hidden="true" />
                         {pet.nextDue.title}: {dueLabel(pet.nextDue.date)}
                       </span>

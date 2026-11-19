@@ -101,3 +101,44 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
+
+.reminder-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+.reminder {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+}
+.reminder:hover {
+  background: var(--color-surface);
+  color: inherit;
+}
+.reminder .record-icon {
+  border: 0;
+}
+.reminder__text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.reminder__text strong {
+  color: var(--color-navy);
+  font-size: var(--text-sm);
+}
+.reminder__text span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.reminder .badge {
+  white-space: nowrap;
+}

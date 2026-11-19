@@ -4,6 +4,7 @@ import { useLocation } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
 import { PageLoader } from '../../components/ui/PageLoader';
 import { useCurrentUser } from '../auth/useAuth';
+import { CareRemindersCard } from './CareRemindersCard';
 import { MyPetsCard } from './MyPetsCard';
 import { PendingVetsCard } from './PendingVetsCard';
 import './dashboard.css';
@@ -122,6 +123,7 @@ export function DashboardPage() {
           </section>
         )}
 
+        {user.role === 'OWNER' && <CareRemindersCard />}
         {user.role === 'OWNER' && <MyPetsCard />}
         {user.role === 'ADMIN' && <PendingVetsCard />}
       </div>

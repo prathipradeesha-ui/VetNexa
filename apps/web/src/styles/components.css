@@ -238,6 +238,10 @@
   background: var(--color-warning-bg);
   color: #85571a;
 }
+.badge--danger {
+  background: var(--color-danger-bg);
+  color: #8f2c1e;
+}
 .badge--neutral {
   background: var(--color-surface);
   color: var(--color-text-muted);
@@ -342,4 +346,36 @@
 .pet-avatar--photo {
   object-fit: cover;
   background: var(--color-surface);
+}
+
+/* ── Record type icons ── */
+.record-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 3px solid var(--color-white);
+  background: var(--color-mint);
+  color: var(--color-primary);
+}
+.record-icon--treatment,
+.record-icon--surgery {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+.record-icon--medication {
+  background: #efe9fb;
+  color: #6b46c1;
+}
+.record-icon--allergy {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+.record-icon--checkup {
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }

@@ -72,6 +72,20 @@ export const routes: RouteObject[] = [
                     path: '/dashboard/pets/:petId/edit',
                     lazy: lazyPage(() => import('./features/pets/PetFormPage'), 'PetFormPage'),
                   },
+                  {
+                    path: '/dashboard/pets/:petId/records/new',
+                    lazy: lazyPage(
+                      () => import('./features/records/RecordFormPage'),
+                      'RecordFormPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/pets/:petId/records/:recordId/edit',
+                    lazy: lazyPage(
+                      () => import('./features/records/RecordFormPage'),
+                      'RecordFormPage',
+                    ),
+                  },
                 ],
               },
             ],

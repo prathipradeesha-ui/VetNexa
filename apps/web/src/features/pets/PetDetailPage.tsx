@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { PageLoader } from '../../components/ui/PageLoader';
+import { HealthTimeline } from '../records/HealthTimeline';
 import { formatDate } from './format';
 import { PetAvatar } from './PetAvatar';
 import { useDeletePet, usePet, usePetPhoto, type Pet } from './usePets';
@@ -33,7 +34,7 @@ export function PetDetailPage() {
 function PetDetail({ pet }: { pet: Pet }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const saved = (location.state as { saved?: 'created' | 'updated' } | null)?.saved;
+  const saved = (location.state as { saved?: 'created' | 'updated' | 'record' } | null)?.saved;
   const { upload, remove } = usePetPhoto(pet.id);
   const deletePet = useDeletePet();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -86,7 +87,11 @@ function PetDetail({ pet }: { pet: Pet }) {
 
       {saved && (
         <Alert tone="success">
-          {saved === 'created' ? `${pet.name} has been added.` : 'Changes saved.'}
+          {saved === 'created'
+            ? `${pet.name} has been added.`
+            : saved === 'record'
+              ? 'Health record saved.'
+              : 'Changes saved.'}
         </Alert>
       )}
 
@@ -153,6 +158,8 @@ function PetDetail({ pet }: { pet: Pet }) {
           )}
         </div>
       </section>
+
+      <HealthTimeline petId={pet.id} petName={pet.name} />
 
       <section className="card danger-zone" aria-labelledby="delete-heading">
         <h2 id="delete-heading">Delete {pet.name}’s profile</h2>
