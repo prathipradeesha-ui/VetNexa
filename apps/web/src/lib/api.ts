@@ -26,14 +26,32 @@ const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export async function api<T>(path: string, options: { method?: Method; body?: unknown } = {}) {
+  return request<T>(path, {
+    method: options.method ?? 'GET',
+    headers: options.body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+  });
+}
+
+/**
+ * Uploads one file as multipart/form-data (the browser sets the boundary header itself).
+ * Used for photos; the API validates the file again on the server.
+ */
+export async function apiUpload<T>(
+  path: string,
+  field: string,
+  file: File,
+  method: Method = 'PUT',
+) {
+  const form = new FormData();
+  form.append(field, file);
+  return request<T>(path, { method, body: form });
+}
+
+async function request<T>(path: string, init: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}${path}`, {
-      method: options.method ?? 'GET',
-      credentials: 'include',
-      headers: options.body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
-      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
-    });
+    response = await fetch(`${API_BASE}${path}`, { ...init, credentials: 'include' });
   } catch {
     throw new ApiError(
       0,

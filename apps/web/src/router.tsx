@@ -52,6 +52,28 @@ export const routes: RouteObject[] = [
                 path: '/dashboard',
                 lazy: lazyPage(() => import('./features/dashboard/DashboardPage'), 'DashboardPage'),
               },
+              {
+                // Pet owners only; the API enforces the same rule.
+                element: <ProtectedRoute roles={['OWNER']} />,
+                children: [
+                  {
+                    path: '/dashboard/pets',
+                    lazy: lazyPage(() => import('./features/pets/PetsPage'), 'PetsPage'),
+                  },
+                  {
+                    path: '/dashboard/pets/new',
+                    lazy: lazyPage(() => import('./features/pets/PetFormPage'), 'PetFormPage'),
+                  },
+                  {
+                    path: '/dashboard/pets/:petId',
+                    lazy: lazyPage(() => import('./features/pets/PetDetailPage'), 'PetDetailPage'),
+                  },
+                  {
+                    path: '/dashboard/pets/:petId/edit',
+                    lazy: lazyPage(() => import('./features/pets/PetFormPage'), 'PetFormPage'),
+                  },
+                ],
+              },
             ],
           },
         ],

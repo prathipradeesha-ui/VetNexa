@@ -10,6 +10,7 @@ export default defineConfig({
     // and the HttpOnly session cookie works without cross-site settings.
     proxy: {
       '/api': { target: 'http://localhost:4100', changeOrigin: false },
+      '/uploads': { target: 'http://localhost:4100', changeOrigin: false },
     },
   },
   test: {

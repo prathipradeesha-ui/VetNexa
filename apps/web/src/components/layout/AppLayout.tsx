@@ -1,13 +1,25 @@
-import { ROLE_LABELS } from '@vetnexa/shared';
-import { Globe, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
+import { ROLE_LABELS, type UserRole } from '@vetnexa/shared';
+import { Globe, LayoutDashboard, LogOut, Menu, PawPrint, X, type LucideIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useCurrentUser, useLogout } from '../../features/auth/useAuth';
 import { Logo } from '../brand/Logo';
 import './app-layout.css';
 
-/** Sidebar items. Each later module adds its entry here, with the roles that may see it. */
-const navItems = [{ to: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true }];
+interface NavItem {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  end?: boolean;
+  /** Roles that see this item; all roles when omitted. */
+  roles?: UserRole[];
+}
+
+/** Sidebar items. Each module adds its entry here, with the roles that may see it. */
+const navItems: NavItem[] = [
+  { to: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/dashboard/pets', label: 'My pets', icon: PawPrint, roles: ['OWNER'] },
+];
 
 /**
  * Shell for signed-in pages: a navy sidebar on desktop that becomes a slide-in drawer
@@ -72,18 +84,20 @@ export function AppLayout() {
         </div>
 
         <nav className="app-nav">
-          {navItems.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className="app-nav__link"
-              onClick={() => setDrawerOpen(false)}
-            >
-              <Icon size={19} aria-hidden="true" />
-              {label}
-            </NavLink>
-          ))}
+          {navItems
+            .filter((item) => !item.roles || item.roles.includes(user.role))
+            .map(({ to, label, icon: Icon, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className="app-nav__link"
+                onClick={() => setDrawerOpen(false)}
+              >
+                <Icon size={19} aria-hidden="true" />
+                {label}
+              </NavLink>
+            ))}
           <Link to="/" className="app-nav__link">
             <Globe size={19} aria-hidden="true" />
             Public website
