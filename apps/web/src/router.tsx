@@ -1,0 +1,63 @@
+import type React from 'react';
+import { createBrowserRouter, Outlet, ScrollRestoration, type RouteObject } from 'react-router';
+import { PublicLayout } from './components/layout/PublicLayout';
+import { ProtectedRoute } from './features/auth/ProtectedRoute';
+import { AboutPage } from './pages/about/AboutPage';
+import { HomePage } from './pages/home/HomePage';
+import { NotFoundPage } from './pages/NotFoundPage';
+
+/*
+ * Pages with forms and the signed-in area are loaded on demand ("code splitting"), so the
+ * home page downloads only what it needs. Each `lazy` import becomes a separate file.
+ */
+const lazyPage =
+  <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, name: K) =>
+  async () => ({ Component: (await load())[name] });
+
+/** All application routes. Exported separately so tests can build a memory router from them. */
+export const routes: RouteObject[] = [
+  {
+    // Root: scrolls to the top on every page change (and restores position on Back).
+    element: (
+      <>
+        <ScrollRestoration />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        element: <PublicLayout />,
+        children: [
+          { path: '/', element: <HomePage /> },
+          { path: '/about', element: <AboutPage /> },
+          {
+            path: '/contact',
+            lazy: lazyPage(() => import('./pages/contact/ContactPage'), 'ContactPage'),
+          },
+          { path: '*', element: <NotFoundPage /> },
+        ],
+      },
+      { path: '/login', lazy: lazyPage(() => import('./features/auth/LoginPage'), 'LoginPage') },
+      {
+        path: '/register',
+        lazy: lazyPage(() => import('./features/auth/RegisterPage'), 'RegisterPage'),
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            lazy: lazyPage(() => import('./components/layout/AppLayout'), 'AppLayout'),
+            children: [
+              {
+                path: '/dashboard',
+                lazy: lazyPage(() => import('./features/dashboard/DashboardPage'), 'DashboardPage'),
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export const router = createBrowserRouter(routes);

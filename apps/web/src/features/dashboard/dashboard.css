@@ -1,0 +1,116 @@
+.dashboard-grid {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (min-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+}
+.card-title svg {
+  color: var(--color-primary);
+}
+.profile-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.profile-card__header h2 {
+  margin-bottom: var(--space-1);
+}
+.profile-card__avatar {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-full);
+  background: var(--color-mint);
+  color: var(--color-primary);
+}
+.detail-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+.detail-list > div {
+  display: grid;
+  gap: 2px;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+.detail-list > div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+@media (min-width: 560px) {
+  .detail-list > div {
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+  }
+}
+.detail-list dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.detail-list dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-navy);
+  word-break: break-word;
+}
+
+.pending-vets {
+  grid-column: 1 / -1;
+}
+.pending-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.pending-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.pending-list__item strong {
+  display: block;
+  color: var(--color-navy);
+}
+.pending-list__item span {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.empty-state svg {
+  color: var(--color-success);
+}
+.empty-state p {
+  margin: 0;
+}
