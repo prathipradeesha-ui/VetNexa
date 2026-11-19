@@ -44,3 +44,6 @@ apps/api/uploads/*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Generated Prisma client (re-created with "npm run db:generate")
+apps/api/src/generated/

@@ -1,0 +1,32 @@
+{
+  "name": "@vetnexa/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "VetNexa REST API (Express + Prisma)",
+  "scripts": {
+    "pretypecheck": "prisma generate",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset --force",
+    "db:studio": "prisma studio"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "prisma": "^7.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.1"
+  },
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "@vetnexa/shared": "^0.1.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2"
+  }
+}

@@ -1,0 +1,415 @@
+// VetNexa data model.
+// Enum values match packages/shared/src/enums.ts so the front end and API use the same names.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ─────────────────────────────── Users and roles ───────────────────────────────
+
+enum UserRole {
+  OWNER
+  VET
+  RESCUER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique @db.VarChar(191)
+  passwordHash String
+  firstName    String        @db.VarChar(60)
+  lastName     String        @db.VarChar(60)
+  phone        String?       @db.VarChar(20)
+  role         UserRole      @default(OWNER)
+  status       AccountStatus @default(ACTIVE)
+  avatarUrl    String?
+  city         String?       @db.VarChar(80)
+  lastLoginAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  vetProfile            VetProfile?
+  pets                  Pet[]
+  recordsCreated        HealthRecord[]        @relation("RecordAuthor")
+  assessments           WoundAssessment[]
+  ownerConsultations    Consultation[]        @relation("ConsultationOwner")
+  vetConsultations      Consultation[]        @relation("ConsultationVet")
+  adoptionListings      AdoptionListing[]
+  adoptionApplications  AdoptionApplication[]
+  rescueReports         RescueReport[]        @relation("RescueReporter")
+  assignedRescueReports RescueReport[]        @relation("RescueAssignee")
+  reviews               Review[]
+  chatMessages          ChatMessage[]
+
+  @@index([role])
+}
+
+/// Extra professional details for users with the VET role. Admins verify the licence before
+/// the vet can access patient records.
+model VetProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  licenseNumber   String    @unique @db.VarChar(40)
+  specialization  String?   @db.VarChar(120)
+  yearsExperience Int?
+  bio             String?   @db.Text
+  isVerified      Boolean   @default(false)
+  verifiedAt      DateTime?
+  clinicId        String?
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic Clinic? @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+
+  @@index([clinicId])
+}
+
+// ─────────────────────────────── Pets and health ───────────────────────────────
+
+enum Species {
+  DOG
+  CAT
+  RABBIT
+  BIRD
+  OTHER
+}
+
+enum PetSex {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+model Pet {
+  id          String    @id @default(cuid())
+  ownerId     String
+  name        String    @db.VarChar(60)
+  species     Species
+  breed       String?   @db.VarChar(80)
+  sex         PetSex    @default(UNKNOWN)
+  dateOfBirth DateTime? @db.Date
+  weightKg    Decimal?  @db.Decimal(5, 2)
+  color       String?   @db.VarChar(60)
+  microchipId String?   @unique @db.VarChar(40)
+  isNeutered  Boolean   @default(false)
+  photoUrl    String?
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  owner         User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  healthRecords HealthRecord[]
+  assessments   WoundAssessment[]
+  consultations Consultation[]
+
+  @@index([ownerId])
+}
+
+enum HealthRecordType {
+  VACCINATION
+  TREATMENT
+  CHECKUP
+  MEDICATION
+  ALLERGY
+  SURGERY
+}
+
+/// A single entry in a pet's medical history. `nextDueDate` drives vaccination and
+/// medication reminders on the owner dashboard.
+model HealthRecord {
+  id          String           @id @default(cuid())
+  petId       String
+  type        HealthRecordType
+  title       String           @db.VarChar(120)
+  description String?          @db.Text
+  recordDate  DateTime         @db.Date
+  nextDueDate DateTime?        @db.Date
+  vetName     String?          @db.VarChar(120)
+  clinicName  String?          @db.VarChar(120)
+  createdById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  pet       Pet   @relation(fields: [petId], references: [id], onDelete: Cascade)
+  createdBy User? @relation("RecordAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([petId, recordDate])
+  @@index([nextDueDate])
+}
+
+// ─────────────────────────────── AI wound assessment ───────────────────────────────
+
+enum WoundSeverity {
+  MINOR
+  MODERATE
+  SEVERE
+  UNCERTAIN
+}
+
+/// Result of one AI wound assessment. The model output is stored exactly as returned
+/// (class, confidence and per-class probabilities) so results can be audited later.
+model WoundAssessment {
+  id             String        @id @default(cuid())
+  petId          String
+  userId         String
+  imageUrl       String
+  predictedClass String        @db.VarChar(60)
+  confidence     Decimal       @db.Decimal(5, 4)
+  severity       WoundSeverity
+  probabilities  Json
+  guidance       String        @db.Text
+  modelVersion   String        @db.VarChar(40)
+  ownerNotes     String?       @db.Text
+  createdAt      DateTime      @default(now())
+
+  pet  Pet  @relation(fields: [petId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([petId, createdAt])
+  @@index([userId])
+}
+
+// ─────────────────────────────── Clinics and consultations ───────────────────────────────
+
+model Clinic {
+  id            String   @id @default(cuid())
+  name          String   @db.VarChar(120)
+  slug          String   @unique @db.VarChar(140)
+  description   String?  @db.Text
+  addressLine   String   @db.VarChar(200)
+  city          String   @db.VarChar(80)
+  district      String   @db.VarChar(80)
+  latitude      Decimal? @db.Decimal(9, 6)
+  longitude     Decimal? @db.Decimal(9, 6)
+  phone         String   @db.VarChar(20)
+  email         String?  @db.VarChar(191)
+  website       String?  @db.VarChar(191)
+  services      Json // list of service names, e.g. ["Vaccination", "Surgery"]
+  openingHours  Json // e.g. { "mon": "08:00-20:00", ... }
+  hasEmergency  Boolean  @default(false)
+  isOpen24Hours Boolean  @default(false)
+  imageUrl      String?
+  isActive      Boolean  @default(true)
+  averageRating Decimal  @default(0) @db.Decimal(3, 2)
+  reviewCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  vets          VetProfile[]
+  consultations Consultation[]
+  reviews       Review[]
+
+  @@index([city])
+  @@index([district])
+}
+
+enum ConsultationStatus {
+  REQUESTED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum ConsultationType {
+  IN_PERSON
+  VIDEO
+}
+
+model Consultation {
+  id          String             @id @default(cuid())
+  petId       String
+  ownerId     String
+  vetId       String?
+  clinicId    String?
+  type        ConsultationType   @default(IN_PERSON)
+  status      ConsultationStatus @default(REQUESTED)
+  scheduledAt DateTime
+  reason      String             @db.Text
+  diagnosis   String?            @db.Text
+  treatment   String?            @db.Text
+  vetNotes    String?            @db.Text
+  followUpAt  DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  pet    Pet     @relation(fields: [petId], references: [id], onDelete: Cascade)
+  owner  User    @relation("ConsultationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  vet    User?   @relation("ConsultationVet", fields: [vetId], references: [id], onDelete: SetNull)
+  clinic Clinic? @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId, scheduledAt])
+  @@index([vetId, scheduledAt])
+  @@index([status])
+}
+
+// ─────────────────────────────── Reviews ───────────────────────────────
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id        String           @id @default(cuid())
+  clinicId  String
+  authorId  String
+  rating    Int // 1 to 5, validated in the API
+  title     String?          @db.VarChar(120)
+  comment   String           @db.Text
+  status    ModerationStatus @default(APPROVED)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // One review per user per clinic; users edit their review instead of posting duplicates.
+  @@unique([clinicId, authorId])
+  @@index([status])
+}
+
+// ─────────────────────────────── Rescue and adoption ───────────────────────────────
+
+enum RescueUrgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RescueStatus {
+  OPEN
+  IN_PROGRESS
+  RESCUED
+  CLOSED
+}
+
+/// A report of an animal that needs help (injured, abandoned or in danger).
+/// Anyone signed in can report; rescuers pick reports up and update their status.
+model RescueReport {
+  id           String        @id @default(cuid())
+  reporterId   String
+  assignedToId String?
+  species      Species
+  title        String        @db.VarChar(120)
+  description  String        @db.Text
+  locationText String        @db.VarChar(200)
+  city         String        @db.VarChar(80)
+  latitude     Decimal?      @db.Decimal(9, 6)
+  longitude    Decimal?      @db.Decimal(9, 6)
+  urgency      RescueUrgency @default(MEDIUM)
+  status       RescueStatus  @default(OPEN)
+  photoUrl     String?
+  contactPhone String?       @db.VarChar(20)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  reporter   User  @relation("RescueReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  assignedTo User? @relation("RescueAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@index([status, urgency])
+  @@index([city])
+}
+
+enum AdoptionStatus {
+  AVAILABLE
+  PENDING
+  ADOPTED
+  WITHDRAWN
+}
+
+enum AgeGroup {
+  BABY
+  YOUNG
+  ADULT
+  SENIOR
+}
+
+model AdoptionListing {
+  id               String         @id @default(cuid())
+  rescuerId        String
+  name             String         @db.VarChar(60)
+  species          Species
+  breed            String?        @db.VarChar(80)
+  sex              PetSex         @default(UNKNOWN)
+  ageGroup         AgeGroup
+  approxAgeMonths  Int?
+  size             String?        @db.VarChar(20)
+  city             String         @db.VarChar(80)
+  description      String         @db.Text
+  healthSummary    String?        @db.Text
+  isVaccinated     Boolean        @default(false)
+  isNeutered       Boolean        @default(false)
+  goodWithChildren Boolean?
+  goodWithPets     Boolean?
+  photoUrl         String?
+  status           AdoptionStatus @default(AVAILABLE)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  rescuer      User                  @relation(fields: [rescuerId], references: [id], onDelete: Cascade)
+  applications AdoptionApplication[]
+
+  @@index([status, species])
+  @@index([city])
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+model AdoptionApplication {
+  id           String            @id @default(cuid())
+  listingId    String
+  applicantId  String
+  message      String            @db.Text
+  homeType     String            @db.VarChar(40)
+  hasOtherPets Boolean           @default(false)
+  hasChildren  Boolean           @default(false)
+  contactPhone String            @db.VarChar(20)
+  status       ApplicationStatus @default(SUBMITTED)
+  rescuerNotes String?           @db.Text
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  listing   AdoptionListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  applicant User            @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  // A person can apply for the same animal only once.
+  @@unique([listingId, applicantId])
+}
+
+// ─────────────────────────────── Chatbot ───────────────────────────────
+
+enum ChatSender {
+  USER
+  ASSISTANT
+}
+
+model ChatMessage {
+  id        String     @id @default(cuid())
+  userId    String
+  sender    ChatSender
+  content   String     @db.Text
+  createdAt DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
