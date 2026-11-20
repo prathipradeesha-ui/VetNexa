@@ -129,6 +129,48 @@ anything else returns `404`. Unverified vets receive `403` on all of these route
 - A vet can open `/vet/patients/:petId` only while they have a consultation with that pet that
   was not cancelled. Owner phone and email are shared with the vet, never the other way round.
 
+## Rescue reports
+
+Signed in. Rescuers and administrators see the board; everyone else sees their own reports.
+
+| Method | Path                  | Access         | Description                                                                                                      |
+| ------ | --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| GET    | `/rescue?view=`       | Signed in      | `open` (default), `mine` (rescuers) or `resolved`.                                                               |
+| POST   | `/rescue`             | Signed in      | Report an animal: `species`, `title`, `description`, `locationText`, `city`, `urgency`, optional `contactPhone`. |
+| GET    | `/rescue/:id`         | Involved users | One report with the viewer's `actions`.                                                                          |
+| POST   | `/rescue/:id/take-on` | Rescuer        | Take on an open report (only one rescuer can).                                                                   |
+| PATCH  | `/rescue/:id/status`  | Rescuer, admin | `RESCUED` or `CLOSED`; reporters may close their own open report.                                                |
+| PUT    | `/rescue/:id/photo`   | Reporter       | Add or replace the photo.                                                                                        |
+
+The board lists waiting reports first, then by urgency (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`).
+Reporter phone numbers are only shown to rescuers and administrators.
+
+## Adoption
+
+| Method | Path                                  | Access          | Description                                                                  |
+| ------ | ------------------------------------- | --------------- | ---------------------------------------------------------------------------- |
+| GET    | `/adoption/listings`                  | Public          | Filters: `species`, `ageGroup`, `city`, `goodWithChildren`.                  |
+| GET    | `/adoption/listings/:id`              | Public          | Detail, plus `myApplication` and `canApply` when signed in.                  |
+| GET    | `/adoption/listings/mine`             | Rescuer         | My listings with `openApplications`.                                         |
+| POST   | `/adoption/listings`                  | Rescuer         | Create a listing.                                                            |
+| PUT    | `/adoption/listings/:id`              | Rescuer (owner) | Update a listing.                                                            |
+| PATCH  | `/adoption/listings/:id/status`       | Rescuer (owner) | `AVAILABLE` or `WITHDRAWN`.                                                  |
+| PUT    | `/adoption/listings/:id/photo`        | Rescuer (owner) | Listing photo.                                                               |
+| GET    | `/adoption/listings/:id/applications` | Rescuer (owner) | Applications with applicant contact details.                                 |
+| POST   | `/adoption/listings/:id/applications` | Owner           | Apply: `homeType`, `hasOtherPets`, `hasChildren`, `contactPhone`, `message`. |
+| GET    | `/adoption/applications/mine`         | Owner           | My applications with the rescuer's notes.                                    |
+| POST   | `/adoption/applications/:id/withdraw` | Owner           | Withdraw an open application.                                                |
+| PATCH  | `/adoption/applications/:id/decision` | Rescuer (owner) | `UNDER_REVIEW`, `APPROVED` or `REJECTED`, optional `rescuerNotes`.           |
+
+**Rules**
+
+- One application per owner per animal; a withdrawn application can be re-submitted.
+- `UNDER_REVIEW` marks the listing as adoption pending. `APPROVED` marks the animal as adopted
+  and, in the same transaction, closes every other open application with a short note.
+  Rejecting the last application under review makes the animal available again.
+- Adopted and withdrawn animals are hidden from the public but stay visible to their rescuer.
+- Rescue reports and adoption applications are limited to 10 per hour per IP address.
+
 ## Contact
 
 | Method | Path       | Access | Description                                                                                    |
