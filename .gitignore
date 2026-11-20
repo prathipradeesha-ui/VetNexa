@@ -26,12 +26,13 @@ venv/
 .pytest_cache/
 .mypy_cache/
 
-# AI model artefacts and datasets (too large for Git)
-services/ai/data/raw/
-services/ai/data/processed/
-services/ai/models/*.pt
-services/ai/models/*.pth
+# AI images, trained models and generated reports (large, and photos may be personal)
+services/ai/data/*
+!services/ai/data/README.md
+services/ai/models/*
 !services/ai/models/.gitkeep
+services/ai/reports/
+.ruff_cache/
 
 # Uploaded files
 apps/api/uploads/*
