@@ -1,0 +1,29 @@
+{
+  "kept_images": 62,
+  "excluded_images": 33,
+  "by_category_and_species": {
+    "allergic_dermatitis/dog": 13,
+    "bacterial_dermatosis/dog": 12,
+    "fungal_infection/dog": 11,
+    "healthy_skin/dog": 26
+  },
+  "by_source": {
+    "mendeley-5dbht54kw7": 62
+  },
+  "excluded_by_reason": {
+    "label '(no label in source)' not used": 33
+  },
+  "categories": {
+    "healthy_skin": "Healthy skin and coat, no visible lesion",
+    "bacterial_dermatosis": "Bacterial skin infection (pyoderma)",
+    "fungal_infection": "Fungal skin infection other than ringworm",
+    "ringworm": "Dermatophytosis: circular, scaly, hairless patches",
+    "allergic_dermatitis": "Hypersensitivity / allergic dermatitis (atopy, food or contact allergy)",
+    "flea_allergy": "Flea allergy dermatitis",
+    "dermatitis": "Dermatitis not further specified by the source",
+    "mange_scabies": "Mite infestations: sarcoptic mange, scabies, demodicosis",
+    "hot_spot": "Acute moist dermatitis (hot spot)",
+    "wound_injury": "Visible wound or injury",
+    "uninjured": "Whole animal with no visible injury"
+  }
+}
