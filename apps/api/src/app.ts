@@ -13,6 +13,11 @@ import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter } from './modules/auth/auth.routes';
 import { clinicsRouter } from './modules/clinics/clinics.routes';
 import { contactRouter } from './modules/contact/contact.routes';
+import {
+  consultationsRouter,
+  vetPortalRouter,
+  vetsRouter,
+} from './modules/consultations/consultations.routes';
 import { petsRouter } from './modules/pets/pets.routes';
 import { recordsRouter, remindersRouter } from './modules/records/records.routes';
 import { uploadRoot, UPLOADS_URL_PREFIX } from './lib/uploads';
@@ -131,6 +136,9 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
   app.use('/api/pets', petsRouter(prisma));
   app.use('/api/reminders', remindersRouter(prisma));
   app.use('/api/clinics', clinicsRouter(prisma, reviewLimiter));
+  app.use('/api/consultations', consultationsRouter(prisma));
+  app.use('/api/vet', vetPortalRouter(prisma));
+  app.use('/api/vets', vetsRouter(prisma));
 
   // ── Errors (must be registered last) ──
   app.use(notFoundHandler);
