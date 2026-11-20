@@ -11,6 +11,7 @@ import { logger } from './lib/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import { clinicsRouter } from './modules/clinics/clinics.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import { petsRouter } from './modules/pets/pets.routes';
 import { recordsRouter, remindersRouter } from './modules/records/records.routes';
@@ -111,6 +112,16 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
       next(HttpError.tooManyRequests('You have sent several messages. Please try again later.')),
   });
 
+  // Reviews: 10 saves per hour per IP, to stop review flooding.
+  const reviewLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) => next(HttpError.tooManyRequests()),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
   app.use('/api/auth', authRouter(prisma, loginLimiter));
@@ -119,6 +130,7 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
   app.use('/api/pets/:petId/records', recordsRouter(prisma));
   app.use('/api/pets', petsRouter(prisma));
   app.use('/api/reminders', remindersRouter(prisma));
+  app.use('/api/clinics', clinicsRouter(prisma, reviewLimiter));
 
   // ── Errors (must be registered last) ──
   app.use(notFoundHandler);

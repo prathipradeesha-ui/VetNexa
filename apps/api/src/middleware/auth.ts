@@ -48,6 +48,24 @@ export function authenticate(prisma: PrismaClient): RequestHandler {
 }
 
 /**
+ * For public pages that show a little more to signed-in users (e.g. "your review").
+ * Attaches the user when a valid session exists, but never rejects the request.
+ */
+export function optionalAuthenticate(prisma: PrismaClient): RequestHandler {
+  const required = authenticate(prisma);
+  return (req, res, next) => {
+    if (!readSessionToken(req.cookies?.[SESSION_COOKIE])) {
+      next();
+      return;
+    }
+    required(req, res, (error?: unknown) => {
+      if (error) req.user = undefined; // e.g. a deleted or suspended account: treat as a visitor
+      next();
+    });
+  };
+}
+
+/**
  * Role-based access control. Use after `authenticate`:
  *   router.get('/users', authenticate(prisma), authorize('ADMIN'), handler)
  */
