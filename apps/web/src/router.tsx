@@ -31,6 +31,14 @@ export const routes: RouteObject[] = [
           { path: '/', element: <HomePage /> },
           { path: '/about', element: <AboutPage /> },
           {
+            path: '/clinics',
+            lazy: lazyPage(() => import('./features/clinics/ClinicsPage'), 'ClinicsPage'),
+          },
+          {
+            path: '/clinics/:slug',
+            lazy: lazyPage(() => import('./features/clinics/ClinicDetailPage'), 'ClinicDetailPage'),
+          },
+          {
             path: '/contact',
             lazy: lazyPage(() => import('./pages/contact/ContactPage'), 'ContactPage'),
           },

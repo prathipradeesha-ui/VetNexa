@@ -121,9 +121,9 @@ export function HomePage() {
               <Link to="/register" className="btn btn--primary">
                 Create a free account <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <a href="#how-it-works" className="btn btn--secondary">
-                See how it works
-              </a>
+              <Link to="/clinics" className="btn btn--secondary">
+                Find a clinic
+              </Link>
             </div>
             <ul className="hero__points">
               <li>

@@ -18,6 +18,12 @@ export function Footer() {
           <h2 className="site-footer__heading">Platform</h2>
           <ul>
             <li>
+              <Link to="/clinics">Find a clinic</Link>
+            </li>
+            <li>
+              <Link to="/clinics?emergency=true">Emergency clinics</Link>
+            </li>
+            <li>
               <Link to="/register">Create an account</Link>
             </li>
             <li>

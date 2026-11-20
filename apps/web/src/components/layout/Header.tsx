@@ -6,6 +6,7 @@ import { Logo } from '../brand/Logo';
 
 export const publicNavLinks = [
   { to: '/', label: 'Home', end: true },
+  { to: '/clinics', label: 'Find a clinic' },
   { to: '/about', label: 'About us' },
   { to: '/contact', label: 'Contact' },
 ];

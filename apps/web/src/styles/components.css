@@ -379,3 +379,98 @@
   background: var(--color-success-bg);
   color: var(--color-success);
 }
+
+/* ── Star ratings ── */
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+.stars__star {
+  position: relative;
+  display: inline-block;
+}
+.stars__empty {
+  color: var(--color-border-strong);
+}
+.stars__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  color: #e3a008;
+}
+.stars__fill svg {
+  fill: currentColor;
+}
+.star-input {
+  border: 0;
+  padding: 0;
+  margin: 0 0 var(--space-4);
+}
+.star-input__options {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.star-input__option {
+  position: relative;
+  cursor: pointer;
+  color: var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+.star-input__option input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.star-input__option .is-filled {
+  color: #e3a008;
+  fill: currentColor;
+}
+.star-input__option:has(input:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+.star-input__label {
+  margin-left: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* ── Shared page helpers: back links, link buttons, form actions, danger button ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.link-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.btn--danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+.btn--danger:hover:not(:disabled) {
+  background: #a33522;
+  color: var(--color-white);
+}
