@@ -474,3 +474,72 @@
   background: #a33522;
   color: var(--color-white);
 }
+
+.badge--info {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+/* ── Consultation row (used on lists and dashboards) ── */
+.consultation-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+}
+.consultation-row:hover {
+  background: var(--color-surface);
+  color: inherit;
+}
+.consultation-row__main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.consultation-row__main strong {
+  color: var(--color-navy);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.consultation-row__reason {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+.consultation-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.consultation-row__meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.consultation-row__chevron {
+  color: var(--color-text-subtle);
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  .consultation-row {
+    flex-wrap: wrap;
+  }
+  .consultation-row__main {
+    flex-basis: calc(100% - 64px);
+  }
+  .consultation-row__chevron {
+    display: none;
+  }
+}
+.link-button--primary {
+  color: var(--color-primary);
+}
+.back-link.link-button {
+  text-decoration: none;
+}

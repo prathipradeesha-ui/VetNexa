@@ -357,9 +357,6 @@
 .review-prompt--mine {
   justify-content: space-between;
 }
-.link-button--primary {
-  color: var(--color-primary);
-}
 .review-form {
   padding: var(--space-4);
   margin-bottom: var(--space-5);

@@ -7,6 +7,8 @@ import { useCurrentUser } from '../auth/useAuth';
 import { CareRemindersCard } from './CareRemindersCard';
 import { MyPetsCard } from './MyPetsCard';
 import { PendingVetsCard } from './PendingVetsCard';
+import { UpcomingConsultationsCard } from './UpcomingConsultationsCard';
+import { VetOverview } from './VetOverview';
 import './dashboard.css';
 
 function greeting(date = new Date()) {
@@ -53,6 +55,8 @@ export function DashboardPage() {
           view patient records and manage consultations once it is approved.
         </Alert>
       )}
+
+      {user.role === 'VET' && !vetAwaitingVerification && <VetOverview />}
 
       <div className="dashboard-grid">
         <section className="card profile-card" aria-labelledby="profile-heading">
@@ -123,6 +127,7 @@ export function DashboardPage() {
           </section>
         )}
 
+        {user.role === 'OWNER' && <UpcomingConsultationsCard />}
         {user.role === 'OWNER' && <CareRemindersCard />}
         {user.role === 'OWNER' && <MyPetsCard />}
         {user.role === 'ADMIN' && <PendingVetsCard />}

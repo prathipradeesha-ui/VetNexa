@@ -1,0 +1,92 @@
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+.tabs__tab {
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--color-text-muted);
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tabs__tab:hover {
+  color: var(--color-primary);
+}
+.tabs__tab[aria-selected='true'] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* ── Lists ── */
+.consultation-list {
+  padding: var(--space-2);
+}
+.consultation-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.consultation-list li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Detail ── */
+.consultation-layout {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+.consultation-layout__main,
+.consultation-layout__side {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 1100px) {
+  .consultation-layout {
+    grid-template-columns: 1fr 320px;
+  }
+}
+.patient-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.patient-cell .muted {
+  font-weight: 500;
+}
+.detail-list dd svg {
+  display: inline;
+  vertical-align: -3px;
+  color: var(--color-primary);
+}
+.pre-line {
+  white-space: pre-line;
+}
+.outcome-card {
+  border-color: #bfd6ee;
+}
+.consultation-actions {
+  display: grid;
+  gap: var(--space-2);
+}
+.consultation-actions .card-title {
+  margin-bottom: var(--space-2);
+}
+.cancel-box {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+.booking-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+}

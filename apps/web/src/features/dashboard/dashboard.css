@@ -142,3 +142,51 @@
 .reminder .badge {
   white-space: nowrap;
 }
+
+.stat-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 700px) {
+  .stat-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.stat-tile {
+  display: grid;
+  gap: var(--space-1);
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.stat-tile:hover {
+  border-color: var(--color-turquoise);
+  color: inherit;
+}
+.stat-tile svg {
+  color: var(--color-primary);
+}
+.stat-tile strong {
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--color-navy);
+}
+.stat-tile span {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.stat-tile--highlight {
+  border-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+.today-card {
+  margin-bottom: var(--space-4);
+}
+.plain-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 calc(-1 * var(--space-3));
+}

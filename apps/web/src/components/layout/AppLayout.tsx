@@ -1,5 +1,14 @@
 import { ROLE_LABELS, type UserRole } from '@vetnexa/shared';
-import { Globe, LayoutDashboard, LogOut, Menu, PawPrint, X, type LucideIcon } from 'lucide-react';
+import {
+  CalendarDays,
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  PawPrint,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useCurrentUser, useLogout } from '../../features/auth/useAuth';
@@ -19,6 +28,12 @@ interface NavItem {
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/dashboard/pets', label: 'My pets', icon: PawPrint, roles: ['OWNER'] },
+  {
+    to: '/dashboard/consultations',
+    label: 'Consultations',
+    icon: CalendarDays,
+    roles: ['OWNER', 'VET'],
+  },
 ];
 
 /**

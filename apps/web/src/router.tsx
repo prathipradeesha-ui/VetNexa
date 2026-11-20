@@ -61,6 +61,37 @@ export const routes: RouteObject[] = [
                 lazy: lazyPage(() => import('./features/dashboard/DashboardPage'), 'DashboardPage'),
               },
               {
+                element: <ProtectedRoute roles={['OWNER', 'VET']} />,
+                children: [
+                  {
+                    path: '/dashboard/consultations',
+                    lazy: lazyPage(
+                      () => import('./features/consultations/ConsultationsPage'),
+                      'ConsultationsPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/consultations/:id',
+                    lazy: lazyPage(
+                      () => import('./features/consultations/ConsultationDetailPage'),
+                      'ConsultationDetailPage',
+                    ),
+                  },
+                ],
+              },
+              {
+                element: <ProtectedRoute roles={['VET']} />,
+                children: [
+                  {
+                    path: '/dashboard/patients/:petId',
+                    lazy: lazyPage(
+                      () => import('./features/consultations/PatientPage'),
+                      'PatientPage',
+                    ),
+                  },
+                ],
+              },
+              {
                 // Pet owners only; the API enforces the same rule.
                 element: <ProtectedRoute roles={['OWNER']} />,
                 children: [
@@ -79,6 +110,13 @@ export const routes: RouteObject[] = [
                   {
                     path: '/dashboard/pets/:petId/edit',
                     lazy: lazyPage(() => import('./features/pets/PetFormPage'), 'PetFormPage'),
+                  },
+                  {
+                    path: '/dashboard/consultations/new',
+                    lazy: lazyPage(
+                      () => import('./features/consultations/BookConsultationPage'),
+                      'BookConsultationPage',
+                    ),
                   },
                   {
                     path: '/dashboard/pets/:petId/records/new',
