@@ -77,6 +77,8 @@ All demo accounts use the password `VetNexa@2026` (defined in `apps/api/prisma/s
 - [API reference](docs/api.md)
 - [Project plan](docs/project-plan.md)
 - [Brand guidelines](docs/brand-guidelines.md)
+- [AI wound assessment – model card](docs/ai-model.md)
+- [AI service setup](services/ai/README.md)
 
 ## Project owner
 
