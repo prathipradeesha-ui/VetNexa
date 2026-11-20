@@ -16,7 +16,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 8   | Pet profiles                      | CRUD API + UI, photo upload                                                        | Done    |
 | 9   | Health records                    | Vaccinations, treatments, medical history timeline                                 | Done    |
 | 10  | Clinic discovery                  | Search, filters, clinic detail page, reviews and ratings                           | Done    |
-| 11  | Veterinary portal                 | Consultations, vet dashboard, treatment notes                                      | Planned |
+| 11  | Veterinary portal                 | Consultations, vet dashboard, treatment notes                                      | Done    |
 | 12  | Rescue and adoption               | Rescue reports, adoption listings, applications                                    | Planned |
 | 13  | AI service – wound model          | Dataset preparation, OpenCV preprocessing, PyTorch training and evaluation         | Planned |
 | 14  | AI wound assessment integration   | Inference API, upload flow, results with uncertainty and guidance                  | Planned |

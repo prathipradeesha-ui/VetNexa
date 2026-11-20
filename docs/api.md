@@ -101,6 +101,34 @@ Public, except writing reviews.
 - Veterinarians and administrators cannot review clinics (conflict of interest).
 - Review saves are limited to 10 per hour per IP address.
 
+## Consultations and the veterinary portal
+
+Owners and **verified** vets only. Every user sees only consultations they take part in;
+anything else returns `404`. Unverified vets receive `403` on all of these routes.
+
+| Method | Path                          | Access     | Description                                                        |
+| ------ | ----------------------------- | ---------- | ------------------------------------------------------------------ |
+| GET    | `/vets`                       | Signed in  | Verified vets that can be booked, with their clinic.               |
+| GET    | `/consultations?view=`        | Owner, vet | `upcoming` (default), `requests`, `past` or `all`.                 |
+| POST   | `/consultations`              | Owner      | Request: `petId`, `vetId`, `type`, `date`, `time`, `reason`.       |
+| GET    | `/consultations/:id`          | Owner, vet | One consultation, including the viewer's `actions`.                |
+| PATCH  | `/consultations/:id/status`   | Owner, vet | `{ status: "CONFIRMED" \| "CANCELLED", note? }`.                   |
+| POST   | `/consultations/:id/complete` | Vet        | `diagnosis`, `treatment`, optional `vetNotes`, `followUpDate`.     |
+| GET    | `/vet/summary`                | Vet        | Pending requests, next 7 days, completed this month, today's list. |
+| GET    | `/vet/patients/:petId`        | Vet        | Patient profile and full history.                                  |
+
+**Rules**
+
+- `date` and `time` are Sri Lanka time; slots are every 30 minutes from 08:00 to 19:30, at
+  least one hour and at most 60 days ahead. A vet cannot be booked twice within 30 minutes
+  (`409`, field `time`).
+- Status changes: the vet confirms `REQUESTED`; either side cancels `REQUESTED` or
+  `CONFIRMED`; only the vet completes a `CONFIRMED` consultation.
+- Completing adds a vet-authored `TREATMENT` record to the pet's history in the same
+  transaction (owners cannot edit it), with the follow-up date as its next due date.
+- A vet can open `/vet/patients/:petId` only while they have a consultation with that pet that
+  was not cancelled. Owner phone and email are shared with the vet, never the other way round.
+
 ## Contact
 
 | Method | Path       | Access | Description                                                                                    |
