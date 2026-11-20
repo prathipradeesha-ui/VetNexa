@@ -543,3 +543,154 @@
 .back-link.link-button {
   text-decoration: none;
 }
+
+/* ── Shared page layouts: tabs, two-column detail pages, filter chips, prompts ── */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+.tabs__tab {
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--color-text-muted);
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tabs__tab:hover {
+  color: var(--color-primary);
+}
+.tabs__tab[aria-selected='true'] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+.consultation-list {
+  padding: var(--space-2);
+}
+.consultation-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.consultation-list li + li {
+  border-top: 1px solid var(--color-border);
+}
+.consultation-layout {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+.consultation-layout__main,
+.consultation-layout__side {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 1100px) {
+  .consultation-layout {
+    grid-template-columns: 1fr 320px;
+  }
+}
+.detail-list dd svg {
+  display: inline;
+  vertical-align: -3px;
+  color: var(--color-primary);
+}
+.pre-line {
+  white-space: pre-line;
+}
+.consultation-actions {
+  display: grid;
+  gap: var(--space-2);
+}
+.consultation-actions .card-title {
+  margin-bottom: var(--space-2);
+}
+.clinics-section {
+  padding-top: var(--space-6);
+}
+.toggle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.toggle-chip input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+.toggle-chip:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-mint);
+  color: var(--color-primary-darker);
+}
+.toggle-chip:has(input:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+.clinic-detail {
+  padding-block: var(--space-5) var(--space-8);
+}
+.map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.review-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+.review-prompt svg {
+  color: var(--color-primary);
+}
+.review-prompt--mine {
+  justify-content: space-between;
+}
+.review-form {
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.review-form h3 {
+  font-size: var(--text-base);
+}
+.review-form .form-actions {
+  align-items: center;
+}
+
+/* ── Photo picker ── */
+.photo-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.photo-picker .alert {
+  flex-basis: 100%;
+  margin: 0;
+}

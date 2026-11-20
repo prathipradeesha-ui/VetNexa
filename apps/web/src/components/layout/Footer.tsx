@@ -24,6 +24,12 @@ export function Footer() {
               <Link to="/clinics?emergency=true">Emergency clinics</Link>
             </li>
             <li>
+              <Link to="/adopt">Adopt an animal</Link>
+            </li>
+            <li>
+              <Link to="/dashboard/rescue/new">Report an animal in need</Link>
+            </li>
+            <li>
               <Link to="/register">Create an account</Link>
             </li>
             <li>

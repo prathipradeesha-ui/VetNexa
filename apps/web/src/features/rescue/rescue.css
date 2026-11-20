@@ -1,0 +1,25 @@
+.rescue-row {
+  border-left: 4px solid transparent;
+}
+.rescue-row--critical {
+  border-left-color: var(--color-danger);
+}
+.rescue-row--high {
+  border-left-color: #e8826f;
+}
+.rescue-row--medium {
+  border-left-color: var(--color-warning);
+}
+.rescue-row__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+.rescue-photo {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}

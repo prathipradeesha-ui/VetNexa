@@ -35,6 +35,17 @@ export const routes: RouteObject[] = [
             lazy: lazyPage(() => import('./features/clinics/ClinicsPage'), 'ClinicsPage'),
           },
           {
+            path: '/adopt',
+            lazy: lazyPage(() => import('./features/adoption/AdoptPage'), 'AdoptPage'),
+          },
+          {
+            path: '/adopt/:id',
+            lazy: lazyPage(
+              () => import('./features/adoption/AdoptionDetailPage'),
+              'AdoptionDetailPage',
+            ),
+          },
+          {
             path: '/clinics/:slug',
             lazy: lazyPage(() => import('./features/clinics/ClinicDetailPage'), 'ClinicDetailPage'),
           },
@@ -80,6 +91,58 @@ export const routes: RouteObject[] = [
                 ],
               },
               {
+                // Any signed-in user can report an animal; the board adapts to the role.
+                path: '/dashboard/rescue',
+                lazy: lazyPage(() => import('./features/rescue/RescuePage'), 'RescuePage'),
+              },
+              {
+                path: '/dashboard/rescue/new',
+                lazy: lazyPage(
+                  () => import('./features/rescue/ReportAnimalPage'),
+                  'ReportAnimalPage',
+                ),
+              },
+              {
+                path: '/dashboard/rescue/:id',
+                lazy: lazyPage(
+                  () => import('./features/rescue/RescueDetailPage'),
+                  'RescueDetailPage',
+                ),
+              },
+              {
+                element: <ProtectedRoute roles={['RESCUER', 'ADMIN']} />,
+                children: [
+                  {
+                    path: '/dashboard/listings',
+                    lazy: lazyPage(
+                      () => import('./features/adoption/MyListingsPage'),
+                      'MyListingsPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/listings/new',
+                    lazy: lazyPage(
+                      () => import('./features/adoption/ListingFormPage'),
+                      'ListingFormPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/listings/:id',
+                    lazy: lazyPage(
+                      () => import('./features/adoption/ListingManagePage'),
+                      'ListingManagePage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/listings/:id/edit',
+                    lazy: lazyPage(
+                      () => import('./features/adoption/ListingFormPage'),
+                      'ListingFormPage',
+                    ),
+                  },
+                ],
+              },
+              {
                 element: <ProtectedRoute roles={['VET']} />,
                 children: [
                   {
@@ -110,6 +173,13 @@ export const routes: RouteObject[] = [
                   {
                     path: '/dashboard/pets/:petId/edit',
                     lazy: lazyPage(() => import('./features/pets/PetFormPage'), 'PetFormPage'),
+                  },
+                  {
+                    path: '/dashboard/applications',
+                    lazy: lazyPage(
+                      () => import('./features/adoption/MyApplicationsPage'),
+                      'MyApplicationsPage',
+                    ),
                   },
                   {
                     path: '/dashboard/consultations/new',

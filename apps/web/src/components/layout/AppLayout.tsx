@@ -1,6 +1,9 @@
 import { ROLE_LABELS, type UserRole } from '@vetnexa/shared';
 import {
   CalendarDays,
+  HandHeart,
+  HeartHandshake,
+  Megaphone,
   Globe,
   LayoutDashboard,
   LogOut,
@@ -33,6 +36,19 @@ const navItems: NavItem[] = [
     label: 'Consultations',
     icon: CalendarDays,
     roles: ['OWNER', 'VET'],
+  },
+  {
+    to: '/dashboard/applications',
+    label: 'Adoption applications',
+    icon: HeartHandshake,
+    roles: ['OWNER'],
+  },
+  { to: '/dashboard/rescue', label: 'Rescue', icon: Megaphone },
+  {
+    to: '/dashboard/listings',
+    label: 'Adoption listings',
+    icon: HandHeart,
+    roles: ['RESCUER', 'ADMIN'],
   },
 ];
 

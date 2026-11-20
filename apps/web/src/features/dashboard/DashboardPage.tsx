@@ -7,6 +7,7 @@ import { useCurrentUser } from '../auth/useAuth';
 import { CareRemindersCard } from './CareRemindersCard';
 import { MyPetsCard } from './MyPetsCard';
 import { PendingVetsCard } from './PendingVetsCard';
+import { RescuerOverview } from './RescuerOverview';
 import { UpcomingConsultationsCard } from './UpcomingConsultationsCard';
 import { VetOverview } from './VetOverview';
 import './dashboard.css';
@@ -57,6 +58,7 @@ export function DashboardPage() {
       )}
 
       {user.role === 'VET' && !vetAwaitingVerification && <VetOverview />}
+      {user.role === 'RESCUER' && <RescuerOverview />}
 
       <div className="dashboard-grid">
         <section className="card profile-card" aria-labelledby="profile-heading">
