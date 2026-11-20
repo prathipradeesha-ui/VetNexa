@@ -11,6 +11,7 @@ import { logger } from './lib/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import { adoptionRouter } from './modules/adoption/adoption.routes';
 import { clinicsRouter } from './modules/clinics/clinics.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import {
@@ -20,6 +21,7 @@ import {
 } from './modules/consultations/consultations.routes';
 import { petsRouter } from './modules/pets/pets.routes';
 import { recordsRouter, remindersRouter } from './modules/records/records.routes';
+import { rescueRouter } from './modules/rescue/rescue.routes';
 import { uploadRoot, UPLOADS_URL_PREFIX } from './lib/uploads';
 import { healthRouter } from './modules/health/health.routes';
 
@@ -127,6 +129,16 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
     handler: (_req, _res, next) => next(HttpError.tooManyRequests()),
   });
 
+  // Rescue reports and adoption applications: 10 per hour per IP, to stop spam.
+  const communityLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) => next(HttpError.tooManyRequests()),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
   app.use('/api/auth', authRouter(prisma, loginLimiter));
@@ -139,6 +151,8 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
   app.use('/api/consultations', consultationsRouter(prisma));
   app.use('/api/vet', vetPortalRouter(prisma));
   app.use('/api/vets', vetsRouter(prisma));
+  app.use('/api/rescue', rescueRouter(prisma, communityLimiter));
+  app.use('/api/adoption', adoptionRouter(prisma, communityLimiter));
 
   // ── Errors (must be registered last) ──
   app.use(notFoundHandler);
