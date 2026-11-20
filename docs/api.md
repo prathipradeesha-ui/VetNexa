@@ -83,6 +83,24 @@ Sign-in and sign-up allow 10 failed attempts per 15 minutes per IP address.
 }
 ```
 
+## Clinics and reviews
+
+Public, except writing reviews.
+
+| Method | Path                          | Access           | Description                                                                              |
+| ------ | ----------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
+| GET    | `/clinics`                    | Public           | Search. Query: `q`, `city`, `service`, `emergency`, `openNow`, `sort` (`rating`/`name`). |
+| GET    | `/clinics/:slug`              | Public           | Details, hours, verified vets, rating breakdown, reviews; `myReview` when signed in.     |
+| PUT    | `/clinics/:slug/reviews/mine` | Owner or rescuer | Write or replace my review (`rating` 1–5, optional `title`, `comment`).                  |
+| DELETE | `/clinics/:slug/reviews/mine` | Signed in        | Delete my review.                                                                        |
+
+- "Open now" is calculated in Sri Lanka time (`Asia/Colombo`) from each clinic's weekly hours.
+- `emergency=true` includes clinics that are open 24 hours.
+- One review per user per clinic; the cached `averageRating` and `reviewCount` are recalculated
+  in the same transaction as each change. Reviewers are shown as first name and initial.
+- Veterinarians and administrators cannot review clinics (conflict of interest).
+- Review saves are limited to 10 per hour per IP address.
+
 ## Contact
 
 | Method | Path       | Access | Description                                                                                    |
