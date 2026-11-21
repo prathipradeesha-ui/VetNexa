@@ -35,7 +35,7 @@
     "vitest": "^5.1.1"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1162.0",
+    "@aws-sdk/client-s3": "^3.1172.0",
     "@prisma/adapter-mariadb": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "@vetnexa/shared": "^0.1.0",
