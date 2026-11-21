@@ -14,11 +14,13 @@ VetNexa is built for **dogs and cats only**. It connects their owners, veterinar
 
 - Pet owner accounts and pet profiles
 - Health records (vaccinations, treatments, medical history)
-- AI wound assessment for dogs and cats
+- AI wound assessment for dogs and cats: photo plus symptom questionnaire and red flags
+- **Emergency mode without an account**: nearest emergency clinics, camera wound check (not
+  stored) and rescue reports
 - Veterinary portal and consultations
-- Clinic discovery with reviews and ratings
-- Rescue reporting and adoption
-- AI pet-care chatbot
+- Clinic discovery with Google Maps, "near me" sorting, directions and call buttons, reviews
+- Rescue reporting with a privacy-safe map, and adoption
+- AI pet-care assistant, on its own page and as a floating chat in the corner of every page
 - Admin dashboard
 
 ## Technology
@@ -55,6 +57,23 @@ service are not published on the host; Nginx in the `web` container forwards `/a
 | `migrate` | API build stage              | Applies Prisma migrations once, then exits           |
 | `ai`      | Python 3.11 + CPU PyTorch    | Wound assessment and pet-care assistant (internal)   |
 | `db`      | MySQL 8.4                    | Database, data in the `db-data` volume               |
+
+## Google Maps
+
+Maps work without any setup using Google's keyless embed, which shows one place at a time,
+with "Directions" links that open Google Maps. For the full interactive map (all clinics or
+reports as pins, info windows and your location), create a browser API key:
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create a project and enable
+   **Maps JavaScript API** (billing must be enabled; Google gives a free monthly allowance).
+2. Under **APIs & Services → Credentials**, create an **API key** and restrict it to
+   **HTTP referrers** (for example `http://localhost:5173/*` and your domain) and to the Maps
+   JavaScript API.
+3. Put it in `apps/web/.env.local` as `VITE_GOOGLE_MAPS_API_KEY=…` for development, or in the
+   root `.env` as `GOOGLE_MAPS_API_KEY=…` for Docker, and rebuild the web app.
+
+The user's own location is only requested when they press "Near me" or "Use my current
+location", and it is never sent to the server except as part of a rescue report.
 
 ## Development setup
 

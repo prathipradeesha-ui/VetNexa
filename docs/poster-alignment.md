@@ -17,8 +17,8 @@ built yet.
 | Input quality checks: image quality                      | Done    | OpenCV blur, exposure, size checks with retake advice                                                      | Turn the checks into a 0–1 image reliability score used by fusion                                               | 20    |
 | Input quality checks: missing inputs                     | Done    | Unanswered questions are listed and lower the completeness score                                           | Use completeness as the reliability of symptom evidence in fusion                                               | 20    |
 | Input quality checks: red flags                          | Done    | Eight red flags; any one forces urgent attention, even with a poor photo                                   | –                                                                                                               | 19    |
-| Input quality checks: OOD detection                      | Planned | –                                                                                                          | Energy score plus feature-distance (Mahalanobis) check; unfamiliar photos are not assessed                      | 20    |
-| Image model: EfficientNet-B0, calibrated probabilities   | Partial | ResNet-18 with temperature scaling                                                                         | EfficientNet-B0 backbone; keep ResNet-18 as a comparison baseline                                               | 20    |
+| Input quality checks: OOD detection                      | Partial | Energy + Mahalanobis detector fitted during training and saved with the model                              | Use it at inference to exclude unfamiliar photos                                                                | 20    |
+| Image model: EfficientNet-B0, calibrated probabilities   | Done    | EfficientNet-B0 (default) with temperature scaling; ResNet-18 kept as baseline                             | –                                                                                                               | 20    |
 | Symptom and context evidence (rule-weighted)             | Done    | 23 documented rules combined as a noisy-OR into a risk and level                                           | –                                                                                                               | 19    |
 | Reliability-weighted evidence fusion, combined risk      | Planned | Image probabilities only                                                                                   | Weight image and symptom evidence by their reliability; explain each contribution                               | 20    |
 | Uncertainty-aware triage: calibrated confidence          | Done    | Temperature scaling (T ≥ 1)                                                                                | –                                                                                                               | –     |
@@ -35,28 +35,37 @@ built yet.
 
 ## Application (poster sections 6 and 9)
 
-| Poster idea                                | Status  | In VetNexa now                                           | Work to do                                                                                   | Stage |
-| ------------------------------------------ | ------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----- |
-| Assess wound: photo + symptom questions    | Done    | Three steps: pet and red flags, symptom questions, photo | –                                                                                            | 19    |
-| Triage result with confidence, explanation | Partial | Severity, confidence, guidance                           | Four outcomes and evidence explanation                                                       | 20    |
-| Nearby clinics on a map or list            | Partial | Searchable list with "open in maps" links                | Interactive map (Leaflet + OpenStreetMap) and "near me" sorting                              | 22    |
-| Rescue map, location shared safely         | Partial | Rescue reports with text location                        | Map of reports; exact location only for the assigned rescuer, others see an approximate area | 22    |
-| Web and mobile application                 | Partial | Responsive website                                       | Installable progressive web app (PWA) with camera capture                                    | 24    |
-| Pet owners, rescuers, veterinary services  | Done    | Owner, rescuer, vet and admin roles                      | –                                                                                            | –     |
+| Poster idea                                | Status  | In VetNexa now                                                                                                  | Work to do                             | Stage |
+| ------------------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----- |
+| Assess wound: photo + symptom questions    | Done    | Three steps: pet and red flags, symptom questions, photo                                                        | –                                      | 19    |
+| Triage result with confidence, explanation | Partial | Severity, confidence, guidance                                                                                  | Four outcomes and evidence explanation | 20    |
+| Nearby clinics on a map or list            | Done    | Google map (interactive with an API key, keyless embed otherwise), near-me sorting, call and directions buttons | –                                      | 22    |
+| Rescue map, location shared safely         | Done    | Rescue map; exact spot only for reporter, assigned rescuer and admins, about 1 km area for others               | –                                      | 22    |
+| Web and mobile application                 | Partial | Responsive site; camera opens directly on phones; emergency mode works without an account                       | Installable PWA                        | 24    |
+| Pet owners, rescuers, veterinary services  | Done    | Owner, rescuer, vet and admin roles                                                                             | –                                      | –     |
 
 ## Technology stack (poster section 8)
 
-| Poster item                 | Status  | Notes                                 | Stage |
-| --------------------------- | ------- | ------------------------------------- | ----- |
-| React + TypeScript          | Done    | `apps/web`                            | –     |
-| Node.js + Express           | Done    | `apps/api`                            | –     |
-| Python + FastAPI            | Done    | `services/ai`                         | –     |
-| PyTorch                     | Done    | Training, calibration, inference      | –     |
-| torchvision EfficientNet-B0 | Planned | ResNet-18 today                       | 20    |
-| OpenCV                      | Done    | Image quality checks                  | –     |
-| MySQL + Prisma              | Done    | –                                     | –     |
-| MinIO storage               | Planned | Uploads are stored in a Docker volume | 23    |
-| Docker                      | Done    | Full Compose stack                    | –     |
+| Poster item                 | Status  | Notes                                           | Stage |
+| --------------------------- | ------- | ----------------------------------------------- | ----- |
+| React + TypeScript          | Done    | `apps/web`                                      | –     |
+| Node.js + Express           | Done    | `apps/api`                                      | –     |
+| Python + FastAPI            | Done    | `services/ai`                                   | –     |
+| PyTorch                     | Done    | Training, calibration, inference                | –     |
+| torchvision EfficientNet-B0 | Done    | Default backbone; ResNet-18 kept for comparison | 20    |
+| OpenCV                      | Done    | Image quality checks                            | –     |
+| MySQL + Prisma              | Done    | –                                               | –     |
+| MinIO storage               | Planned | Uploads are stored in a Docker volume           | 23    |
+| Docker                      | Done    | Full Compose stack                              | –     |
+
+## Additions beyond the poster
+
+| Addition                               | Why                                                                                                                                       |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Emergency mode without an account      | In an emergency nobody should have to register first: nearest clinics, camera wound check (not stored) and rescue reports work signed out |
+| Floating pet-care assistant            | Quick questions from any page; emergencies in the chat are redirected to clinics                                                          |
+| Call and directions buttons on clinics | One tap to phone a clinic or open Google Maps directions                                                                                  |
+| Dogs and cats only                     | The whole platform is scoped to the species the AI and knowledge base cover                                                               |
 
 ## Dataset and ethics (poster section 5)
 

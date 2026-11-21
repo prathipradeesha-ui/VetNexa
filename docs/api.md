@@ -90,6 +90,9 @@ Sign-in and sign-up allow 10 failed attempts per 15 minutes per IP address.
 
 ## Clinics and reviews
 
+Directory results include `latitude` and `longitude` (clinics are public places) for the
+map and "near me" sorting, which happens in the browser.
+
 Public, except writing reviews.
 
 | Method | Path                          | Access           | Description                                                                              |
@@ -138,17 +141,36 @@ anything else returns `404`. Unverified vets receive `403` on all of these route
 
 Signed in. Rescuers and administrators see the board; everyone else sees their own reports.
 
-| Method | Path                  | Access         | Description                                                                                                      |
-| ------ | --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
-| GET    | `/rescue?view=`       | Signed in      | `open` (default), `mine` (rescuers) or `resolved`.                                                               |
-| POST   | `/rescue`             | Signed in      | Report an animal: `species`, `title`, `description`, `locationText`, `city`, `urgency`, optional `contactPhone`. |
-| GET    | `/rescue/:id`         | Involved users | One report with the viewer's `actions`.                                                                          |
-| POST   | `/rescue/:id/take-on` | Rescuer        | Take on an open report (only one rescuer can).                                                                   |
-| PATCH  | `/rescue/:id/status`  | Rescuer, admin | `RESCUED` or `CLOSED`; reporters may close their own open report.                                                |
-| PUT    | `/rescue/:id/photo`   | Reporter       | Add or replace the photo.                                                                                        |
+| Method | Path                  | Access         | Description                                                                                                                               |
+| ------ | --------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/rescue?view=`       | Signed in      | `open` (default), `mine` (rescuers) or `resolved`.                                                                                        |
+| POST   | `/rescue`             | Signed in      | Report an animal: `species`, `title`, `description`, `locationText`, `city`, `urgency`, optional `contactPhone`, `latitude`, `longitude`. |
+| GET    | `/rescue/:id`         | Involved users | One report with the viewer's `actions`.                                                                                                   |
+| POST   | `/rescue/:id/take-on` | Rescuer        | Take on an open report (only one rescuer can).                                                                                            |
+| PATCH  | `/rescue/:id/status`  | Rescuer, admin | `RESCUED` or `CLOSED`; reporters may close their own open report.                                                                         |
+| PUT    | `/rescue/:id/photo`   | Reporter       | Add or replace the photo.                                                                                                                 |
 
 The board lists waiting reports first, then by urgency (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`).
 Reporter phone numbers are only shown to rescuers and administrators.
+
+**Location privacy:** the exact `latitude`/`longitude` is returned only to the reporter, the
+rescuer who took the report on and administrators. Other rescuers receive the position rounded
+to two decimals (about 1 km) with `locationApproximate: true` until they take the report on.
+Positions must be inside Sri Lanka.
+
+## Emergency help without an account
+
+Public routes for emergencies, rate limited per IP address.
+
+| Method | Path                | Description                                                                                         |
+| ------ | ------------------- | --------------------------------------------------------------------------------------------------- |
+| GET    | `/emergency/status` | Whether the wound check is available, and whether a demonstration model is running.                 |
+| POST   | `/emergency/assess` | Wound check: multipart `photo`, `species` (`DOG` or `CAT`), optional `answers`. 10 per hour per IP. |
+| POST   | `/emergency/rescue` | Rescue report with required `reporterName` and `contactPhone`. Returns a `reference`. 5 per hour.   |
+
+The wound check result is returned once with `stored: false`: no record is created and the
+photo is not saved. Guest rescue reports appear on the rescue board marked "no account", and
+rescuers call the reporter back on the phone number given.
 
 ## Adoption
 

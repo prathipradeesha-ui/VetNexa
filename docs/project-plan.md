@@ -25,15 +25,17 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 17  | Containerisation                  | Dockerfiles, Docker Compose for all services                                                       | Done        |
 | 18  | Continuous integration            | GitHub Actions: lint, type-check, tests                                                            | Done        |
 | 19  | Multimodal input                  | Symptom and context questionnaire, red flags, missing-input checks, rule-weighted symptom evidence | Done        |
-| 20  | Reliability-weighted triage       | EfficientNet-B0, OOD detection, reliability-weighted fusion, four triage outcomes, explanation     | Planned     |
+| 20  | Reliability-weighted triage       | EfficientNet-B0, OOD detection, reliability-weighted fusion, four triage outcomes, explanation     | In progress |
 | 21  | Evaluation extensions             | Urgent-case sensitivity, risk–coverage, OOD metrics, baselines and ablations                       | Planned     |
-| 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Planned     |
+| 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Done        |
 | 23  | Object storage                    | MinIO for uploaded photos                                                                          | Planned     |
-| 24  | Mobile application                | Installable PWA, camera capture                                                                    | Planned     |
+| 24  | Mobile application                | Installable PWA, camera capture                                                                    | In progress |
 | 25  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                                         | Planned     |
 | 26  | Final documentation               | User guide, setup guide, AI evaluation report                                                      | Planned     |
 
-Stages 19–24 implement the ideas presented in the project poster; see
+Also delivered alongside stage 22: emergency mode without an account (nearest emergency
+clinics, camera wound check that is not stored, guest rescue reports) and a floating chat
+assistant on every page. Stages 19–24 implement the ideas presented in the project poster; see
 [poster-alignment.md](poster-alignment.md) for the full comparison.
 
 ## Working conventions
