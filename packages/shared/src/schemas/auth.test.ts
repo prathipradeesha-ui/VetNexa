@@ -23,6 +23,23 @@ describe('registerSchema', () => {
     expect(result.error?.issues[0]?.path).toEqual(['confirmPassword']);
   });
 
+  it('refuses passwords longer than the 72 bytes that bcrypt checks', () => {
+    const sinhala = `Aa1${'ශ'.repeat(30)}`; // 33 characters but 93 bytes
+    const result = registerSchema.safeParse({
+      ...validRegistration,
+      password: sinhala,
+      confirmPassword: sinhala,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toMatch(/too long/);
+
+    const ascii = `Aa1${'x'.repeat(69)}`; // exactly 72 bytes is fine
+    expect(
+      registerSchema.safeParse({ ...validRegistration, password: ascii, confirmPassword: ascii })
+        .success,
+    ).toBe(true);
+  });
+
   it.each([
     ['short', 'Ab1'],
     ['no uppercase', 'secure123'],
