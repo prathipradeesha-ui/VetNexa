@@ -26,6 +26,9 @@ python -m vetnexa_ai.train --data-dir data/wounds --epochs 25
 # 2. Evaluate on the held-out test split; writes reports/evaluation.json and .md
 python -m vetnexa_ai.evaluate --model models/wound-classifier.pt
 
+# 3. Triage evaluation: baselines, ablation, risk–coverage, OOD (see docs/evaluation.md)
+python -m vetnexa_ai.evaluate_triage --model models/wound-classifier.pt
+
 # Two-stage training (e.g. human wound photos first, then dog and cat photos)
 python -m vetnexa_ai.train --data-dir data/human-wounds --output-dir models/stage1
 python -m vetnexa_ai.train --data-dir data/wounds --init-from models/stage1/wound-classifier.pt
@@ -83,12 +86,15 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epoch
 | `symptoms.py` | Validates answers and turns them into rule-weighted symptom evidence |
 | `chat/` | Pet-care assistant: knowledge loading, safety triage, TF-IDF retrieval, replies |
 | `service.py` | FastAPI inference service (`/health`, `/assess`) used by the Node API |
+| `triage.py` | Reliability-weighted fusion, four outcomes and safety overrides |
+| `ood.py` | Out-of-distribution detector (energy score and Mahalanobis distance) |
+| `evaluate_triage.py` | Poster evaluation: baselines, scenarios, sensitivity, risk–coverage, OOD |
 | `synthetic.py` | Synthetic drawings for automated tests |
 
 ## Tests and code quality
 
 ```bash
-pytest            # 96 tests, including an end-to-end train → evaluate → assess run
+pytest            # 137 tests, including an end-to-end train → evaluate → assess run
 ruff check .
 ruff format .
 ```

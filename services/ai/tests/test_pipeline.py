@@ -167,3 +167,30 @@ def test_legacy_resnet_checkpoints_still_load(tmp_path):
     model, checkpoint = load_checkpoint(path)
     assert checkpoint["arch"] == "resnet18"
     assert model(torch.zeros(1, 3, 224, 224)).shape == (1, 5)
+
+
+def test_triage_evaluation_runs_end_to_end(trained, tmp_path):
+    from vetnexa_ai.evaluate_triage import evaluate, write_report
+    from vetnexa_ai.triage import FUSION_MODES
+
+    root, _ = trained
+    report = evaluate(
+        root / "models" / "wound-classifier.pt",
+        root / "models" / "split.json",
+        baseline_path=root / "models" / "wound-classifier.pt",
+        draws=1,
+        ood_count=8,
+    )
+    assert set(report["triage"]) == set(FUSION_MODES)
+    overall = report["triage"]["reliability"]["overall"]
+    assert overall["cases"] == report["cases_per_mode"]
+    assert 0 <= overall["coverage"] <= 1
+    assert len(report["triage"]["reliability"]["scenarios"]) == 12  # 3 photo x 4 answer scenarios
+    assert report["ood"]["unfamiliar_images"] == 8
+    assert "baseline_classifier" in report
+
+    write_report(report, tmp_path)
+    markdown = (tmp_path / "triage-evaluation.md").read_text(encoding="utf-8")
+    assert "Reliability-weighted fusion (proposed)" in markdown
+    assert (tmp_path / "risk-coverage.svg").read_text(encoding="utf-8").startswith("<svg")
+    assert (tmp_path / "reliability-diagram.svg").exists()

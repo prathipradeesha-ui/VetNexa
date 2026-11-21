@@ -15,3 +15,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Report writer: long Markdown table rows and SVG templates read better unwrapped.
+"vetnexa_ai/evaluate_triage.py" = ["E501"]
