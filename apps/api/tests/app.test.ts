@@ -70,6 +70,16 @@ describe('security headers and CORS', () => {
     expect(res.headers['access-control-allow-credentials']).toBe('true');
   });
 
+  it('does not read HTML form posts, so other websites cannot submit forms to it', async () => {
+    const res = await request(testApp())
+      .post('/api/auth/login')
+      .type('form')
+      .send({ email: 'owner@test.vetnexa.lk', password: 'Password123' });
+
+    expect(res.status).toBe(422);
+    expect(res.headers['set-cookie']).toBeUndefined();
+  });
+
   it('does not allow unknown origins', async () => {
     const res = await request(testApp()).get('/api/health').set('Origin', 'https://evil.example');
 

@@ -61,8 +61,9 @@ export function createApp({
       credentials: true, // allow the auth cookie to be sent from the web app
     }),
   );
+  // JSON only (photos use multipart uploads). HTML form posts are not read, so a form on
+  // another website cannot submit data to the API using the visitor's session.
   app.use(express.json({ limit: '1mb' }));
-  app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
 
   if (env.NODE_ENV !== 'test') {

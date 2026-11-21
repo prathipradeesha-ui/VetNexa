@@ -12,8 +12,15 @@ const envSchema = z
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(4100),
     DATABASE_URL: z.url({ protocol: /^mysql$/, error: 'DATABASE_URL must be a mysql:// URL' }),
-    // Comma-separated list of front-end origins allowed to call the API with cookies.
-    CORS_ORIGIN: z.string().default('http://localhost:5173'),
+    // Comma-separated list of front-end origins allowed to call the API with cookies. A "*"
+    // would let any website use a visitor's session, so it is refused.
+    CORS_ORIGIN: z
+      .string()
+      .default('http://localhost:5173')
+      .refine(
+        (value) => value.split(',').every((origin) => /^https?:\/\/[^\s/*]+$/.test(origin.trim())),
+        'CORS_ORIGIN must list exact origins such as https://vetnexa.example (no "*")',
+      ),
     // Secret used to sign login tokens. Must be long and random; never commit the real value.
     JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
     // How long a login lasts, in hours.

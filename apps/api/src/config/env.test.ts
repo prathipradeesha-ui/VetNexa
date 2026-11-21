@@ -23,6 +23,20 @@ describe('loadEnv', () => {
     expect(() => loadEnv({})).toThrow(/Invalid environment configuration:\n {2}- DATABASE_URL/);
   });
 
+  it('refuses a wildcard or malformed CORS origin', () => {
+    expect(() => loadEnv({ DATABASE_URL, JWT_SECRET, CORS_ORIGIN: '*' })).toThrow(/CORS_ORIGIN/);
+    expect(() =>
+      loadEnv({ DATABASE_URL, JWT_SECRET, CORS_ORIGIN: 'https://*.example.com' }),
+    ).toThrow(/CORS_ORIGIN/);
+    expect(
+      loadEnv({
+        DATABASE_URL,
+        JWT_SECRET,
+        CORS_ORIGIN: 'https://vetnexa.example, http://localhost:8088',
+      }).CORS_ORIGIN,
+    ).toBe('https://vetnexa.example, http://localhost:8088');
+  });
+
   it('rejects a short JWT secret', () => {
     expect(() => loadEnv({ DATABASE_URL, JWT_SECRET: 'too-short' })).toThrow(/JWT_SECRET/);
   });
