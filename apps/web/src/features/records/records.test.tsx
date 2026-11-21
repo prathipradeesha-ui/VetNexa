@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { localDateFromToday } from '../../test/dates';
 import { demoOwner, mockApi, renderRoute } from '../../test/render';
 
 afterEach(() => {
@@ -8,8 +9,7 @@ afterEach(() => {
 });
 
 const signedInOwner = { status: 200, body: { user: demoOwner } };
-const day = (offset: number) =>
-  new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+const day = localDateFromToday;
 
 const bruno = {
   id: 'pet-1',

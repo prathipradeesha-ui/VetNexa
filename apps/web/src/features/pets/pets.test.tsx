@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { localDateFromToday } from '../../test/dates';
 import { demoOwner, mockApi, renderRoute } from '../../test/render';
 
 afterEach(() => {
@@ -42,7 +43,7 @@ describe('my pets list', () => {
   });
 
   it('shows each pet with its summary and next due item', async () => {
-    const dueDate = new Date(Date.now() + 5 * 86_400_000).toISOString().slice(0, 10);
+    const dueDate = localDateFromToday(5);
     mockApi({
       'GET /api/auth/me': signedInOwner,
       'GET /api/pets': {

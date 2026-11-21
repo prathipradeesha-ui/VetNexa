@@ -125,7 +125,8 @@ describe('clinic page', () => {
       'src',
       'https://maps.google.com/maps?q=6.87%2C79.89&z=15&output=embed',
     );
-    expect(screen.getByRole('rowheader', { name: 'Sunday' }).nextSibling).toHaveTextContent(
+    // On a Sunday the row is announced as "Sunday (today)".
+    expect(screen.getByRole('rowheader', { name: /^Sunday/ }).nextSibling).toHaveTextContent(
       'Closed',
     );
     expect(screen.getByText('Dr. Ruwan Senanayake')).toBeInTheDocument();
