@@ -277,12 +277,38 @@ Retrieval-based assistant; see [assistant.md](assistant.md) for how answers are 
 
 ## Administration
 
-All routes require the `ADMIN` role.
+All routes require the `ADMIN` role. Lists are paginated 20 at a time and return
+`{ page, pageSize, total, pages }` alongside the items.
 
-| Method | Path                               | Description                                               |
-| ------ | ---------------------------------- | --------------------------------------------------------- |
-| GET    | `/admin/vets/pending`              | Veterinarians waiting for licence verification.           |
-| PATCH  | `/admin/vets/:userId/verification` | Body `{ "approved": true }` to verify, `false` to revoke. |
+| Method | Path                               | Description                                                           |
+| ------ | ---------------------------------- | --------------------------------------------------------------------- |
+| GET    | `/admin/stats`                     | Platform counts (users, pets, clinics, AI use, rescue, adoption).     |
+| GET    | `/admin/users`                     | Users; filters `q` (name or email), `role`, `status`, `page`.         |
+| PATCH  | `/admin/users/:userId/status`      | Body `{ "status": "SUSPENDED" }` or `"ACTIVE"`.                       |
+| GET    | `/admin/vets/pending`              | Active veterinarians waiting for licence verification.                |
+| PATCH  | `/admin/vets/:userId/verification` | Body `{ "approved": true }` to verify, `false` to revoke.             |
+| GET    | `/admin/clinics`                   | All clinics, including hidden ones; optional `q`.                     |
+| POST   | `/admin/clinics`                   | Add a clinic.                                                         |
+| GET    | `/admin/clinics/:id`               | One clinic with every field.                                          |
+| PUT    | `/admin/clinics/:id`               | Edit a clinic.                                                        |
+| PATCH  | `/admin/clinics/:id/active`        | Body `{ "isActive": false }` hides it from the public directory.      |
+| GET    | `/admin/reviews`                   | Reviews; filter `status` (`APPROVED`, `REJECTED`), `page`.            |
+| PATCH  | `/admin/reviews/:id`               | Body `{ "status": "REJECTED" }` hides, `"APPROVED"` shows again.      |
+| GET    | `/admin/messages`                  | Contact messages; filter `status` (`NEW`, `IN_PROGRESS`, `RESOLVED`). |
+| PATCH  | `/admin/messages/:id`              | Body `{ "status": "RESOLVED" }`.                                      |
+
+**Rules**
+
+- Statistics contain counts only, never personal data.
+- A suspended user receives `403` on their very next request, because the session check reloads
+  the account every time. Admins cannot suspend themselves or other administrators (`403`).
+- Clinic slugs (public URLs) are created from the name and town, made unique, and never change
+  when a clinic is edited, so shared links keep working. Hiding a clinic keeps its history.
+- Clinic form: phone `0XXXXXXXXX` or `+94XXXXXXXXX`; opening hours `HH:MM-HH:MM` or `Closed`
+  for each day, closing after opening; coordinates must be inside Sri Lanka; services are
+  de-duplicated.
+- Hiding or showing a review recalculates the clinic's average rating and review count in the
+  same transaction.
 
 ## Access control summary
 

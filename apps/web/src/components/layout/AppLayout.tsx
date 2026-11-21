@@ -5,6 +5,7 @@ import {
   HeartHandshake,
   Megaphone,
   Globe,
+  ShieldCheck,
   LayoutDashboard,
   LogOut,
   MessageCircleQuestion,
@@ -48,6 +49,7 @@ const navItems: NavItem[] = [
   },
   { to: '/dashboard/rescue', label: 'Rescue', icon: Megaphone },
   { to: '/dashboard/assistant', label: 'Ask VetNexa', icon: MessageCircleQuestion },
+  { to: '/dashboard/admin', label: 'Administration', icon: ShieldCheck, roles: ['ADMIN'] },
   {
     to: '/dashboard/listings',
     label: 'Adoption listings',

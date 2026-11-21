@@ -154,6 +154,65 @@ export const routes: RouteObject[] = [
                 ],
               },
               {
+                // Administration: the API enforces the same ADMIN-only rule on every route.
+                element: <ProtectedRoute roles={['ADMIN']} />,
+                children: [
+                  {
+                    path: '/dashboard/admin',
+                    lazy: lazyPage(
+                      () => import('./features/admin/AdminStatsPage'),
+                      'AdminStatsPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/admin/users',
+                    lazy: lazyPage(
+                      () => import('./features/admin/AdminUsersPage'),
+                      'AdminUsersPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/admin/vets',
+                    lazy: lazyPage(() => import('./features/admin/AdminVetsPage'), 'AdminVetsPage'),
+                  },
+                  {
+                    path: '/dashboard/admin/clinics',
+                    lazy: lazyPage(
+                      () => import('./features/admin/AdminClinicsPage'),
+                      'AdminClinicsPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/admin/clinics/new',
+                    lazy: lazyPage(
+                      () => import('./features/admin/ClinicFormPage'),
+                      'ClinicFormPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/admin/clinics/:id',
+                    lazy: lazyPage(
+                      () => import('./features/admin/ClinicFormPage'),
+                      'ClinicFormPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/admin/reviews',
+                    lazy: lazyPage(
+                      () => import('./features/admin/AdminReviewsPage'),
+                      'AdminReviewsPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/admin/messages',
+                    lazy: lazyPage(
+                      () => import('./features/admin/AdminMessagesPage'),
+                      'AdminMessagesPage',
+                    ),
+                  },
+                ],
+              },
+              {
                 element: <ProtectedRoute roles={['VET']} />,
                 children: [
                   {
