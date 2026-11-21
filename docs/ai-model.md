@@ -1,11 +1,11 @@
 # VetNexa Wound Assessment – Model Card
 
-|           |                                                                                |
-| --------- | ------------------------------------------------------------------------------ |
-| Model     | `wound-resnet18` – ResNet-18 pre-trained on ImageNet, fine-tuned for 5 classes |
-| Status    | **Research prototype. Not validated for clinical use.**                        |
-| Developer | Pradeesha Baskaran                                                             |
-| Code      | `services/ai/vetnexa_ai`                                                       |
+|           |                                                                                                                                        |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Model     | `wound-efficientnetb0` – EfficientNet-B0 pre-trained on ImageNet, fine-tuned for 5 classes (ResNet-18 kept as the comparison baseline) |
+| Status    | **Research prototype. Not validated for clinical use.**                                                                                |
+| Developer | Pradeesha Baskaran                                                                                                                     |
+| Code      | `services/ai/vetnexa_ai`                                                                                                               |
 
 ## Intended use
 
@@ -66,10 +66,45 @@ uploading it (`services/ai/vetnexa_ai/questionnaire.json`, `symptoms.py`):
 - **Missing inputs.** Unanswered questions are listed and lower the completeness score, which
   Stage 20 uses as the reliability of this evidence.
 
-Until the reliability-weighted fusion (Stage 20), the two inputs are combined cautiously: red
-flags override everything, otherwise the more serious of the image result and the symptom level
-is shown, and the owner sees every rule that raised the urgency. The questions, weights and
-thresholds are a developer draft and must be reviewed by a veterinarian.
+The questions, weights and thresholds are a developer draft and must be reviewed by a
+veterinarian.
+
+## Out-of-distribution (OOD) detection
+
+A classifier always picks one of its classes, even for a photo of a sofa or a human hand.
+`ood.py` checks whether a photo looks like the photos the model was trained on, using two
+signals fitted after training and stored in the checkpoint:
+
+- **Energy score** of the logits (Liu et al., 2020): familiar photos have low energy.
+- **Mahalanobis distance** of the EfficientNet feature vector to the nearest class centre, with
+  a Ledoit–Wolf shared covariance (Lee et al., 2018).
+
+Each threshold is the 97.5th percentile on the validation photos. The scores become a
+familiarity between 0 and 1 (0.5 at the threshold); below 0.5 the photo is treated as
+unfamiliar and **not used** – the decision then rests on the answers, or the system abstains.
+
+## Reliability-weighted evidence fusion and triage
+
+`triage.py` turns both inputs into one of **four outcomes**: routine care / monitor,
+veterinary consultation recommended, urgent veterinary attention, or **unable to assess
+safely**.
+
+| Input    | Risk                                                 | Reliability                                     |
+| -------- | ---------------------------------------------------- | ----------------------------------------------- |
+| Photo    | Σ p(class) × class risk (0.05 healthy … 0.8 abscess) | quality × familiarity × (0.5 + 0.5 × certainty) |
+| Symptoms | noisy-OR of the triggered rules                      | share of questions answered                     |
+
+- **Fusion:** `risk = Σ rᵢ·riskᵢ / Σ rᵢ`; overall reliability `1 − Π(1 − rᵢ)`. Below 0.25 →
+  routine, from 0.25 → consultation, from 0.60 → urgent.
+- **Safe abstention:** overall reliability below 0.35 → unable to assess safely.
+- **Safety overrides:** red flags → urgent; a reliable input (r ≥ 0.5) saying "see a vet" can
+  never end as routine, and its "urgent" can drop at most to a consultation; a reliable photo of
+  a cut, puncture or infection always refers; weak evidence that points to urgency is urgent,
+  not "unable".
+- **Explanation:** every result stores each input's risk, reliability and weight, the overrides
+  and the OOD result; owners see them under "Why this result".
+- **Baselines for the evaluation:** the same function runs in `image_only` and `unweighted`
+  modes, so Stage 21 can compare them with reliability weighting.
 
 ## How it is used in VetNexa
 

@@ -275,7 +275,9 @@ receive `422` (field `answers`).
 `severity` (`MINOR`, `MODERATE`, `SEVERE`, `UNCERTAIN`), `referToVet`, `escalated`,
 per-class `probabilities`, `summary`, `guidance`, `modelVersion`, `demoModel`, `answers`,
 `symptoms` (red flags, triggered rules with reasons and weights, risk, level, completeness and
-missing inputs) and `disclaimer`.
+missing inputs), `triage` (`ROUTINE`, `CONSULT`, `URGENT` or `UNABLE`), `triageDetails`
+(each input's risk, reliability and weight, safety overrides and fusion mode; `null` for results
+stored before Stage 20) and `disclaimer`.
 
 **Rules**
 
