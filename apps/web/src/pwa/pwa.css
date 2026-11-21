@@ -89,3 +89,40 @@
     display: none;
   }
 }
+
+.sent-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.sent-banner p {
+  margin: 0;
+}
+
+.sent-banner svg {
+  flex-shrink: 0;
+}
+
+.sent-banner__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sent-banner__close:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}

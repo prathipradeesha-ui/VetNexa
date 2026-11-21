@@ -1,4 +1,5 @@
-import { Download, Share, WifiOff, X } from 'lucide-react';
+import { CheckCircle2, Download, Share, WifiOff, X } from 'lucide-react';
+import { usePendingReportSender } from '../features/emergency/usePendingReports';
 import { useInstallPrompt } from './useInstallPrompt';
 import { useOnlineStatus } from './useOnlineStatus';
 import './pwa.css';
@@ -10,6 +11,7 @@ import './pwa.css';
 export function AppStatus() {
   const online = useOnlineStatus();
   const { option, install, dismiss } = useInstallPrompt();
+  const reports = usePendingReportSender();
 
   return (
     <>
@@ -22,6 +24,27 @@ export function AppStatus() {
               phone your vet directly.
             </span>
           </p>
+        )}
+        {reports.sent.length > 0 && (
+          <div className="sent-banner">
+            <CheckCircle2 size={18} aria-hidden="true" />
+            <p>
+              {reports.sent.map((report) => (
+                <span key={report.reference}>
+                  Your saved rescue report “{report.title}” has been sent. Reference{' '}
+                  <strong>{report.reference}</strong>.{' '}
+                </span>
+              ))}
+            </p>
+            <button
+              type="button"
+              className="sent-banner__close"
+              aria-label="Close message"
+              onClick={reports.clear}
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
+          </div>
         )}
       </div>
 

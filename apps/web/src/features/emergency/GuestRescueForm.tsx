@@ -8,7 +8,8 @@ import {
   type GuestRescueReportData,
   type GuestRescueReportInput,
 } from '@vetnexa/shared';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Clock } from 'lucide-react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router';
 import { LocationPicker } from '../../components/maps/LocationPicker';
@@ -16,11 +17,16 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { FieldWrapper, TextField } from '../../components/ui/FormField';
 import { applyServerErrors, hasFieldErrors } from '../../lib/form-errors';
+import { queueReport, shouldRetry } from './pendingReports';
 import { useGuestRescueReport } from './useEmergency';
 
-/** Report an animal in need without an account; rescuers call the reporter back. */
+/**
+ * Report an animal in need without an account; rescuers call the reporter back. Without a
+ * connection the report waits on the phone and is sent automatically later.
+ */
 export function GuestRescueForm() {
   const report = useGuestRescueReport();
+  const [saved, setSaved] = useState<'queued' | 'failed' | null>(null);
   const {
     register,
     handleSubmit,
@@ -33,6 +39,25 @@ export function GuestRescueForm() {
     defaultValues: { urgency: 'HIGH' },
   });
   const [latitude, longitude] = useWatch({ control, name: ['latitude', 'longitude'] });
+
+  const saveForLater = (data: GuestRescueReportData) =>
+    setSaved(queueReport(data) ? 'queued' : 'failed');
+
+  if (saved === 'queued') {
+    return (
+      <div className="guest-report-done guest-report-done--waiting" role="status">
+        <Clock size={32} aria-hidden="true" />
+        <h3>Saved on this phone. It will be sent when you are back online.</h3>
+        <p>
+          You do not need to do anything: VetNexa sends it as soon as it can reach the internet, the
+          next time the app is open. Until then it is kept only on this phone.
+        </p>
+        <p>
+          <strong>If the animal is badly hurt, please phone an emergency clinic now.</strong>
+        </p>
+      </div>
+    );
+  }
 
   if (report.isSuccess) {
     return (
@@ -54,10 +79,20 @@ export function GuestRescueForm() {
     <form
       className="guest-report"
       noValidate
-      onSubmit={handleSubmit((data) =>
-        report.mutate(data, { onError: (error) => applyServerErrors(error, setError) }),
-      )}
+      onSubmit={handleSubmit((data) => {
+        if (!navigator.onLine) return saveForLater(data);
+        report.mutate(data, {
+          onError: (error) =>
+            shouldRetry(error) ? saveForLater(data) : applyServerErrors(error, setError),
+        });
+      })}
     >
+      {saved === 'failed' && (
+        <Alert tone="error">
+          This report could not be saved on this phone. Please phone an emergency clinic or a local
+          rescue group directly.
+        </Alert>
+      )}
       {report.isError && !hasFieldErrors(report.error) && (
         <Alert tone="error">{report.error.message}</Alert>
       )}

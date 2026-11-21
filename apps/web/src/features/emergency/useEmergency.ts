@@ -35,12 +35,14 @@ export function useGuestAssessment() {
   });
 }
 
+/** Sends a rescue report made without an account. */
+export function postGuestRescueReport(data: GuestRescueReportData) {
+  return api<{ report: { reference: string; createdAt: string } }>('/emergency/rescue', {
+    method: 'POST',
+    body: data,
+  }).then((r) => r.report);
+}
+
 export function useGuestRescueReport() {
-  return useMutation({
-    mutationFn: (data: GuestRescueReportData) =>
-      api<{ report: { reference: string; createdAt: string } }>('/emergency/rescue', {
-        method: 'POST',
-        body: data,
-      }).then((r) => r.report),
-  });
+  return useMutation({ mutationFn: postGuestRescueReport });
 }
