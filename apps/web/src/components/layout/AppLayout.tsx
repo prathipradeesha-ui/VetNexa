@@ -7,6 +7,7 @@ import {
   Globe,
   LayoutDashboard,
   LogOut,
+  MessageCircleQuestion,
   Menu,
   PawPrint,
   ScanSearch,
@@ -46,6 +47,7 @@ const navItems: NavItem[] = [
     roles: ['OWNER'],
   },
   { to: '/dashboard/rescue', label: 'Rescue', icon: Megaphone },
+  { to: '/dashboard/assistant', label: 'Ask VetNexa', icon: MessageCircleQuestion },
   {
     to: '/dashboard/listings',
     label: 'Adoption listings',

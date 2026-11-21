@@ -50,6 +50,10 @@ export const routes: RouteObject[] = [
             lazy: lazyPage(() => import('./features/clinics/ClinicDetailPage'), 'ClinicDetailPage'),
           },
           {
+            path: '/assistant',
+            lazy: lazyPage(() => import('./features/assistant/AssistantPage'), 'AssistantPage'),
+          },
+          {
             path: '/contact',
             lazy: lazyPage(() => import('./pages/contact/ContactPage'), 'ContactPage'),
           },
@@ -89,6 +93,13 @@ export const routes: RouteObject[] = [
                     ),
                   },
                 ],
+              },
+              {
+                path: '/dashboard/assistant',
+                lazy: lazyPage(
+                  () => import('./features/assistant/AssistantPage'),
+                  'DashboardAssistantPage',
+                ),
               },
               {
                 // Any signed-in user can report an animal; the board adapts to the role.

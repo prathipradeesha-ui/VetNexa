@@ -253,6 +253,28 @@ per-class `probabilities`, `summary`, `guidance`, `modelVersion`, `demoModel` an
   interface then shows a clear warning that the result says nothing about the pet.
 - At most 20 assessments per hour per IP address.
 
+## Pet-care assistant
+
+Retrieval-based assistant; see [assistant.md](assistant.md) for how answers are chosen.
+
+| Method | Path            | Description                                                                  |
+| ------ | --------------- | ---------------------------------------------------------------------------- |
+| POST   | `/chat`         | Body `{ "message" }` (1–500 characters). Anyone; returns `{ reply, saved }`. |
+| GET    | `/chat/history` | Signed in: my last 50 messages, oldest first.                                |
+| DELETE | `/chat/history` | Signed in: delete my conversation.                                           |
+
+**Reply:** `kind` (`answer`, `emergency`, `redirect`, `fallback`, `smalltalk`), `text`,
+`emergency` (`reason`, `steps`), `article` (title, summary, sections, sources), `related`,
+`suggestions`, `actions` (links into VetNexa), `score` and `disclaimer`.
+
+**Rules**
+
+- Visitors' questions are answered but never stored. Signed-in users' questions and answers are
+  saved together in one transaction and are visible only to them.
+- If the AI service is unavailable, `POST /chat` returns `503` with a message to contact a vet
+  if the pet seems unwell.
+- At most 30 questions per 10 minutes per IP address.
+
 ## Administration
 
 All routes require the `ADMIN` role.

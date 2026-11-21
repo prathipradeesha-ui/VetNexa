@@ -115,7 +115,7 @@ Full schema lives in `apps/api/prisma/schema.prisma`. Main entities:
 Two responsibilities:
 
 1. **Wound assessment** – a PyTorch image classifier (transfer learning on a pretrained CNN such as ResNet-18 / EfficientNet-B0). OpenCV handles image loading, resizing, colour normalisation and basic quality checks (blur and brightness) before inference.
-2. **Pet-care chatbot** – a retrieval-based assistant over a curated pet-care knowledge base. It returns general educational guidance only and always redirects emergencies to a veterinarian.
+2. **Pet-care chatbot** – a retrieval-based assistant over a curated pet-care knowledge base. It returns general educational guidance only and always redirects emergencies to a veterinarian. Details and evaluation: [assistant.md](assistant.md).
 
 ### AI safety principles
 
