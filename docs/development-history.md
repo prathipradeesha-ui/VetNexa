@@ -35,6 +35,7 @@ every push was also checked by GitHub Actions.
 | 22 Maps and emergency mode     | Google Maps, near-me, rescue location privacy, emergency help without an account, floating chat | `65ec2ec`, `461a214`, `8a3d842`, `55408f3` (21 Nov)                                           |
 | 21 Evaluation                  | Baselines, ablation, risk–coverage, OOD and calibration results                                 | `20a91fa`, `89caf6d` (21 Nov)                                                                 |
 | 23 Photo storage               | MinIO bucket for photos, built from source                                                      | `e2e255c`, `7fa32c7`, `cc4004d`, `1b0d1dd` (21 Nov)                                           |
+| 24 Installable app             | App icons and manifest, offline first-aid page, install button and offline notice               | `56cf2d0`, `b2092a0`, `5630329` (21 Nov)                                                      |
 
 Stage 22 (maps) was finished before Stage 21 (evaluation) because the maps and emergency mode
 were requested during Stage 20; the table follows the real order of the commits.
@@ -57,6 +58,7 @@ were requested during Stage 20; the table follows the real order of the commits.
 | Rescue map with location shared safely                                       | `a9bb5e5`, `ea891db`, map and privacy in `65ec2ec`, `461a214` |
 | Evaluation: urgent sensitivity, macro-F1, ECE, risk–coverage, OOD, baselines | `8a97b45`, `20a91fa`, `89caf6d`                               |
 | React, Node/Express, Python/FastAPI, PyTorch, OpenCV, MySQL/Prisma           | Stages 3–14                                                   |
+| Installable web and mobile app                                               | `56cf2d0`, `b2092a0`, `5630329`                               |
 | MinIO storage and Docker                                                     | `bacfe2d`, `e2e255c`, `7fa32c7`                               |
 | Ethics and verified data                                                     | `58f6e11`, `7fca36a`, `99aae77`                               |
 
@@ -64,8 +66,7 @@ were requested during Stage 20; the table follows the real order of the commits.
 
 | Item                                                   | Why                                                                                                      | Plan                                         |
 | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Installable mobile app                                 | Started: responsive pages and phone camera work; the app cannot be installed yet                         | Stage 24                                     |
-| Follow-up check-ins after a wound check                | Not built                                                                                                | After Stage 24                               |
+| Follow-up check-ins after a wound check                | Not built                                                                                                | Next                                         |
 | Skin conditions as separate model classes              | The model knows wound types and healthy skin; skin problems are covered by the symptom questions         | Needs labelled skin photos                   |
 | Training and evaluation on real wounds                 | No labelled dog and cat wound photos yet; results so far use a demonstration model and simulated answers | When PetWound or partner-clinic data arrives |
 | Ethics approval for collecting real photos             | Needed from the university before using clinic data                                                      | Before any real-world data collection        |

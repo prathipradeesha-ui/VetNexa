@@ -22,6 +22,8 @@ VetNexa is built for **dogs and cats only**. It connects their owners, veterinar
 - Rescue reporting with a privacy-safe map, and adoption
 - AI pet-care assistant, on its own page and as a floating chat in the corner of every page
 - Admin dashboard
+- **Installable app**: add VetNexa to a phone's home screen; first-aid advice still opens
+  without a connection
 
 ## Technology
 
@@ -90,6 +92,21 @@ reports as pins, info windows and your location), create a browser API key:
 
 The user's own location is only requested when they press "Near me" or "Use my current
 location", and it is never sent to the server except as part of a rescue report.
+
+## Installing the app on a phone
+
+VetNexa is a progressive web app, so it can be installed without an app store:
+
+- **Android (Chrome or Edge):** tap **Install app** on the card at the bottom of the page, or
+  open the browser menu and choose **Install app**.
+- **iPhone and iPad (Safari):** tap **Share**, then **Add to Home Screen**.
+- **Windows and macOS (Chrome or Edge):** use the install icon in the address bar.
+
+Pressing and holding the app icon gives shortcuts to Emergency help, Find a clinic and a new
+wound check. Without a connection the app shows wound first-aid steps instead of an error.
+Nothing private is saved for offline use: health records, wound photos and account details
+always come from the server. Installing needs HTTPS (or `localhost`), and the service worker
+is only used in production builds, so `npm run dev` always loads fresh files.
 
 ## Development setup
 

@@ -29,7 +29,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 21  | Evaluation extensions             | Urgent-case sensitivity, risk–coverage, OOD metrics, baselines and ablations                       | Done        |
 | 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Done        |
 | 23  | Object storage                    | MinIO for uploaded photos                                                                          | Done        |
-| 24  | Mobile application                | Installable PWA, camera capture                                                                    | In progress |
+| 24  | Mobile application                | Installable PWA, camera capture                                                                    | Done        |
 | 25  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                                         | Planned     |
 | 26  | Final documentation               | User guide, setup guide, AI evaluation report                                                      | Planned     |
 

@@ -35,14 +35,14 @@ built yet.
 
 ## Application (poster sections 6 and 9)
 
-| Poster idea                                | Status  | In VetNexa now                                                                                                  | Work to do      | Stage |
-| ------------------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------- | --------------- | ----- |
-| Assess wound: photo + symptom questions    | Done    | Three steps: pet and red flags, symptom questions, photo                                                        | –               | 19    |
-| Triage result with confidence, explanation | Done    | Four outcomes with reliability and per-input explanation                                                        | –               | 20    |
-| Nearby clinics on a map or list            | Done    | Google map (interactive with an API key, keyless embed otherwise), near-me sorting, call and directions buttons | –               | 22    |
-| Rescue map, location shared safely         | Done    | Rescue map; exact spot only for reporter, assigned rescuer and admins, about 1 km area for others               | –               | 22    |
-| Web and mobile application                 | Partial | Responsive site; camera opens directly on phones; emergency mode works without an account                       | Installable PWA | 24    |
-| Pet owners, rescuers, veterinary services  | Done    | Owner, rescuer, vet and admin roles                                                                             | –               | –     |
+| Poster idea                                | Status | In VetNexa now                                                                                                  | Work to do | Stage |
+| ------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------- | ---------- | ----- |
+| Assess wound: photo + symptom questions    | Done   | Three steps: pet and red flags, symptom questions, photo                                                        | –          | 19    |
+| Triage result with confidence, explanation | Done   | Four outcomes with reliability and per-input explanation                                                        | –          | 20    |
+| Nearby clinics on a map or list            | Done   | Google map (interactive with an API key, keyless embed otherwise), near-me sorting, call and directions buttons | –          | 22    |
+| Rescue map, location shared safely         | Done   | Rescue map; exact spot only for reporter, assigned rescuer and admins, about 1 km area for others               | –          | 22    |
+| Web and mobile application                 | Done   | Installable app (PWA) with home-screen shortcuts; camera opens directly on phones; first aid offline            | –          | 24    |
+| Pet owners, rescuers, veterinary services  | Done   | Owner, rescuer, vet and admin roles                                                                             | –          | –     |
 
 ## Technology stack (poster section 8)
 
@@ -65,6 +65,7 @@ built yet.
 | Emergency mode without an account      | In an emergency nobody should have to register first: nearest clinics, camera wound check (not stored) and rescue reports work signed out |
 | Floating pet-care assistant            | Quick questions from any page; emergencies in the chat are redirected to clinics                                                          |
 | Call and directions buttons on clinics | One tap to phone a clinic or open Google Maps directions                                                                                  |
+| First aid when offline                 | If the connection drops, the installed app shows wound first-aid steps instead of an error                                                |
 | Dogs and cats only                     | The whole platform is scoped to the species the AI and knowledge base cover                                                               |
 
 ## Dataset and ethics (poster section 5)
