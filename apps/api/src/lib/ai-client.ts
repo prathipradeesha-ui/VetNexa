@@ -1,3 +1,4 @@
+import type { ChatReply } from '@vetnexa/shared';
 import { env } from '../config/env';
 import { HttpError } from './http-error';
 import { logger } from './logger';
@@ -29,12 +30,13 @@ export interface AiHealth {
 export interface AiClient {
   assess(image: Buffer, contentType: string): Promise<AiAssessment>;
   health(): Promise<AiHealth>;
+  chat(message: string): Promise<ChatReply>;
 }
 
 const unavailable = () =>
   HttpError.serviceUnavailable(
-    'The AI assessment service is not available right now. If you are worried about your ' +
-      'pet, please contact a veterinarian.',
+    'The VetNexa AI service is not available right now. If you are worried about your pet, ' +
+      'please contact a veterinarian.',
   );
 
 /**
@@ -79,6 +81,22 @@ export function httpAiClient(
         throw unavailable();
       }
       return (await response.json()) as AiAssessment;
+    },
+
+    async chat(message) {
+      const response = await call('/chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (!response.ok) {
+        logger.warn({ status: response.status }, 'AI service refused a chat message');
+        throw HttpError.serviceUnavailable(
+          'The pet-care assistant is not available right now. If your pet seems unwell or ' +
+            'you think it is an emergency, please contact a veterinarian.',
+        );
+      }
+      return (await response.json()) as ChatReply;
     },
 
     async health() {

@@ -849,24 +849,7 @@ async function main() {
   });
   await prisma.adoptionListing.update({ where: { id: coco!.id }, data: { status: 'PENDING' } });
 
-  // ── Chatbot history ──
-  await prisma.chatMessage.createMany({
-    data: [
-      {
-        userId: nimali.id,
-        sender: 'USER',
-        content: 'How often should my cat be vaccinated?',
-        createdAt: daysFromNow(-3, 20),
-      },
-      {
-        userId: nimali.id,
-        sender: 'ASSISTANT',
-        content:
-          "Adult cats usually receive the core FVRCP vaccine every one to three years and rabies according to local regulations. Your vet will recommend a schedule based on Luna's lifestyle. Luna's next FVRCP booster in VetNexa is due soon.",
-        createdAt: daysFromNow(-3, 20),
-      },
-    ],
-  });
+  // No chat history is seeded: every assistant answer must come from the knowledge base.
 
   const counts = {
     users: await prisma.user.count(),

@@ -42,6 +42,9 @@ function fakeAi(answer: Partial<AiAssessment> = {}, modelLoaded = true) {
       modelVersion: 'wound-resnet18-test',
       demoModel: true,
     })),
+    chat: vi.fn(async () => {
+      throw new Error('not used in these tests');
+    }),
   } satisfies AiClient;
 }
 
@@ -200,6 +203,9 @@ describe('AI wound assessments', () => {
         throw HttpError.serviceUnavailable();
       },
       health: async () => {
+        throw HttpError.serviceUnavailable();
+      },
+      chat: async () => {
         throw HttpError.serviceUnavailable();
       },
     };

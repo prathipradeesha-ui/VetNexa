@@ -416,11 +416,15 @@ enum ChatSender {
   ASSISTANT
 }
 
+/// One message in a signed-in user's conversation with the pet-care assistant.
+/// `content` is the plain text; `payload` keeps the assistant's structured reply (article,
+/// emergency steps, links) so the conversation can be shown again exactly as it was.
 model ChatMessage {
   id        String     @id @default(cuid())
   userId    String
   sender    ChatSender
   content   String     @db.Text
+  payload   Json?
   createdAt DateTime   @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

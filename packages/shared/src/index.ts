@@ -7,3 +7,4 @@ export * from './schemas/clinic';
 export * from './schemas/consultation';
 export * from './schemas/rescue-adoption';
 export * from './schemas/assessment';
+export * from './schemas/chat';

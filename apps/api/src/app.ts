@@ -13,6 +13,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { adminRouter } from './modules/admin/admin.routes';
 import { assessmentsRouter } from './modules/assessments/assessments.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import { chatRouter } from './modules/chat/chat.routes';
 import { adoptionRouter } from './modules/adoption/adoption.routes';
 import { clinicsRouter } from './modules/clinics/clinics.routes';
 import { contactRouter } from './modules/contact/contact.routes';
@@ -158,6 +159,17 @@ export function createApp({
       next(HttpError.tooManyRequests('You have assessed many photos. Please try again later.')),
   });
 
+  // Pet-care assistant: 30 questions per 10 minutes per IP.
+  const chatLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 30,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) =>
+      next(HttpError.tooManyRequests('You have asked a lot of questions. Please wait a moment.')),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
   app.use('/api/auth', authRouter(prisma, loginLimiter));
@@ -167,6 +179,7 @@ export function createApp({
   app.use('/api/pets', petsRouter(prisma));
   app.use('/api/reminders', remindersRouter(prisma));
   app.use('/api/assessments', assessmentsRouter(prisma, aiClient, assessmentLimiter));
+  app.use('/api/chat', chatRouter(prisma, aiClient, chatLimiter));
   app.use('/api/clinics', clinicsRouter(prisma, reviewLimiter));
   app.use('/api/consultations', consultationsRouter(prisma));
   app.use('/api/vet', vetPortalRouter(prisma));
