@@ -96,8 +96,10 @@ src/
 - **RBAC** middleware on every protected route, plus ownership checks in services (an owner can only read their own pets).
 - **Helmet** security headers, **CORS** restricted to the web origin, **rate limiting** on auth and AI endpoints.
 - All input validated with **Zod** before reaching business logic.
-- Uploaded images limited by size and MIME type, stored with random file names.
+- Uploaded images limited by size and MIME type, decoded and re-encoded (which removes location data), stored with random file names.
+- JSON-only request bodies and an exact CORS origin list (a `*` origin is refused at start-up), so other websites cannot submit data with a visitor's session.
 - Errors returned in one consistent shape without stack traces in production.
+- Reviewed in Stage 25; see [security-accessibility-review.md](security-accessibility-review.md) for the findings, fixes and remaining risks.
 
 ## 5. Data model (summary)
 

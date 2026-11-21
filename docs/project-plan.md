@@ -30,7 +30,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Done        |
 | 23  | Object storage                    | MinIO for uploaded photos                                                                          | Done        |
 | 24  | Mobile application                | Installable PWA, camera capture                                                                    | Done        |
-| 25  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                                         | Planned     |
+| 25  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                                         | Done        |
 | 26  | Final documentation               | User guide, setup guide, AI evaluation report                                                      | Planned     |
 
 Also delivered alongside stage 22: emergency mode without an account (nearest emergency

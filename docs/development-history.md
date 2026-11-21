@@ -37,6 +37,8 @@ every push was also checked by GitHub Actions.
 | 23 Photo storage               | MinIO bucket for photos, built from source                                                       | `e2e255c`, `7fa32c7`, `cc4004d`, `1b0d1dd` (21 Nov)                                           |
 | 24 Installable app             | App icons and manifest, offline first-aid page, install button and offline notice                | `56cf2d0`, `b2092a0`, `5630329` (21 Nov)                                                      |
 | – Offline emergency help       | Emergency page offline: saved clinics, danger-sign check, first-aid guides, rescue reports later | `86b793b`, `52f279e`, `ee333a1`, `212a908`, `445bdd3`, `8711636` (21 Nov)                     |
+| – Friendly error page          | Clear message and automatic reload when a page fails to load                                     | `260422f` (21 Nov)                                                                            |
+| 25 Security and accessibility  | Dependency and API review, fixes, access tests, contrast and screen reader fixes, axe in CI      | `9ec3b25`, `3af7d87`, `7e8d60a`, `cc5cb04`, `0dbcdb1`, `a7567a4` (21 Nov)                     |
 
 Stage 22 (maps) was finished before Stage 21 (evaluation) because the maps and emergency mode
 were requested during Stage 20; the table follows the real order of the commits.
@@ -66,10 +68,10 @@ were requested during Stage 20; the table follows the real order of the commits.
 
 ## Not finished yet
 
-| Item                                                   | Why                                                                                                      | Plan                                         |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Follow-up check-ins after a wound check                | Not built                                                                                                | Next                                         |
-| Skin conditions as separate model classes              | The model knows wound types and healthy skin; skin problems are covered by the symptom questions         | Needs labelled skin photos                   |
-| Training and evaluation on real wounds                 | No labelled dog and cat wound photos yet; results so far use a demonstration model and simulated answers | When PetWound or partner-clinic data arrives |
-| Ethics approval for collecting real photos             | Needed from the university before using clinic data                                                      | Before any real-world data collection        |
-| Security and accessibility review, final documentation | Planned                                                                                                  | Stages 25 and 26                             |
+| Item                                       | Why                                                                                                      | Plan                                         |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Follow-up check-ins after a wound check    | Not built                                                                                                | Next                                         |
+| Skin conditions as separate model classes  | The model knows wound types and healthy skin; skin problems are covered by the symptom questions         | Needs labelled skin photos                   |
+| Training and evaluation on real wounds     | No labelled dog and cat wound photos yet; results so far use a demonstration model and simulated answers | When PetWound or partner-clinic data arrives |
+| Ethics approval for collecting real photos | Needed from the university before using clinic data                                                      | Before any real-world data collection        |
+| Final documentation                        | Planned                                                                                                  | Stage 26                                     |

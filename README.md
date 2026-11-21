@@ -189,6 +189,7 @@ pip, GitHub Actions and Docker base images; each update must pass CI before it i
 - [Pet-care assistant](docs/assistant.md)
 - [Triage evaluation](docs/evaluation.md)
 - [Alignment with the project poster](docs/poster-alignment.md)
+- [Security and accessibility review](docs/security-accessibility-review.md)
 
 ## Project owner
 
