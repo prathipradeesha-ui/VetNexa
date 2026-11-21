@@ -8,8 +8,9 @@ const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url
 const external = Object.keys(pkg.dependencies).filter((name) => !name.startsWith('@vetnexa/'));
 
 await build({
-  entryPoints: ['src/server.ts'],
-  outfile: 'dist/server.js',
+  // The server and the photo migration script (storage:migrate), as two files in dist/.
+  entryPoints: { server: 'src/server.ts', 'migrate-uploads': 'src/scripts/migrate-uploads.ts' },
+  outdir: 'dist',
   bundle: true,
   platform: 'node',
   target: 'node24',

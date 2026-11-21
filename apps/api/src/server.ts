@@ -1,12 +1,17 @@
 import { createApp } from './app';
 import { env } from './config/env';
 import { logger } from './lib/logger';
+import { objectStore } from './lib/storage';
 import { createPrismaClient } from './lib/prisma';
 
 /** Entry point: connects to the database, starts the HTTP server and shuts down cleanly. */
 async function start() {
   const prisma = createPrismaClient(env.DATABASE_URL);
   await prisma.$connect();
+  // Creates the upload folder or MinIO bucket if needed, and fails fast if it is unreachable.
+  const store = objectStore();
+  await store.ready();
+  logger.info(`Photo storage: ${store.driver}`);
 
   const app = createApp({ prisma });
   const server = app.listen(env.PORT, () => {

@@ -26,4 +26,20 @@ describe('loadEnv', () => {
   it('rejects a short JWT secret', () => {
     expect(() => loadEnv({ DATABASE_URL, JWT_SECRET: 'too-short' })).toThrow(/JWT_SECRET/);
   });
+
+  it('uses local storage by default and checks S3 settings when S3 is chosen', () => {
+    expect(loadEnv({ DATABASE_URL, JWT_SECRET }).STORAGE_DRIVER).toBe('local');
+    expect(() => loadEnv({ DATABASE_URL, JWT_SECRET, STORAGE_DRIVER: 's3' })).toThrow(
+      /S3_ENDPOINT is required[\s\S]*S3_ACCESS_KEY_ID is required/,
+    );
+    const s3 = loadEnv({
+      DATABASE_URL,
+      JWT_SECRET,
+      STORAGE_DRIVER: 's3',
+      S3_ENDPOINT: 'http://minio:9000',
+      S3_ACCESS_KEY_ID: 'vetnexa',
+      S3_SECRET_ACCESS_KEY: 'secret-key-123',
+    });
+    expect(s3).toMatchObject({ S3_BUCKET: 'vetnexa-uploads', S3_FORCE_PATH_STYLE: true });
+  });
 });

@@ -14,7 +14,7 @@ describe('GET /api/health', () => {
     expect(res.body).toMatchObject({
       status: 'ok',
       service: 'vetnexa-api',
-      checks: { database: 'up' },
+      checks: { database: 'up', storage: 'up' },
     });
     expect(typeof res.body.uptimeSeconds).toBe('number');
   });

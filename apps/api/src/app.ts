@@ -26,7 +26,7 @@ import {
 import { petsRouter } from './modules/pets/pets.routes';
 import { recordsRouter, remindersRouter } from './modules/records/records.routes';
 import { rescueRouter } from './modules/rescue/rescue.routes';
-import { uploadRoot, UPLOADS_URL_PREFIX } from './lib/uploads';
+import { serveUpload, UPLOADS_URL_PREFIX } from './lib/uploads';
 import { healthRouter } from './modules/health/health.routes';
 
 export interface AppDependencies {
@@ -80,17 +80,9 @@ export function createApp({
     );
   }
 
-  // Uploaded photos. Names are random and files are re-encoded images, so they are safe to serve;
+  // Uploaded photos, streamed from the local folder or the MinIO/S3 bucket (see lib/storage.ts).
   // Helmet's nosniff header stops browsers from treating them as anything else.
-  app.use(
-    UPLOADS_URL_PREFIX,
-    express.static(uploadRoot(), {
-      index: false,
-      dotfiles: 'deny',
-      maxAge: '7d',
-      fallthrough: false,
-    }),
-  );
+  app.get(`${UPLOADS_URL_PREFIX}/:folder/:file`, serveUpload);
 
   // General limit for every API route; stricter limits are added on login and AI routes later.
   app.use(
