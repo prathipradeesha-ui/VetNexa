@@ -4,7 +4,7 @@
 #   docker build -f apps/web/Dockerfile -t vetnexa-web .
 
 # ── build ──
-FROM node:24-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
 COPY apps/api/package.json apps/api/
