@@ -243,9 +243,17 @@ to the AI service directly.
 | GET    | `/assessments/:id`    | One assessment.                                                             |
 | DELETE | `/assessments/:id`    | Delete an assessment and its stored photo.                                  |
 
+**Questionnaire:** optional multipart field `answers`, a JSON string with `redFlags` (list),
+`bodyLocation`, `duration`, `cause`, `signs` (list), `appetite`, `energy` and `pain`; `null`
+means "not sure". Allowed values are defined in `packages/shared/src/schemas/questionnaire.ts`.
+The API adds the pet's species before forwarding the answers to the AI service. Invalid answers
+receive `422` (field `answers`).
+
 **Result:** `status` (`ASSESSED` or `UNCERTAIN`), `predictedClass`, calibrated `confidence`,
 `severity` (`MINOR`, `MODERATE`, `SEVERE`, `UNCERTAIN`), `referToVet`, `escalated`,
-per-class `probabilities`, `summary`, `guidance`, `modelVersion`, `demoModel` and `disclaimer`.
+per-class `probabilities`, `summary`, `guidance`, `modelVersion`, `demoModel`, `answers`,
+`symptoms` (red flags, triggered rules with reasons and weights, risk, level, completeness and
+missing inputs) and `disclaimer`.
 
 **Rules**
 

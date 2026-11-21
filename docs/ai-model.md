@@ -49,6 +49,28 @@ a veterinarian before any real-world use.
    - Cuts, punctures and infections always recommend a vet.
    - Every result carries a disclaimer and the word "diagnosis" is never used for AI output.
 
+## Multimodal input: symptoms and context
+
+The photo is the first input. The second is a short questionnaire the owner answers before
+uploading it (`services/ai/vetnexa_ai/questionnaire.json`, `symptoms.py`):
+
+- **Red flags.** Eight emergency signs (heavy bleeding, breathing difficulty, collapse, a very
+  deep or penetrating wound, a road accident or fall, an eye injury, rapid facial swelling or a
+  possible snake bite, a seizure). Ticking one shows an emergency notice at once, and the
+  result is always urgent, even when the photo is too poor to assess.
+- **Symptoms and context.** Body location, duration, cause, visible signs, appetite, energy and
+  pain. Every question has a "Not sure" answer.
+- **Rule-weighted evidence.** 23 documented rules each add a weight; weights combine as a
+  noisy-OR, `risk = 1 − Π(1 − wᵢ)`. Below 0.25 the symptoms suggest routine care, from 0.25 a
+  veterinary consultation, and from 0.60 urgent attention.
+- **Missing inputs.** Unanswered questions are listed and lower the completeness score, which
+  Stage 20 uses as the reliability of this evidence.
+
+Until the reliability-weighted fusion (Stage 20), the two inputs are combined cautiously: red
+flags override everything, otherwise the more serious of the image result and the symptom level
+is shown, and the owner sees every rule that raised the urgency. The questions, weights and
+thresholds are a developer draft and must be reviewed by a veterinarian.
+
 ## How it is used in VetNexa
 
 The model runs in a separate Python service (`python -m vetnexa_ai.service`). Owners upload a

@@ -24,7 +24,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 16  | Admin dashboard                   | User and vet verification, clinic and content management, statistics                               | Done        |
 | 17  | Containerisation                  | Dockerfiles, Docker Compose for all services                                                       | Done        |
 | 18  | Continuous integration            | GitHub Actions: lint, type-check, tests                                                            | Done        |
-| 19  | Multimodal input                  | Symptom and context questionnaire, red flags, missing-input checks, rule-weighted symptom evidence | Planned     |
+| 19  | Multimodal input                  | Symptom and context questionnaire, red flags, missing-input checks, rule-weighted symptom evidence | Done        |
 | 20  | Reliability-weighted triage       | EfficientNet-B0, OOD detection, reliability-weighted fusion, four triage outcomes, explanation     | Planned     |
 | 21  | Evaluation extensions             | Urgent-case sensitivity, risk–coverage, OOD metrics, baselines and ablations                       | Planned     |
 | 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Planned     |

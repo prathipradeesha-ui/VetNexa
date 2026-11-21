@@ -36,15 +36,18 @@ export interface NewAssessment {
   petId: string;
   photo: File;
   ownerNotes?: string;
+  /** Questionnaire answers (see symptomAnswersSchema in @vetnexa/shared). */
+  answers?: object;
 }
 
 export function useCreateAssessment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ petId, photo, ownerNotes }: NewAssessment) => {
+    mutationFn: ({ petId, photo, ownerNotes, answers }: NewAssessment) => {
       const form = new FormData();
       form.append('petId', petId);
       if (ownerNotes) form.append('ownerNotes', ownerNotes);
+      if (answers) form.append('answers', JSON.stringify(answers));
       form.append('photo', photo);
       return apiForm<{ assessment: WoundAssessmentResult }>('/assessments', form).then(
         (r) => r.assessment,

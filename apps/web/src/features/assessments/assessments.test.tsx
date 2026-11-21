@@ -96,42 +96,66 @@ describe('wound check history', () => {
 });
 
 describe('new wound check', () => {
-  it('requires a pet, a photo and the acknowledgement', async () => {
-    const fetchMock = mockApi({
+  const setup = (extra: Record<string, unknown> = {}) =>
+    mockApi({
       'GET /api/auth/me': signedInOwner,
       'GET /api/assessments/status': available,
-      'GET /api/pets': {
-        status: 200,
-        body: { pets: [pet('pet-1', 'Bruno', 'DOG')] },
-      },
-    });
+      'GET /api/pets': { status: 200, body: { pets: [pet('pet-1', 'Bruno', 'DOG')] } },
+      ...extra,
+    } as Parameters<typeof mockApi>[0]);
+
+  /** Answers the symptom step: a bite, 1–3 days, swelling, everything else "Not sure". */
+  async function answerSymptoms() {
+    await userEvent.click(
+      await screen.findByRole('radio', { name: 'A bite or a fight with another animal' }),
+    );
+    await userEvent.click(screen.getByRole('radio', { name: '1–3 days' }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Swelling' }));
+  }
+
+  it('asks for a pet first and shows red-flag emergencies at once', async () => {
+    const fetchMock = setup();
     renderRoute('/dashboard/assessments/new');
 
-    const select = await screen.findByLabelText('Which pet?');
-    expect(within(select).getByRole('option', { name: 'Bruno' })).toBeInTheDocument();
-    expect(screen.getByText(/Demonstration model/)).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: 'Check wound' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
     expect(screen.getByText('Please choose which pet the photo is of')).toBeInTheDocument();
+
+    await userEvent.selectOptions(screen.getByLabelText('Which pet?'), 'pet-1');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('checkbox', { name: /Difficulty breathing/ }));
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveTextContent('This is an emergency');
+    expect(within(alert).getByRole('link', { name: 'Find an emergency clinic' })).toHaveAttribute(
+      'href',
+      '/clinics?emergency=true',
+    );
+    expect(fetchMock).not.toHaveBeenCalledWith('/api/assessments', expect.anything());
+  });
+
+  it('requires a photo and the acknowledgement on the last step', async () => {
+    setup();
+    renderRoute('/dashboard/assessments/new?petId=pet-1');
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Check wound' }));
     expect(screen.getByText('Please add a photo of the wound')).toBeInTheDocument();
     expect(
       screen.getByText('Please confirm you understand this is not a diagnosis'),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalledWith('/api/assessments', expect.anything());
   });
 
-  it('uploads the photo and opens the result', async () => {
-    const fetchMock = mockApi({
-      'GET /api/auth/me': signedInOwner,
-      'GET /api/assessments/status': available,
-      'GET /api/pets': { status: 200, body: { pets: [pet('pet-1', 'Bruno', 'DOG')] } },
+  it('sends the photo with the symptom answers and opens the result', async () => {
+    const fetchMock = setup({
       'POST /api/assessments': { status: 201, body: { assessment: result } },
     });
     const { router } = renderRoute('/dashboard/assessments/new?petId=pet-1');
 
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
+    await answerSymptoms();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     await userEvent.upload(await screen.findByLabelText('Photo of the wound'), photo());
     expect(screen.getByAltText('Chosen wound photo')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('checkbox'));
+    await userEvent.click(screen.getByRole('checkbox', { name: /I understand/ }));
     await userEvent.click(screen.getByRole('button', { name: 'Check wound' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/dashboard/assessments/a-1'));
@@ -139,13 +163,46 @@ describe('new wound check', () => {
     const form = init!.body as FormData;
     expect(form.get('petId')).toBe('pet-1');
     expect(form.get('photo')).toBeInstanceOf(File);
+    expect(JSON.parse(String(form.get('answers')))).toEqual({
+      redFlags: [],
+      bodyLocation: null,
+      duration: '1_3_days',
+      cause: 'bite_fight',
+      appetite: null,
+      energy: null,
+      pain: null,
+      signs: ['swelling'],
+    });
+  });
+
+  it('keeps answers when going back and sends "Not sure" for signs when ticked', async () => {
+    const fetchMock = setup({
+      'POST /api/assessments': { status: 201, body: { assessment: result } },
+    });
+    renderRoute('/dashboard/assessments/new?petId=pet-1');
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
+    await answerSymptoms();
+    await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(screen.getByRole('radio', { name: '1–3 days' })).toBeChecked();
+
+    const signs = screen.getByRole('group', { name: /What do you see/ });
+    await userEvent.click(within(signs).getByRole('checkbox', { name: 'Not sure' }));
+    expect(within(signs).getByRole('checkbox', { name: 'Swelling' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    await userEvent.upload(await screen.findByLabelText('Photo of the wound'), photo());
+    await userEvent.click(screen.getByRole('checkbox', { name: /I understand/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Check wound' }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('/api/assessments', expect.anything()),
+    );
+    const [, init] = fetchMock.mock.calls.find(([url]) => url === '/api/assessments')!;
+    expect(JSON.parse(String((init!.body as FormData).get('answers'))).signs).toBeNull();
   });
 
   it('shows photo-quality advice when the photo is rejected', async () => {
-    mockApi({
-      'GET /api/auth/me': signedInOwner,
-      'GET /api/assessments/status': available,
-      'GET /api/pets': { status: 200, body: { pets: [pet('pet-1', 'Bruno', 'DOG')] } },
+    setup({
       'POST /api/assessments': {
         status: 422,
         body: {
@@ -158,9 +215,10 @@ describe('new wound check', () => {
       },
     });
     renderRoute('/dashboard/assessments/new?petId=pet-1');
-
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
     await userEvent.upload(await screen.findByLabelText('Photo of the wound'), photo());
-    await userEvent.click(screen.getByRole('checkbox'));
+    await userEvent.click(screen.getByRole('checkbox', { name: /I understand/ }));
     await userEvent.click(screen.getByRole('button', { name: 'Check wound' }));
 
     expect(await screen.findByText('This photo cannot be assessed reliably')).toBeInTheDocument();
@@ -169,6 +227,64 @@ describe('new wound check', () => {
 });
 
 describe('wound check result', () => {
+  it('explains how the symptom answers were used', async () => {
+    mockApi({
+      'GET /api/auth/me': signedInOwner,
+      'GET /api/assessments/a-1': {
+        status: 200,
+        body: {
+          assessment: {
+            ...result,
+            answers: {
+              redFlags: [],
+              bodyLocation: 'paw',
+              duration: '1_3_days',
+              cause: 'bite_fight',
+              signs: ['swelling'],
+              appetite: null,
+              energy: null,
+              pain: null,
+            },
+            symptoms: {
+              species: 'dog',
+              redFlags: [],
+              risk: 0.45,
+              level: 'consult',
+              rules: [
+                { id: 'bite', weight: 0.35, reason: 'Bite wounds often hide deep damage.' },
+                { id: 'swelling', weight: 0.15, reason: 'Swelling can mean infection.' },
+              ],
+              completeness: 4 / 7,
+              missing: ['appetite', 'energy', 'pain'],
+              questionnaireVersion: 'test',
+            },
+          },
+        },
+      },
+    });
+    renderRoute('/dashboard/assessments/a-1');
+
+    const heading = await screen.findByRole('heading', { name: /How your answers were used/ });
+    const panel = heading.closest('section')!;
+    expect(within(panel).getByText('Veterinary consultation recommended')).toBeInTheDocument();
+    expect(within(panel).getByText('Bite wounds often hide deep damage.')).toBeInTheDocument();
+    expect(within(panel).getByText('+35%')).toBeInTheDocument();
+    expect(within(panel).getByText(/You answered 4 of 7 questions/)).toBeInTheDocument();
+    expect(within(panel).getByText('Paw or toes')).toBeInTheDocument();
+  });
+
+  it('says when no symptom answers were given', async () => {
+    mockApi({
+      'GET /api/auth/me': signedInOwner,
+      'GET /api/assessments/a-1': {
+        status: 200,
+        body: { assessment: { ...result, answers: null, symptoms: null } },
+      },
+    });
+    renderRoute('/dashboard/assessments/a-1');
+    expect(await screen.findByText(/based on the photo only/)).toBeInTheDocument();
+  });
+
   it('shows severity, confidence, guidance, referral and disclaimer', async () => {
     mockApi({
       'GET /api/auth/me': signedInOwner,

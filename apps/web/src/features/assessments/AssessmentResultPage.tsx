@@ -12,6 +12,7 @@ import {
   percent,
   SeverityBadge,
 } from './AssessmentBits';
+import { SymptomEvidencePanel } from './SymptomEvidencePanel';
 import { useAssessment, useDeleteAssessment } from './useAssessments';
 import '../pets/pets.css';
 import './assessments.css';
@@ -102,7 +103,10 @@ export function AssessmentResultPage() {
 
           {result.escalated && (
             <Alert tone="warning">
-              The urgency was raised because the model also saw signs of a more serious problem.
+              {result.symptoms &&
+              (result.symptoms.redFlags.length > 0 || result.symptoms.level !== 'routine')
+                ? 'The urgency was raised to be on the safe side, based on the symptoms you described or other signs the model saw.'
+                : 'The urgency was raised because the model also saw signs of a more serious problem.'}
             </Alert>
           )}
 
@@ -134,6 +138,8 @@ export function AssessmentResultPage() {
           )}
         </section>
       </div>
+
+      <SymptomEvidencePanel answers={result.answers} symptoms={result.symptoms} />
 
       <EmergencyNotice />
 
