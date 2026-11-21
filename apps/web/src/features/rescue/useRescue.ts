@@ -10,13 +10,15 @@ export interface RescueReport {
   locationText: string;
   city: string;
   latitude: number | null;
+  /** True when the position is rounded to about 1 km for privacy. */
+  locationApproximate: boolean;
   longitude: number | null;
   urgency: RescueUrgency;
   status: RescueStatus;
   photoUrl: string | null;
   createdAt: string;
   updatedAt: string;
-  reporter: { name: string; phone: string | null; isMe: boolean };
+  reporter: { name: string; phone: string | null; isMe: boolean; isGuest: boolean };
   assignedTo: { name: string; phone: string | null; isMe: boolean } | null;
   actions: { canTakeOn: boolean; canResolve: boolean; canClose: boolean; canChangePhoto: boolean };
 }

@@ -10,9 +10,11 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router';
+import { MapView } from '../../components/maps/MapView';
 import { Alert } from '../../components/ui/Alert';
 import { PageLoader } from '../../components/ui/PageLoader';
 import { StarRating } from '../../components/ui/Stars';
+import { directionsUrl } from '../../lib/maps';
 import { OpenBadge } from './ClinicsPage';
 import { ReviewSection } from './ReviewSection';
 import { useClinic, type ClinicDetail } from './useClinics';
@@ -36,10 +38,13 @@ export function ClinicDetailPage() {
 
 function ClinicProfile({ clinic }: { clinic: ClinicDetail }) {
   const today = clinicLocalTime(new Date()).day;
-  const mapUrl =
+  const position =
     clinic.latitude !== null && clinic.longitude !== null
-      ? `https://www.google.com/maps/search/?api=1&query=${clinic.latitude},${clinic.longitude}`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${clinic.name} ${clinic.addressLine} ${clinic.city}`)}`;
+      ? { lat: clinic.latitude, lng: clinic.longitude }
+      : null;
+  const mapUrl = directionsUrl(
+    position ?? `${clinic.name}, ${clinic.addressLine}, ${clinic.city}, Sri Lanka`,
+  );
 
   return (
     <>
@@ -168,6 +173,24 @@ function ClinicProfile({ clinic }: { clinic: ClinicDetail }) {
                 </div>
               </li>
             </ul>
+            {position && (
+              <div className="clinic-location-map">
+                <MapView
+                  label={`Map showing ${clinic.name}`}
+                  places={[
+                    {
+                      id: clinic.id,
+                      position,
+                      title: clinic.name,
+                      subtitle: `${clinic.addressLine}, ${clinic.city}`,
+                      highlight: clinic.hasEmergency || clinic.isOpen24Hours,
+                    },
+                  ]}
+                  selectedId={clinic.id}
+                  height={260}
+                />
+              </div>
+            )}
           </section>
 
           <section className="card" aria-labelledby="hours-heading">

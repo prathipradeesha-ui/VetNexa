@@ -5,7 +5,7 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "declaration": false,
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom", "google.maps"]
   },
   "include": ["src", "vite.config.ts"]
 }

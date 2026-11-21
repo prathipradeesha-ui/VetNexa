@@ -1,8 +1,21 @@
-import { Clock, MapPin, Phone, Search, Siren, X } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import {
+  Clock,
+  Crosshair,
+  List,
+  Map as MapIcon,
+  MapPin,
+  Navigation,
+  Phone,
+  Search,
+  Siren,
+  X,
+} from 'lucide-react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
+import { MapView, type MapPlace } from '../../components/maps/MapView';
 import { StarRating } from '../../components/ui/Stars';
+import { directionsUrl, distanceKm, formatDistance, useGeolocation } from '../../lib/maps';
 import { useClinicSearch, type ClinicFilters, type ClinicSummary } from './useClinics';
 import './clinics.css';
 
@@ -35,6 +48,41 @@ export function ClinicsPage() {
   const [filters, setFilters] = useFiltersFromUrl();
   const [text, setText] = useState(filters.q ?? '');
   const search = useClinicSearch(filters);
+  const [view, setView] = useState<'list' | 'map'>('list');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const geo = useGeolocation();
+  const me = geo.state.status === 'ready' ? geo.state.position : null;
+
+  /** With the user's location: nearest first, with the distance on every card. */
+  const clinics = useMemo(() => {
+    const list = (search.data?.clinics ?? []).map((clinic) => ({
+      clinic,
+      distance:
+        me && clinic.latitude !== null && clinic.longitude !== null
+          ? distanceKm(me, { lat: clinic.latitude, lng: clinic.longitude })
+          : null,
+    }));
+    if (me) list.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+    return list;
+  }, [search.data, me]);
+
+  const places: MapPlace[] = clinics
+    .filter(({ clinic }) => clinic.latitude !== null && clinic.longitude !== null)
+    .map(({ clinic, distance }) => ({
+      id: clinic.id,
+      position: { lat: clinic.latitude!, lng: clinic.longitude! },
+      title: clinic.name,
+      subtitle: [
+        `${clinic.addressLine}, ${clinic.city}`,
+        clinic.isOpen24Hours ? 'Open 24 hours' : clinic.isOpenNow ? 'Open now' : 'Closed now',
+        distance !== null ? formatDistance(distance) : null,
+      ]
+        .filter(Boolean)
+        .join(' · '),
+      href: `/clinics/${clinic.slug}`,
+      highlight: clinic.hasEmergency || clinic.isOpen24Hours,
+    }));
+  const activeId = selectedId ?? places[0]?.id ?? null;
   const hasFilters = Boolean(
     filters.q || filters.city || filters.service || filters.emergency || filters.openNow,
   );
@@ -129,6 +177,16 @@ export function ClinicsPage() {
               />
               <Clock size={16} aria-hidden="true" /> Open now
             </label>
+            <button
+              type="button"
+              className="toggle-chip"
+              aria-pressed={geo.state.status === 'ready'}
+              onClick={geo.locate}
+              disabled={geo.state.status === 'locating'}
+            >
+              <Crosshair size={16} aria-hidden="true" />
+              {geo.state.status === 'locating' ? 'Finding you…' : 'Near me'}
+            </button>
             <select
               className="select clinic-filters__sort"
               aria-label="Sort by"
@@ -140,10 +198,32 @@ export function ClinicsPage() {
             </select>
           </div>
 
+          {geo.state.status === 'error' && <Alert tone="info">{geo.state.message}</Alert>}
+
+          <div className="clinic-view-toggle" role="group" aria-label="Show results as">
+            <button
+              type="button"
+              className="toggle-chip"
+              aria-pressed={view === 'list'}
+              onClick={() => setView('list')}
+            >
+              <List size={16} aria-hidden="true" /> List
+            </button>
+            <button
+              type="button"
+              className="toggle-chip"
+              aria-pressed={view === 'map'}
+              onClick={() => setView('map')}
+            >
+              <MapIcon size={16} aria-hidden="true" /> Map
+            </button>
+          </div>
+
           <div className="clinic-results__summary" aria-live="polite">
             {search.isSuccess && (
               <p>
                 {search.data.total} clinic{search.data.total === 1 ? '' : 's'} found
+                {me && ', nearest first'}
                 {hasFilters && (
                   <button type="button" className="link-button" onClick={clearAll}>
                     <X size={14} aria-hidden="true" /> Clear filters
@@ -165,14 +245,43 @@ export function ClinicsPage() {
             </div>
           )}
 
-          {search.isSuccess && search.data.total > 0 && (
+          {search.isSuccess && search.data.total > 0 && view === 'list' && (
             <ul className={`clinic-grid ${search.isPlaceholderData ? 'is-updating' : ''}`}>
-              {search.data.clinics.map((clinic) => (
+              {clinics.map(({ clinic, distance }) => (
                 <li key={clinic.id}>
-                  <ClinicCard clinic={clinic} />
+                  <ClinicCard clinic={clinic} distance={distance} />
                 </li>
               ))}
             </ul>
+          )}
+
+          {search.isSuccess && search.data.total > 0 && view === 'map' && (
+            <div className="clinic-map-layout">
+              <div className="clinic-map-layout__map">
+                <MapView
+                  label="Map of veterinary clinics"
+                  places={places}
+                  selectedId={activeId}
+                  onSelect={setSelectedId}
+                  userLocation={me}
+                  height={520}
+                />
+              </div>
+              <ul className="clinic-map-layout__list">
+                {clinics.map(({ clinic, distance }) => (
+                  <li key={clinic.id}>
+                    <ClinicCard
+                      clinic={clinic}
+                      distance={distance}
+                      selected={clinic.id === activeId}
+                      onShowOnMap={
+                        clinic.latitude !== null ? () => setSelectedId(clinic.id) : undefined
+                      }
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       </section>
@@ -180,9 +289,23 @@ export function ClinicsPage() {
   );
 }
 
-function ClinicCard({ clinic }: { clinic: ClinicSummary }) {
+function ClinicCard({
+  clinic,
+  distance = null,
+  selected = false,
+  onShowOnMap,
+}: {
+  clinic: ClinicSummary;
+  distance?: number | null;
+  selected?: boolean;
+  onShowOnMap?: () => void;
+}) {
+  const destination =
+    clinic.latitude !== null && clinic.longitude !== null
+      ? { lat: clinic.latitude, lng: clinic.longitude }
+      : `${clinic.name}, ${clinic.addressLine}, ${clinic.city}, Sri Lanka`;
   return (
-    <article className="card clinic-card">
+    <article className={`card clinic-card${selected ? ' clinic-card--selected' : ''}`}>
       <div className="clinic-card__badges">
         <OpenBadge clinic={clinic} />
         {(clinic.hasEmergency || clinic.isOpen24Hours) && (
@@ -209,6 +332,9 @@ function ClinicCard({ clinic }: { clinic: ClinicSummary }) {
       </p>
       <p className="clinic-card__line">
         <MapPin size={15} aria-hidden="true" /> {clinic.addressLine}, {clinic.city}
+        {distance !== null && (
+          <span className="clinic-card__distance">{formatDistance(distance)}</span>
+        )}
       </p>
       <p className="clinic-card__line">
         <Phone size={15} aria-hidden="true" /> <a href={`tel:${clinic.phone}`}>{clinic.phone}</a>
@@ -219,6 +345,24 @@ function ClinicCard({ clinic }: { clinic: ClinicSummary }) {
         ))}
         {clinic.services.length > 4 && <li>+{clinic.services.length - 4} more</li>}
       </ul>
+      <div className="clinic-card__actions">
+        <a href={`tel:${clinic.phone}`} className="btn btn--secondary btn--sm">
+          <Phone size={15} aria-hidden="true" /> Call
+        </a>
+        <a
+          href={directionsUrl(destination)}
+          target="_blank"
+          rel="noreferrer"
+          className="btn btn--secondary btn--sm"
+        >
+          <Navigation size={15} aria-hidden="true" /> Directions
+        </a>
+        {onShowOnMap && (
+          <button type="button" className="btn btn--ghost btn--sm" onClick={onShowOnMap}>
+            <MapPin size={15} aria-hidden="true" /> Show on map
+          </button>
+        )}
+      </div>
     </article>
   );
 }

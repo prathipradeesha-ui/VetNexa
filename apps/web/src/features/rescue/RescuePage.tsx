@@ -1,5 +1,7 @@
-import { Megaphone } from 'lucide-react';
+import { List, Map as MapIcon, Megaphone } from 'lucide-react';
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import { MapView, type MapPlace } from '../../components/maps/MapView';
 import { Alert } from '../../components/ui/Alert';
 import { PageLoader } from '../../components/ui/PageLoader';
 import { useCurrentUser } from '../auth/useAuth';
@@ -22,6 +24,19 @@ export function RescuePage() {
   const requested = params.get('view') as RescueView | null;
   const view = isResponder && tabs.some((t) => t.id === requested) ? requested! : 'open';
   const reports = useRescueReports(view);
+  const [display, setDisplay] = useState<'list' | 'map'>('list');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const places: MapPlace[] = (reports.data ?? [])
+    .filter((r) => r.latitude !== null && r.longitude !== null)
+    .map((r) => ({
+      id: r.id,
+      position: { lat: r.latitude!, lng: r.longitude! },
+      title: r.title,
+      subtitle: `${r.locationText}, ${r.city}${r.locationApproximate ? ' · approximate area' : ''}`,
+      href: `/dashboard/rescue/${r.id}`,
+      highlight: r.urgency === 'CRITICAL' || r.urgency === 'HIGH',
+      approximateRadiusM: r.locationApproximate ? 1000 : undefined,
+    }));
 
   return (
     <>
@@ -53,6 +68,43 @@ export function RescuePage() {
               {tab.label}
             </button>
           ))}
+        </div>
+      )}
+
+      {isResponder && (
+        <div className="clinic-view-toggle" role="group" aria-label="Show reports as">
+          <button
+            type="button"
+            className="toggle-chip"
+            aria-pressed={display === 'list'}
+            onClick={() => setDisplay('list')}
+          >
+            <List size={16} aria-hidden="true" /> List
+          </button>
+          <button
+            type="button"
+            className="toggle-chip"
+            aria-pressed={display === 'map'}
+            onClick={() => setDisplay('map')}
+          >
+            <MapIcon size={16} aria-hidden="true" /> Map
+          </button>
+        </div>
+      )}
+
+      {isResponder && display === 'map' && reports.isSuccess && (
+        <div className="rescue-board-map">
+          <MapView
+            label="Map of rescue reports"
+            places={places}
+            selectedId={selectedId ?? places[0]?.id ?? null}
+            onSelect={setSelectedId}
+            height={460}
+          />
+          <p className="field__hint">
+            {places.length} of {reports.data.length} reports have a location. Red areas are
+            approximate; the exact spot is shown once you take a report on.
+          </p>
         </div>
       )}
 

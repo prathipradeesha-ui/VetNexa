@@ -118,7 +118,12 @@ describe('clinic page', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Get directions/ })).toHaveAttribute(
       'href',
-      'https://www.google.com/maps/search/?api=1&query=6.87,79.89',
+      'https://www.google.com/maps/dir/?api=1&destination=6.87%2C79.89',
+    );
+    // Without an API key the map is Google's keyless embed of the clinic's position.
+    expect(screen.getByTitle(/Map showing/)).toHaveAttribute(
+      'src',
+      'https://maps.google.com/maps?q=6.87%2C79.89&z=15&output=embed',
     );
     expect(screen.getByRole('rowheader', { name: 'Sunday' }).nextSibling).toHaveTextContent(
       'Closed',
@@ -167,5 +172,54 @@ describe('clinic page', () => {
 
     expect(await screen.findByText(/written by pet owners and rescuers/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Post review' })).not.toBeInTheDocument();
+  });
+});
+
+describe('clinic map and near me', () => {
+  const located = (id: string, name: string, lat: number, lng: number) => ({
+    ...summary,
+    id,
+    slug: id,
+    name,
+    latitude: lat,
+    longitude: lng,
+  });
+  const kandy = located('k', 'Hillside Pet Care Centre', 7.29, 80.63);
+  const colombo = located('c', 'Harbourview Animal Hospital', 6.93, 79.84);
+
+  it('sorts by distance, shows how far each clinic is and maps the selected one', async () => {
+    mockApi({
+      'GET /api/auth/me': signedOut,
+      'GET /api/clinics': { status: 200, body: { clinics: [kandy, colombo], total: 2, facets } },
+    });
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      geolocation: {
+        getCurrentPosition: (ok: PositionCallback) =>
+          ok({ coords: { latitude: 6.9, longitude: 79.85 } } as GeolocationPosition),
+      },
+    });
+    renderRoute('/clinics');
+
+    await screen.findByRole('heading', { name: 'Hillside Pet Care Centre' });
+    await userEvent.click(screen.getByRole('button', { name: 'Near me' }));
+    expect(await screen.findByText(/nearest first/)).toBeInTheDocument();
+    const names = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(names.indexOf('Harbourview Animal Hospital')).toBeLessThan(
+      names.indexOf('Hillside Pet Care Centre'),
+    );
+    expect(screen.getAllByText(/km away/)[0]).toHaveTextContent('3.5 km away');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Map' }));
+    const map = screen.getByTitle(/Map of veterinary clinics/);
+    expect(map.getAttribute('src')).toContain('6.93%2C79.84');
+    await userEvent.click(screen.getAllByRole('button', { name: 'Show on map' })[1]!);
+    expect(screen.getByTitle(/Map of veterinary clinics/).getAttribute('src')).toContain(
+      '7.29%2C80.63',
+    );
+    expect(screen.getAllByRole('link', { name: /Directions/ })[0]).toHaveAttribute(
+      'href',
+      expect.stringContaining('google.com/maps/dir/'),
+    );
   });
 });

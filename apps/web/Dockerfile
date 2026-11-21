@@ -13,6 +13,12 @@ COPY packages/shared/package.json packages/shared/
 RUN npm ci --no-audit --no-fund
 COPY packages/shared packages/shared
 COPY apps/web apps/web
+# Optional Google Maps browser key (restrict it to your domain in Google Cloud). Without it the
+# app uses Google's keyless embed for one place at a time.
+ARG VITE_GOOGLE_MAPS_API_KEY=
+ARG VITE_GOOGLE_MAPS_MAP_ID=
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY \
+    VITE_GOOGLE_MAPS_MAP_ID=$VITE_GOOGLE_MAPS_MAP_ID
 RUN npm run build --workspace=@vetnexa/web
 
 # ── runtime ──

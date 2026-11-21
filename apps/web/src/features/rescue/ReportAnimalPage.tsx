@@ -9,8 +9,9 @@ import {
   type RescueReportInput,
 } from '@vetnexa/shared';
 import { ArrowLeft } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { LocationPicker } from '../../components/maps/LocationPicker';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { FieldWrapper, TextField } from '../../components/ui/FormField';
@@ -27,12 +28,15 @@ export function ReportAnimalPage() {
   const {
     register,
     handleSubmit,
+    setValue,
+    control,
     setError,
     formState: { errors },
   } = useForm<RescueReportInput, unknown, RescueReportData>({
     resolver: zodResolver(rescueReportSchema),
     defaultValues: { urgency: 'MEDIUM', city: user?.city ?? '', contactPhone: user?.phone ?? '' },
   });
+  const [latitude, longitude] = useWatch({ control, name: ['latitude', 'longitude'] });
 
   return (
     <>
@@ -133,6 +137,16 @@ export function ReportAnimalPage() {
             {...register('contactPhone')}
           />
         </div>
+        <FieldWrapper id="report-location" label="Exact location" optional>
+          <LocationPicker
+            value={latitude != null && longitude != null ? { lat: latitude, lng: longitude } : null}
+            onChange={(position) => {
+              setValue('latitude', position?.lat ?? null);
+              setValue('longitude', position?.lng ?? null);
+            }}
+            privacyNote="Only you, the rescuer who takes this on and administrators see the exact spot. Other rescuers see the area (about 1 km)."
+          />
+        </FieldWrapper>
         <p className="field__hint">You can add a photo on the next page.</p>
         <div className="form-actions">
           <Link to="/dashboard/rescue" className="btn btn--secondary">

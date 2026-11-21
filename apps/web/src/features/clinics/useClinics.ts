@@ -9,6 +9,8 @@ export interface ClinicSummary {
   addressLine: string;
   city: string;
   district: string;
+  latitude: number | null;
+  longitude: number | null;
   phone: string;
   services: string[];
   hasEmergency: boolean;
@@ -33,8 +35,6 @@ export interface ClinicDetail extends ClinicSummary {
   description: string | null;
   email: string | null;
   website: string | null;
-  latitude: number | null;
-  longitude: number | null;
   openingHours: OpeningHours;
   vets: {
     id: string;

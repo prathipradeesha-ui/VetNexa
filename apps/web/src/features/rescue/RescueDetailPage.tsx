@@ -1,10 +1,12 @@
 import { RESCUE_URGENCY_LABELS, SPECIES_LABELS } from '@vetnexa/shared';
 import { ArrowLeft, ExternalLink, HandHeart, MapPin, Phone } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
+import { MapView } from '../../components/maps/MapView';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { PageLoader } from '../../components/ui/PageLoader';
 import { PhotoPicker } from '../../components/ui/PhotoPicker';
+import { directionsUrl, placeUrl } from '../../lib/maps';
 import { RescueStatusBadge, timeAgo, UrgencyBadge } from './RescueBits';
 import { useRescueActions, useRescueReport, type RescueReport } from './useRescue';
 import '../pets/pets.css';
@@ -28,7 +30,14 @@ export function RescueDetailPage() {
 function ReportDetail({ report }: { report: RescueReport }) {
   const location = useLocation();
   const { takeOn, setStatus, uploadPhoto } = useRescueActions(report.id);
-  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${report.locationText}, ${report.city}, Sri Lanka`)}`;
+  const position =
+    report.latitude !== null && report.longitude !== null
+      ? { lat: report.latitude, lng: report.longitude }
+      : null;
+  const mapUrl =
+    position && !report.locationApproximate
+      ? directionsUrl(position)
+      : placeUrl(`${report.locationText}, ${report.city}, Sri Lanka`);
   const busy = takeOn.isPending || setStatus.isPending;
   const error = takeOn.error ?? setStatus.error;
 
@@ -85,6 +94,29 @@ function ReportDetail({ report }: { report: RescueReport }) {
                 </dd>
               </div>
             </dl>
+            {position && (
+              <div className="rescue-map">
+                <MapView
+                  label="Where the animal was seen"
+                  places={[
+                    {
+                      id: report.id,
+                      position,
+                      title: report.locationApproximate ? 'Approximate area' : report.locationText,
+                      approximateRadiusM: report.locationApproximate ? 1000 : undefined,
+                      highlight: true,
+                    },
+                  ]}
+                  selectedId={report.id}
+                  height={240}
+                />
+                {report.locationApproximate && (
+                  <p className="field__hint">
+                    For the reporter's safety, the exact spot is shown once you take this report on.
+                  </p>
+                )}
+              </div>
+            )}
             {report.actions.canChangePhoto && (
               <PhotoPicker
                 label="Upload a photo of the animal"
