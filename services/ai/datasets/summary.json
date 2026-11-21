@@ -1,24 +1,43 @@
 {
-  "kept_images": 62,
-  "excluded_images": 33,
+  "kept_images": 290,
+  "excluded_images": 569,
   "by_category_and_species": {
-    "allergic_dermatitis/dog": 13,
-    "bacterial_dermatosis/dog": 12,
-    "fungal_infection/dog": 11,
-    "healthy_skin/dog": 26
+    "allergic_dermatitis/dog": 62,
+    "bacterial_dermatosis/dog": 42,
+    "fungal_infection/dog": 58,
+    "healthy_skin/dog": 58,
+    "uninjured/cat": 24,
+    "uninjured/dog": 15,
+    "wound_injury/cat": 14,
+    "wound_injury/dog": 17
   },
   "by_source": {
-    "mendeley-5dbht54kw7": 62
+    "kaggle-yashmotiani-dogs-skin-disease": 158,
+    "mendeley-5dbht54kw7": 62,
+    "roboflow-resqpetai-injury-classifier": 70
   },
   "excluded_by_reason": {
-    "label '(no label in source)' not used": 33
+    "augmented copy of the same photo": 350,
+    "multispectral band frame, not a normal photo": 80,
+    "label '(no label in source)' not used": 33,
+    "not a dog or cat": 33,
+    "augmented copy: rotated with filled corners": 19,
+    "exact duplicate": 15,
+    "too small": 14,
+    "label 'Unlabeled' not used": 10,
+    "stock-photo watermark: Shutterstock": 5,
+    "near-duplicate": 3,
+    "stock-photo watermark: Alamy": 3,
+    "cropped copy of another photo": 2,
+    "stock-photo watermark: Getty Images": 1,
+    "stock-photo watermark: CanStockPhoto": 1
   },
   "categories": {
     "healthy_skin": "Healthy skin and coat, no visible lesion",
     "bacterial_dermatosis": "Bacterial skin infection (pyoderma)",
     "fungal_infection": "Fungal skin infection other than ringworm",
     "ringworm": "Dermatophytosis: circular, scaly, hairless patches",
-    "allergic_dermatitis": "Hypersensitivity / allergic dermatitis (atopy, food or contact allergy)",
+    "allergic_dermatitis": "Hypersensitivity / allergic dermatitis (atopy, food or contact)",
     "flea_allergy": "Flea allergy dermatitis",
     "dermatitis": "Dermatitis not further specified by the source",
     "mange_scabies": "Mite infestations: sarcoptic mange, scabies, demodicosis",

@@ -15,11 +15,20 @@
       "url": "https://data.mendeley.com/datasets/5dbht54kw7/1",
       "doi": "10.17632/5dbht54kw7.1",
       "licence": "CC BY 4.0",
-      "species": ["dog"],
+      "species": [
+        "dog"
+      ],
       "content": "Clinical skin images of 95 pet dogs photographed at a veterinary hospital with written owner consent: 23 bacterial dermatosis, 19 fungal infections, 23 hypersensitivity allergic dermatosis, 30 healthy.",
-      "labels": ["Bacterial_dermatosis", "Fungal_infections", "Hypersensitivity_allergic_dermatosis", "Healthy"],
+      "labels": [
+        "Bacterial_dermatosis",
+        "Fungal_infections",
+        "Hypersensitivity_allergic_dermatosis",
+        "Healthy"
+      ],
       "access": "Direct download, no account needed",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "verified",
+      "inspection_notes": "Original clinical data from a research institute, published with a DOI; photos taken by the researchers with written owner consent. 10 frames per dog: pic0 is the white-light photo (used); pic1-9 are narrow-band multispectral frames (not used). The label file covers 62 of 95 folders; the other 33 are excluded."
     },
     {
       "id": "kaggle-yashmotiani-dogs-skin-disease",
@@ -27,11 +36,20 @@
       "provider": "Kaggle (yashmotiani)",
       "url": "https://www.kaggle.com/datasets/yashmotiani/dogs-skin-disease-dataset",
       "licence": "CC0: Public Domain",
-      "species": ["dog"],
+      "species": [
+        "dog"
+      ],
       "content": "About 500 images in 4 folders (Bacterial_dermatosis 97, Fungal_infections 137, Healthy 119, Hypersensitivity). The author notes the dataset has flaws and should be checked before use.",
-      "labels": ["Bacterial_dermatosis", "Fungal_infections", "Healthy", "Hypersensitivity_dermatitis"],
+      "labels": [
+        "Bacterial_dermatosis",
+        "Fungal_infections",
+        "Healthy",
+        "Hypersensitivity_dermatitis"
+      ],
       "access": "Kaggle sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, contradicted",
+      "inspection_notes": "Inspection on 2026-11-21 found this is a compilation: it re-uploads the Mendeley CC BY 4.0 images (including multispectral band frames) under CC0, contains photos from veterinary websites (e.g. \"© SeniorTailWaggers.com\"), collages, annotated images and rotated augmented copies. The CC0 claim cannot cover third-party photos."
     },
     {
       "id": "kaggle-youssefmohmmed-dogs-skin-diseases",
@@ -39,11 +57,21 @@
       "provider": "Kaggle (youssefmohmmed)",
       "url": "https://www.kaggle.com/datasets/youssefmohmmed/dogs-skin-diseases-image-dataset",
       "licence": "Apache 2.0",
-      "species": ["dog"],
+      "species": [
+        "dog"
+      ],
       "content": "Labelled images of dogs with skin conditions (229.9 MB).",
-      "labels": ["Dermatitis", "Fungal_infections", "Healthy", "Hypersensitivity", "demodicosis", "ringworm"],
+      "labels": [
+        "Dermatitis",
+        "Fungal_infections",
+        "Healthy",
+        "Hypersensitivity",
+        "demodicosis",
+        "ringworm"
+      ],
       "access": "Kaggle sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-dog-skin-disease-dermatosis",
@@ -51,12 +79,20 @@
       "provider": "Roboflow Universe (Dog Skin Disease dermatosis)",
       "url": "https://universe.roboflow.com/dog-skin-disease-dermatosis/dog-skin-disease-dataset",
       "licence": "CC BY 4.0",
-      "species": ["dog"],
+      "species": [
+        "dog"
+      ],
       "task": "Classification",
       "images": 1418,
-      "labels": ["healthy", "bacterial dermatosis", "fungal infection", "hypersensitivity dermatitis"],
+      "labels": [
+        "healthy",
+        "bacterial dermatosis",
+        "fungal infection",
+        "hypersensitivity dermatitis"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-majorproject-dog-skin-disease-prediction",
@@ -64,12 +100,20 @@
       "provider": "Roboflow Universe (majorProject)",
       "url": "https://universe.roboflow.com/majorproject-kopqr/dog-skin-disease-prediction",
       "licence": "CC BY 4.0",
-      "species": ["dog"],
+      "species": [
+        "dog"
+      ],
       "task": "Classification",
       "images": 361,
-      "labels": ["flea_allergy", "hotspot", "mange", "ringworm"],
+      "labels": [
+        "flea_allergy",
+        "hotspot",
+        "mange",
+        "ringworm"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-litespy-dog-skin-diseases",
@@ -77,12 +121,20 @@
       "provider": "Roboflow Universe (litespy)",
       "url": "https://universe.roboflow.com/litespy-l22hu/dog-skin-diseases",
       "licence": "CC BY 4.0",
-      "species": ["dog"],
+      "species": [
+        "dog"
+      ],
       "task": "Object Detection",
       "images": 618,
-      "labels": ["healthy", "bacterial-dermatosis", "fungal-infection", "hypersensitivity-allergic-dermatosis"],
+      "labels": [
+        "healthy",
+        "bacterial-dermatosis",
+        "fungal-infection",
+        "hypersensitivity-allergic-dermatosis"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-kat-cat-skin-disease",
@@ -90,12 +142,20 @@
       "provider": "Roboflow Universe (kat)",
       "url": "https://universe.roboflow.com/kat-0wwmp/cat-skin-disease-dza04-kvf5y",
       "licence": "CC BY 4.0",
-      "species": ["cat"],
+      "species": [
+        "cat"
+      ],
       "task": "Classification",
       "images": 983,
-      "labels": ["Flea Allergy", "Health", "Ringworm", "Scabies"],
+      "labels": [
+        "Flea Allergy",
+        "Health",
+        "Ringworm",
+        "Scabies"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-bios-cat-skin-disease",
@@ -103,12 +163,19 @@
       "provider": "Roboflow Universe (bios)",
       "url": "https://universe.roboflow.com/bios-mz7bh/cat-skin-disease-a1uku",
       "licence": "Public Domain",
-      "species": ["cat"],
+      "species": [
+        "cat"
+      ],
       "task": "Classification",
       "images": 348,
-      "labels": ["jamuran (Indonesian: fungal infection)", "ringworm", "scabbies"],
+      "labels": [
+        "jamuran (Indonesian: fungal infection)",
+        "ringworm",
+        "scabbies"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-humaira-feline-health-conditions",
@@ -116,12 +183,20 @@
       "provider": "Roboflow Universe (humaira)",
       "url": "https://universe.roboflow.com/humaira-0chnz/feline-health-conditions-dataset",
       "licence": "CC BY 4.0",
-      "species": ["cat"],
+      "species": [
+        "cat"
+      ],
       "task": "Object Detection",
       "images": 800,
-      "labels": ["dermatitis", "flea_allergy", "ringworm", "scabies"],
+      "labels": [
+        "dermatitis",
+        "flea_allergy",
+        "ringworm",
+        "scabies"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included"
+      "decision": "included",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-resqpetai-injury-classifier",
@@ -129,12 +204,20 @@
       "provider": "Roboflow Universe (RESQPETAI)",
       "url": "https://universe.roboflow.com/resqpetai/dataset-2-injury-classifier-nouqt",
       "licence": "CC BY 4.0",
-      "species": ["dog", "cat (to be confirmed per image)"],
+      "species": [
+        "dog",
+        "cat (to be confirmed per image)"
+      ],
       "task": "Classification",
       "images": 134,
-      "labels": ["healthy", "injured"],
+      "labels": [
+        "healthy",
+        "injured"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included – each image is checked and anything that is not a dog or cat is removed"
+      "decision": "included – each image is checked and anything that is not a dog or cat is removed",
+      "provenance": "uploader-asserted, contradicted",
+      "inspection_notes": "Inspection on 2026-11-21 found web-collected photos including stock images with Shutterstock, Alamy, Getty Images and CanStockPhoto watermarks, and many cows and buffalo. The CC BY 4.0 claim cannot cover stock photos."
     },
     {
       "id": "roboflow-animalwounded-injured-dog-detector",
@@ -142,12 +225,25 @@
       "provider": "Roboflow Universe (AnimalWounded)",
       "url": "https://universe.roboflow.com/animalwounded/injured-dog-detector-xnb9y",
       "licence": "CC BY 4.0",
-      "species": ["dog", "cat", "cow", "buffalo", "human"],
+      "species": [
+        "dog",
+        "cat",
+        "cow",
+        "buffalo",
+        "human"
+      ],
       "task": "Object Detection",
       "images": 174,
-      "labels": ["injured-dogs", "uninjured dogs", "injured cat", "uninjured cat", "(others excluded)"],
+      "labels": [
+        "injured-dogs",
+        "uninjured dogs",
+        "injured cat",
+        "uninjured cat",
+        "(others excluded)"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included – only images whose boxes are dogs or cats are kept"
+      "decision": "included – only images whose boxes are dogs or cats are kept",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-sunny-injured-animal-detector",
@@ -155,12 +251,24 @@
       "provider": "Roboflow Universe (sunny)",
       "url": "https://universe.roboflow.com/sunny-83vgc/injured-animal-detector-6zzbu",
       "licence": "Public Domain",
-      "species": ["dog", "cat", "cow", "buffalo", "human"],
+      "species": [
+        "dog",
+        "cat",
+        "cow",
+        "buffalo",
+        "human"
+      ],
       "task": "Object Detection",
       "images": 149,
-      "labels": ["dog", "cat", "injured", "(others excluded)"],
+      "labels": [
+        "dog",
+        "cat",
+        "injured",
+        "(others excluded)"
+      ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included – only images containing a dog or cat are kept"
+      "decision": "included – only images containing a dog or cat are kept",
+      "provenance": "uploader-asserted, not yet inspected"
     },
     {
       "id": "roboflow-maria-angelica-skin-disease-of-cat",
@@ -205,5 +313,10 @@
       "name": "basic-wound-classify, Master-Wound-Classifier, WOUND v2 and similar",
       "decision": "excluded – human wounds (WOUND v2 is also empty)"
     }
-  ]
+  ],
+  "provenance_levels": {
+    "verified": "Original data published by the people who took the photos (institution, DOI, consent statement).",
+    "uploader-asserted": "Community upload; the licence is the uploader's claim and the original photographers are unknown.",
+    "uploader-asserted, contradicted": "Inspection found images the uploader cannot have licensed (stock watermarks, copies of other datasets)."
+  }
 }
