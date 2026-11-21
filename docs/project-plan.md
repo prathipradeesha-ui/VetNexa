@@ -28,7 +28,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 20  | Reliability-weighted triage       | EfficientNet-B0, OOD detection, reliability-weighted fusion, four triage outcomes, explanation     | Done        |
 | 21  | Evaluation extensions             | Urgent-case sensitivity, risk–coverage, OOD metrics, baselines and ablations                       | Done        |
 | 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Done        |
-| 23  | Object storage                    | MinIO for uploaded photos                                                                          | Planned     |
+| 23  | Object storage                    | MinIO for uploaded photos                                                                          | Done        |
 | 24  | Mobile application                | Installable PWA, camera capture                                                                    | In progress |
 | 25  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                                         | Planned     |
 | 26  | Final documentation               | User guide, setup guide, AI evaluation report                                                      | Planned     |

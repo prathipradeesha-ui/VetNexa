@@ -225,7 +225,9 @@ pet ID returns `404`, so the API does not reveal that it exists.
 
 **Photos:** JPG, PNG or WebP up to 5 MB. Every upload is decoded and re-encoded as an
 800 × 800 WebP, which rejects files that are not real images and removes location (EXIF)
-data from phone photos. Files get random names and are served from `/uploads/...`.
+data from phone photos. Files get random names and are served from `/uploads/...`, streamed by
+the API from the configured store: the local folder in development, a private MinIO bucket in
+Docker (`STORAGE_DRIVER`, `S3_*` settings).
 
 ## Health records
 

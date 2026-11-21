@@ -169,7 +169,11 @@ Two responsibilities:
   Policy, `X-Frame-Options: DENY`, `nosniff` and a referrer policy; the API adds Helmet's
   headers. Secrets come from `.env`, which is never committed; the API refuses to start if
   `JWT_SECRET` is missing or too short.
-- **Data.** MySQL data and uploaded photos live in named volumes (`db-data`, `uploads`). The
+- **Data.** MySQL data lives in the `db-data` volume and uploaded photos in **MinIO**
+  (`minio-data` volume, private bucket). The API's storage layer (`lib/storage.ts`) has a local
+  folder driver and an S3 driver, streams photos to the browser and creates the bucket on start-up.
+  MinIO is built from its official AGPL-3.0 source (`infra/minio`) and used unmodified as a separate
+  service. The
   trained wound model is mounted read-only from `services/ai/models`, so images contain no
   model weights or personal data.
 - **Health.** Every service has a health check; `web` waits for a healthy API, and the API waits

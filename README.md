@@ -41,7 +41,7 @@ Requirements: Docker Desktop.
 
 ```bash
 cp .env.example .env                                  # then set JWT_SECRET and the passwords
-docker compose up -d --build                          # build and start all five services
+docker compose up -d --build                          # build and start all six services
 docker compose run --rm migrate npm run db:seed       # optional: demo data (development only)
 ```
 
@@ -57,6 +57,22 @@ service are not published on the host; Nginx in the `web` container forwards `/a
 | `migrate` | API build stage              | Applies Prisma migrations once, then exits           |
 | `ai`      | Python 3.11 + CPU PyTorch    | Wound assessment and pet-care assistant (internal)   |
 | `db`      | MySQL 8.4                    | Database, data in the `db-data` volume               |
+| `minio`   | MinIO (built from source)    | Object storage for uploaded photos (private bucket)  |
+
+## Photo storage (MinIO)
+
+In Docker, uploaded photos are stored in **MinIO**, an S3-compatible object store, as proposed
+in the project. The API creates a private bucket on start-up and streams photos to the browser,
+so the bucket is never exposed and photo links (`/uploads/…`) look the same as before. For local
+development the API keeps using the `apps/api/uploads` folder (`STORAGE_DRIVER=local`).
+
+- MinIO stopped publishing community container images, so `infra/minio/Dockerfile` builds a
+  pinned release (`RELEASE.2025-10-15T17-29-55Z`) from MinIO's official source code. The first
+  build takes a few minutes.
+- Move photos saved before MinIO into the bucket (safe to repeat, `--dry-run` to preview):
+  `docker compose exec api node dist/migrate-uploads.js`.
+- The MinIO console is available on <http://localhost:9001> (loopback only) with
+  `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` from `.env`.
 
 ## Google Maps
 

@@ -46,17 +46,17 @@ built yet.
 
 ## Technology stack (poster section 8)
 
-| Poster item                 | Status  | Notes                                           | Stage |
-| --------------------------- | ------- | ----------------------------------------------- | ----- |
-| React + TypeScript          | Done    | `apps/web`                                      | –     |
-| Node.js + Express           | Done    | `apps/api`                                      | –     |
-| Python + FastAPI            | Done    | `services/ai`                                   | –     |
-| PyTorch                     | Done    | Training, calibration, inference                | –     |
-| torchvision EfficientNet-B0 | Done    | Default backbone; ResNet-18 kept for comparison | 20    |
-| OpenCV                      | Done    | Image quality checks                            | –     |
-| MySQL + Prisma              | Done    | –                                               | –     |
-| MinIO storage               | Planned | Uploads are stored in a Docker volume           | 23    |
-| Docker                      | Done    | Full Compose stack                              | –     |
+| Poster item                 | Status | Notes                                                                            | Stage |
+| --------------------------- | ------ | -------------------------------------------------------------------------------- | ----- |
+| React + TypeScript          | Done   | `apps/web`                                                                       | –     |
+| Node.js + Express           | Done   | `apps/api`                                                                       | –     |
+| Python + FastAPI            | Done   | `services/ai`                                                                    | –     |
+| PyTorch                     | Done   | Training, calibration, inference                                                 | –     |
+| torchvision EfficientNet-B0 | Done   | Default backbone; ResNet-18 kept for comparison                                  | 20    |
+| OpenCV                      | Done   | Image quality checks                                                             | –     |
+| MySQL + Prisma              | Done   | –                                                                                | –     |
+| MinIO storage               | Done   | Private MinIO bucket for photos, built from source; local folder for development | 23    |
+| Docker                      | Done   | Full Compose stack                                                               | –     |
 
 ## Additions beyond the poster
 
