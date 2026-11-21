@@ -461,3 +461,104 @@ li:last-child > .assessment-row {
   color: var(--color-primary);
   margin-bottom: var(--space-3);
 }
+
+/* ── Triage outcome and explanation ── */
+.triage-outcome {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.assessment-verdict--severe .triage-outcome {
+  color: var(--color-danger);
+}
+.assessment-verdict--moderate .triage-outcome {
+  color: #85571a;
+}
+.triage-explanation {
+  margin-bottom: var(--space-5);
+}
+.triage-inputs {
+  list-style: none;
+  margin: var(--space-3) 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+@media (min-width: 720px) {
+  .triage-inputs {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+.triage-input {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.triage-input h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-base);
+}
+.triage-input__weight {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+.triage-input__says {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+}
+.triage-input__note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: #85571a;
+}
+.triage-meter {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) 3rem;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-1);
+}
+.triage-meter strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.triage-meter__bar {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-mint);
+  overflow: hidden;
+}
+.triage-meter__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-primary);
+}
+.triage-overrides {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-mint);
+  color: var(--color-navy);
+}
+.triage-overrides svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+.triage-overrides ul {
+  margin: var(--space-1) 0 0;
+  padding-left: 1.2em;
+  font-size: var(--text-sm);
+}

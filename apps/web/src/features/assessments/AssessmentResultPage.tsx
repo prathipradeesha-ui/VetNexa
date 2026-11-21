@@ -1,29 +1,16 @@
-import { WOUND_CLASS_LABELS } from '@vetnexa/shared';
+import { TRIAGE_OUTCOME_LABELS, WOUND_CLASS_LABELS } from '@vetnexa/shared';
 import { ArrowLeft, CalendarPlus, MapPin, ShieldAlert, Stethoscope, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { PageLoader } from '../../components/ui/PageLoader';
-import {
-  DemoModelNotice,
-  EmergencyNotice,
-  formatDateTime,
-  percent,
-  SeverityBadge,
-} from './AssessmentBits';
+import { DemoModelNotice, EmergencyNotice, formatDateTime, percent } from './AssessmentBits';
 import { SymptomEvidencePanel } from './SymptomEvidencePanel';
+import { OUTCOME_MEANING, TriageBadge, TriageExplanation } from './TriageExplanation';
 import { useAssessment, useDeleteAssessment } from './useAssessments';
 import '../pets/pets.css';
 import './assessments.css';
-
-/** How each severity is explained to the owner, in plain words. */
-const SEVERITY_MEANING = {
-  MINOR: 'Usually manageable at home with care. Watch it closely over the next few days.',
-  MODERATE: 'Should be seen by a veterinarian, ideally within 24 hours.',
-  SEVERE: 'Needs veterinary attention as soon as possible.',
-  UNCERTAIN: 'The photo could not be assessed confidently. Please ask a veterinarian.',
-} as const;
 
 export function AssessmentResultPage() {
   const { id = '' } = useParams();
@@ -73,11 +60,12 @@ export function AssessmentResultPage() {
           className={`card assessment-verdict assessment-verdict--${result.severity.toLowerCase()}`}
           aria-labelledby="verdict-title"
         >
+          <p className="triage-outcome">{TRIAGE_OUTCOME_LABELS[result.triage]}</p>
           <div className="assessment-verdict__head">
             <h2 id="verdict-title">{result.summary}</h2>
-            <SeverityBadge severity={result.severity} />
+            <TriageBadge outcome={result.triage} />
           </div>
-          <p className="assessment-verdict__meaning">{SEVERITY_MEANING[result.severity]}</p>
+          <p className="assessment-verdict__meaning">{OUTCOME_MEANING[result.triage]}</p>
 
           {!uncertain && (
             <div className="result-confidence">
@@ -138,6 +126,8 @@ export function AssessmentResultPage() {
           )}
         </section>
       </div>
+
+      <TriageExplanation details={result.triageDetails} />
 
       <SymptomEvidencePanel answers={result.answers} symptoms={result.symptoms} />
 

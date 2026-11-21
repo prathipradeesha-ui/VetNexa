@@ -47,6 +47,37 @@ const result = {
   modelVersion: 'wound-resnet18-test',
   demoModel: true,
   ownerNotes: null,
+  triage: 'CONSULT',
+  triageDetails: {
+    outcome: 'CONSULT',
+    label: 'Veterinary consultation recommended',
+    combinedRisk: 0.48,
+    reliability: 0.93,
+    inputs: [
+      {
+        source: 'image',
+        risk: 0.47,
+        level: 'CONSULT',
+        reliability: 0.78,
+        weight: 0.44,
+        notes: [],
+        quality: 1,
+        familiarity: 0.92,
+        certainty: 0.7,
+        topClass: 'laceration',
+      },
+      {
+        source: 'symptoms',
+        risk: 0.49,
+        level: 'CONSULT',
+        reliability: 1,
+        weight: 0.56,
+        notes: [],
+      },
+    ],
+    overrides: ['Photos showing a cut (laceration) always need a veterinarian.'],
+    fusion: 'reliability',
+  },
   disclaimer: 'This is a preliminary, AI-generated assessment. It is not a diagnosis.',
   createdAt: '2026-11-21T09:30:00.000Z',
 };
@@ -76,7 +107,7 @@ describe('wound check history', () => {
     const row = (await screen.findByText('Bruno')).closest('a')!;
     expect(row).toHaveAttribute('href', '/dashboard/assessments/a-1');
     expect(within(row).getByText('Cut (laceration) · 81% confidence')).toBeInTheDocument();
-    expect(within(row).getByText('Moderate')).toBeInTheDocument();
+    expect(within(row).getByText('See a vet')).toBeInTheDocument();
     expect(within(row).getByText('Demo model')).toBeInTheDocument();
     expect(screen.getByText(/Emergency\?/)).toBeInTheDocument();
   });
@@ -298,6 +329,15 @@ describe('wound check result', () => {
       '81',
     );
     expect(screen.getByText(/Should be seen by a veterinarian/)).toBeInTheDocument();
+    expect(screen.getByText('Veterinary consultation recommended')).toBeInTheDocument();
+    const why = screen.getByRole('heading', { name: /Why this result/ }).closest('section')!;
+    expect(within(why).getByText('counted for 44%')).toBeInTheDocument();
+    expect(within(why).getByText('counted for 56%')).toBeInTheDocument();
+    expect(within(why).getByText(/always need a veterinarian/)).toBeInTheDocument();
+    expect(within(why).getAllByRole('meter', { name: 'Reliability' })[1]).toHaveAttribute(
+      'aria-valuenow',
+      '100',
+    );
     expect(screen.getByText('Contact a veterinarian within 24 hours.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Find a clinic/ })).toHaveAttribute('href', '/clinics');
     expect(screen.getByText(/Demonstration model/)).toBeInTheDocument();
@@ -314,6 +354,8 @@ describe('wound check result', () => {
             ...result,
             status: 'UNCERTAIN',
             severity: 'UNCERTAIN',
+            triage: 'UNABLE',
+            triageDetails: null,
             summary: 'The photo could not be assessed confidently.',
           },
         },
@@ -321,7 +363,8 @@ describe('wound check result', () => {
     });
     renderRoute('/dashboard/assessments/a-1');
 
-    expect(await screen.findByText('Uncertain')).toBeInTheDocument();
+    expect(await screen.findByText('Unable to assess')).toBeInTheDocument();
+    expect(screen.getByText(/no breakdown is available/)).toBeInTheDocument();
     expect(screen.queryByRole('meter')).not.toBeInTheDocument();
     expect(screen.getByText(/We recommend a veterinarian/)).toBeInTheDocument();
   });

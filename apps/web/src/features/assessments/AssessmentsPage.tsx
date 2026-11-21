@@ -3,7 +3,8 @@ import { ChevronRight, ScanSearch } from 'lucide-react';
 import { Link } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
 import { PageLoader } from '../../components/ui/PageLoader';
-import { EmergencyNotice, formatDateTime, percent, SeverityBadge } from './AssessmentBits';
+import { EmergencyNotice, formatDateTime, percent } from './AssessmentBits';
+import { TriageBadge } from './TriageExplanation';
 import { useAssessments, useAssessmentStatus } from './useAssessments';
 import './assessments.css';
 
@@ -59,7 +60,7 @@ export function AssessmentsPage() {
                     <span className="assessment-row__date">{formatDateTime(item.createdAt)}</span>
                   </span>
                   <span className="assessment-row__badges">
-                    <SeverityBadge severity={item.severity} />
+                    <TriageBadge outcome={item.triage} />
                     {item.demoModel && <span className="badge badge--neutral">Demo model</span>}
                   </span>
                   <ChevronRight size={18} aria-hidden="true" className="assessment-row__chevron" />

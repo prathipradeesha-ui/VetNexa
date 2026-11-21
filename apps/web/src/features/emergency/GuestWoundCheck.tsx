@@ -1,4 +1,4 @@
-import { SEVERITY_LABELS, type GuestAssessmentResult } from '@vetnexa/shared';
+import { TRIAGE_OUTCOME_LABELS, type GuestAssessmentResult } from '@vetnexa/shared';
 import { Camera, ImageUp, MapPin, ScanSearch, UserPlus } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link } from 'react-router';
@@ -6,6 +6,7 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { DemoModelNotice, percent } from '../assessments/AssessmentBits';
 import { SymptomEvidencePanel } from '../assessments/SymptomEvidencePanel';
+import { OUTCOME_MEANING, TriageBadge, TriageExplanation } from '../assessments/TriageExplanation';
 import {
   emptyAnswers,
   RedFlagQuestions,
@@ -21,13 +22,6 @@ import '../assessments/assessments.css';
 const TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_MB = 5;
 
-const SEVERITY_TONE = {
-  MINOR: 'badge',
-  MODERATE: 'badge badge--warning',
-  SEVERE: 'badge badge--danger',
-  UNCERTAIN: 'badge badge--info',
-} as const;
-
 function GuestResult({ result, onAgain }: { result: GuestAssessmentResult; onAgain: () => void }) {
   const { data: user } = useCurrentUser();
   return (
@@ -36,12 +30,14 @@ function GuestResult({ result, onAgain }: { result: GuestAssessmentResult; onAga
       <div
         className={`card assessment-verdict assessment-verdict--${result.severity.toLowerCase()}`}
       >
+        <p className="triage-outcome">{TRIAGE_OUTCOME_LABELS[result.triage]}</p>
         <div className="assessment-verdict__head">
           <h3>{result.summary}</h3>
-          <span className={SEVERITY_TONE[result.severity]}>{SEVERITY_LABELS[result.severity]}</span>
+          <TriageBadge outcome={result.triage} />
         </div>
+        <p className="assessment-verdict__meaning">{OUTCOME_MEANING[result.triage]}</p>
         {result.status === 'ASSESSED' && (
-          <p className="field__hint">Model confidence: {percent(result.confidence)}</p>
+          <p className="field__hint">Photo model confidence: {percent(result.confidence)}</p>
         )}
         <h4 className="assessment-verdict__subtitle">What to do now</h4>
         <p>{result.guidance}</p>
@@ -63,6 +59,7 @@ function GuestResult({ result, onAgain }: { result: GuestAssessmentResult; onAga
         )}
         <p className="chat-disclaimer">{result.disclaimer}</p>
       </div>
+      <TriageExplanation details={result.triageDetails} />
       <SymptomEvidencePanel answers={result.answers} symptoms={result.symptoms} />
       <div className="guest-result__after">
         <p>

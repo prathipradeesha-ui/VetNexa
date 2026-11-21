@@ -41,6 +41,8 @@ const assessment = {
   demoModel: true,
   answers: null,
   symptoms: null,
+  triage: 'CONSULT',
+  triageDetails: null,
   disclaimer: 'This is a preliminary, AI-generated assessment. It is not a diagnosis.',
 };
 
@@ -113,6 +115,7 @@ describe('emergency page without an account', () => {
     await userEvent.click(within(section).getByRole('button', { name: 'Check wound now' }));
 
     expect(await within(section).findByText(assessment.summary)).toBeInTheDocument();
+    expect(within(section).getByText('Veterinary consultation recommended')).toBeInTheDocument();
     expect(section).toHaveTextContent('This result was not saved');
     expect(within(section).getByRole('link', { name: /Create a free account/ })).toHaveAttribute(
       'href',
