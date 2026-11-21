@@ -1,10 +1,13 @@
 # VetNexa AI service
 
 Python package for the **AI wound assessment**: image quality checks (OpenCV), a transfer-learning
-classifier (PyTorch, ResNet-18), calibrated confidence and cautious safety rules.
+classifier (PyTorch, EfficientNet-B0 with a ResNet-18 baseline), calibrated confidence,
+an unfamiliar-photo (OOD) check, symptom questions and reliability-weighted triage.
 
 > The wound assessment is a **decision-support prototype**, not a diagnostic tool. See the
-> [model card](../../docs/ai-model.md) for intended use, evaluation and limitations.
+> [model card](../../docs/ai-model.md) for intended use and limitations, the
+> [AI evaluation report](../../docs/ai-evaluation-report.md) for results, and the
+> [setup guide](../../docs/setup-guide.md) for running the whole platform.
 
 ## Setup
 
@@ -77,7 +80,7 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epoch
 | `quality.py` | Decoding uploads and rejecting blurry, dark, washed-out or tiny photos |
 | `preprocessing.py` | Resize and normalise for the model; augmentation for training |
 | `dataset.py` | Finding images, removing duplicates, group-aware train/val/test split |
-| `model.py` | ResNet-18 with a new head; saving and loading checkpoints with metadata |
+| `model.py` | EfficientNet-B0 (default) or ResNet-18 with a new head; saving and loading checkpoints with metadata |
 | `calibration.py` | Temperature scaling (only ever softens confidence) and calibration error |
 | `train.py` | Two-phase training, class weighting, early stopping, calibration |
 | `evaluate.py` | Test metrics, confusion matrix, coverage and under-triage rate |
@@ -94,7 +97,7 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epoch
 ## Tests and code quality
 
 ```bash
-pytest            # 137 tests, including an end-to-end train → evaluate → assess run
+pytest            # includes an end-to-end train → evaluate → assess run
 ruff check .
 ruff format .
 ```
