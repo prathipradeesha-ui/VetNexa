@@ -29,6 +29,12 @@ export function EmergencyClinics() {
     if (search.data) saveClinics(search.data.clinics);
   }, [search.data]);
 
+  // Back online after a failed load: fetch the live list again.
+  const { isError, refetch } = search;
+  useEffect(() => {
+    if (online && isError) void refetch();
+  }, [online, isError, refetch]);
+
   const live = search.data?.clinics;
   const saved = useMemo(
     () => (!live && (search.isError || !online) ? loadSavedClinics() : null),
@@ -94,8 +100,9 @@ export function EmergencyClinics() {
 
       {saved && (
         <Alert tone="info">
-          You are offline. This is the clinic list saved on this phone on {savedDate(saved.savedAt)}
-          . Phone ahead to check the clinic is open.
+          {online ? 'VetNexa cannot be reached right now.' : 'You are offline.'} This is the clinic
+          list saved on this phone on {savedDate(saved.savedAt)}. Phone ahead to check the clinic is
+          open.
         </Alert>
       )}
       {search.isError && !saved && (

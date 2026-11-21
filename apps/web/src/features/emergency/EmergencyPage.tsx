@@ -6,6 +6,7 @@ import {
   ScanSearch,
   Siren,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import { Link } from 'react-router';
 import { useOnlineStatus } from '../../pwa/useOnlineStatus';
 import { useCurrentUser } from '../auth/useAuth';
@@ -33,7 +34,11 @@ export function EmergencyPage() {
   const online = useOnlineStatus();
   // The photo check needs the server; if it cannot be reached, offer the offline check instead.
   const status = useEmergencyStatus();
-  const canCheckPhoto = online && !status.isError;
+  const { isError: statusFailed, refetch: recheckStatus } = status;
+  useEffect(() => {
+    if (online && statusFailed) void recheckStatus();
+  }, [online, statusFailed, recheckStatus]);
+  const canCheckPhoto = online && !statusFailed;
 
   return (
     <>

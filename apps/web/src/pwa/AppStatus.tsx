@@ -20,8 +20,8 @@ export function AppStatus() {
           <p className="offline-banner">
             <WifiOff size={18} aria-hidden="true" />
             <span>
-              You are offline. Clinics, wound checks and records need a connection. In an emergency,
-              phone your vet directly.
+              You are offline. Emergency help still works: saved clinics with call buttons, a
+              danger-sign check and first-aid guides. <a href="/emergency">Open emergency help</a>
             </span>
           </p>
         )}

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, renderRoute, signedOut } from '../../test/render';
@@ -161,6 +161,32 @@ describe('emergency page offline', () => {
       await screen.findByText(/This is the clinic list saved on this phone/),
     ).toBeInTheDocument();
     expect(screen.queryByLabelText('Map of emergency clinics')).not.toBeInTheDocument();
+  });
+
+  it('loads the live clinic list again when the connection comes back', async () => {
+    saveClinics([{ ...clinic, name: 'Old saved clinic' }]);
+    const onLine = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    let reachable = false;
+    mockApi({
+      'GET /api/auth/me': signedOut,
+      'GET /api/emergency/status': () =>
+        reachable ? { status: 200, body: { available: true, demoModel: true } } : { status: 503 },
+      [clinicsUrl]: () =>
+        reachable
+          ? { status: 200, body: { clinics: [clinic], total: 1, facets: {} } }
+          : { status: 503 },
+    });
+    renderRoute('/emergency');
+    expect(await screen.findByText('Old saved clinic')).toBeInTheDocument();
+
+    reachable = true;
+    onLine.mockReturnValue(true);
+    act(() => {
+      window.dispatchEvent(new Event('online'));
+    });
+    expect((await screen.findAllByText('Colombo 24h Animal Hospital')).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/clinic list saved on this phone/)).not.toBeInTheDocument();
+    expect(await screen.findByLabelText('Photo of the wound or skin')).toBeInTheDocument();
   });
 
   it('still shows the first-aid guides', async () => {
