@@ -22,7 +22,7 @@ VetNexa is built for **dogs and cats only**. It connects their owners, veterinar
 - Rescue reporting with a privacy-safe map, and adoption
 - AI pet-care assistant, on its own page and as a floating chat in the corner of every page
 - Admin dashboard
-- **Installable app**: add VetNexa to a phone's home screen; first-aid advice still opens
+- **Installable app**: add VetNexa to a phone's home screen; emergency help keeps working
   without a connection
 
 ## Technology
@@ -103,10 +103,25 @@ VetNexa is a progressive web app, so it can be installed without an app store:
 - **Windows and macOS (Chrome or Edge):** use the install icon in the address bar.
 
 Pressing and holding the app icon gives shortcuts to Emergency help, Find a clinic and a new
-wound check. Without a connection the app shows wound first-aid steps instead of an error.
-Nothing private is saved for offline use: health records, wound photos and account details
-always come from the server. Installing needs HTTPS (or `localhost`), and the service worker
-is only used in production builds, so `npm run dev` always loads fresh files.
+wound check. Installing needs HTTPS (or `localhost`), and the service worker is only used in
+production builds, so `npm run dev` always loads fresh files.
+
+### Emergency help with or without internet
+
+Once VetNexa has been opened, the emergency page works online and offline:
+
+| Feature                       | Online                          | Offline                                                                 |
+| ----------------------------- | ------------------------------- | ----------------------------------------------------------------------- |
+| Emergency clinics             | Live list, map, near-me sorting | List saved on the phone (with its date); call and near-me still work    |
+| Wound check                   | Photo and symptom check         | Danger-sign check on the phone: any sign means "go to a vet now"        |
+| First-aid guides              | Yes                             | Yes (built from the assistant's emergency articles)                     |
+| Report an animal in need      | Sent straight away              | Kept on the phone and sent automatically when the connection comes back |
+| Other pages (records, adopt…) | Yes                             | Offline page with wound first aid and a link to emergency help          |
+
+The photo check stays online only: the model runs on the server and is not used without it.
+Nothing private is saved for offline use. Health records, wound photos and account details
+always come from the server; the only things kept on the phone are the public clinic list and,
+until it is sent, a rescue report the person wrote themselves.
 
 ## Development setup
 

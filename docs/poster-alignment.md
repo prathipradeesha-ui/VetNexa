@@ -65,7 +65,7 @@ built yet.
 | Emergency mode without an account      | In an emergency nobody should have to register first: nearest clinics, camera wound check (not stored) and rescue reports work signed out |
 | Floating pet-care assistant            | Quick questions from any page; emergencies in the chat are redirected to clinics                                                          |
 | Call and directions buttons on clinics | One tap to phone a clinic or open Google Maps directions                                                                                  |
-| First aid when offline                 | If the connection drops, the installed app shows wound first-aid steps instead of an error                                                |
+| Emergency help offline                 | Saved clinic list with call buttons, a danger-sign check, first-aid guides and rescue reports sent later all work without internet        |
 | Dogs and cats only                     | The whole platform is scoped to the species the AI and knowledge base cover                                                               |
 
 ## Dataset and ethics (poster section 5)

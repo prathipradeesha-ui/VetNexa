@@ -136,7 +136,8 @@ Two responsibilities:
 - Hand-written CSS using design tokens (CSS custom properties) from the brand guidelines, so colours and spacing stay consistent.
 - Role-aware layout: public pages (home, clinics, adoption, about, contact) and a dashboard area with a sidebar whose items depend on the user's role.
 - Mobile first: the sidebar collapses into a drawer below 900 px; tables become stacked cards on small screens.
-- Installable progressive web app: a web app manifest with icons and shortcuts, and a small hand-written service worker (`apps/web/public/sw.js`). It saves the built files and an offline first-aid page, but never anything from `/api` or `/uploads`, so private data is not stored on the device.
+- Installable progressive web app: a web app manifest with icons and shortcuts, and a small hand-written service worker (`apps/web/public/sw.js`). A Vite plugin writes the list of built files into it, so the whole app is saved when it is installed; it never saves anything from `/api` or `/uploads`, so private data is not stored on the device.
+- Offline emergency help: offline, `/emergency` opens from the saved app and uses the public clinic list kept in `localStorage`, a danger-sign check that runs in the browser (any red flag means urgent), first-aid guides built from the knowledge-base articles at build time, and a queue that sends rescue reports once the API can be reached. Other pages fall back to `offline.html`.
 - Accessibility: semantic HTML, labelled form controls, visible focus states, colour contrast that meets WCAG AA.
 
 ## 8. Testing and quality

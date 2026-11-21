@@ -34,6 +34,10 @@ One paragraph, always shown first.
 
 Headings starting with **"Get help now"** are highlighted as urgent in the chat interface.
 
+Articles with `urgency: emergency`, plus `wound-first-aid` and `injured-stray-animal`, are also
+built into the web app as the **first-aid guides** on the emergency page, which work offline.
+Rebuild the web app after changing them.
+
 ## Adding or changing an article
 
 1. Add or edit the file and keep statements cautious and general (no doses, no diagnoses).
