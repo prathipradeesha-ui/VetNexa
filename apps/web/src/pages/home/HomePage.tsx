@@ -45,7 +45,7 @@ const features = [
   {
     icon: ClipboardList,
     title: 'Pet profiles',
-    text: 'Breed, age, weight, microchip, allergies and photos for every pet you own.',
+    text: 'Breed, age, weight, microchip, allergies and photos for every dog and cat you own.',
   },
   {
     icon: Syringe,
@@ -106,16 +106,16 @@ export function HomePage() {
       <section className="hero">
         <div className="container hero__grid">
           <div className="hero__content">
-            <span className="eyebrow">Pet healthcare and animal welfare</span>
+            <span className="eyebrow">Healthcare and welfare for dogs and cats</span>
             <h1 className="hero__title">
-              Every pet’s health,
+              Every dog and cat’s health,
               <br />
               <span className="hero__title-accent">connected in one place.</span>
             </h1>
             <p className="lead hero__lead">
-              VetNexa brings pet owners, veterinarians, clinics and rescuers together. Keep health
-              records organised, spot problems earlier with AI-supported guidance, and reach the
-              right vet when it matters.
+              VetNexa brings dog and cat owners, veterinarians, clinics and rescuers together. Keep
+              health records organised, spot problems earlier with AI-supported guidance, and reach
+              the right vet when it matters.
             </p>
             <div className="hero__actions">
               <Link to="/register" className="btn btn--primary">

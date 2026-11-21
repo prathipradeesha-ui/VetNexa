@@ -46,7 +46,7 @@ export function AdoptPage() {
               value={filters.species ?? ''}
               onChange={(event) => update('species', event.target.value || undefined)}
             >
-              <option value="">All animals</option>
+              <option value="">Dogs and cats</option>
               {SPECIES.map((species) => (
                 <option key={species} value={species}>
                   {SPECIES_LABELS[species]}

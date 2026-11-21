@@ -23,7 +23,7 @@ const stats = {
     })),
   },
   vets: { verified: 2, pending: 1 },
-  pets: { total: 9, bySpecies: { DOG: 5, CAT: 4, RABBIT: 0, BIRD: 0, OTHER: 0 } },
+  pets: { total: 9, bySpecies: { DOG: 5, CAT: 4 } },
   clinics: { active: 6, inactive: 1, emergency: 2 },
   consultations: { total: 4, byStatus: { REQUESTED: 1, CONFIRMED: 1, COMPLETED: 2, CANCELLED: 0 } },
   assessments: {

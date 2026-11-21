@@ -66,8 +66,8 @@ export function AboutPage() {
               Our vision
             </h2>
             <p>
-              A future where every pet has a complete health history, every owner can reach
-              trustworthy veterinary advice, and no animal in need goes unnoticed.
+              A future where every dog and cat has a complete health history, every owner can reach
+              trustworthy veterinary advice, and no dog or cat in need goes unnoticed.
             </p>
             <div className="callout">
               <strong>About our AI</strong>

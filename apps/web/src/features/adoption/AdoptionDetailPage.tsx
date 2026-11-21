@@ -33,7 +33,7 @@ export function AdoptionDetailPage() {
   return (
     <div className="container clinic-detail">
       <Link to="/adopt" className="back-link">
-        <ArrowLeft size={16} aria-hidden="true" /> All animals
+        <ArrowLeft size={16} aria-hidden="true" /> All dogs and cats
       </Link>
       {listing.isPending && <PageLoader label="Loading…" />}
       {listing.isError && <Alert tone="error">{listing.error.message}</Alert>}

@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import type { WoundSeverity } from '../enums';
+import { SPECIES, type WoundSeverity } from '../enums';
 import { optionalText } from './auth';
 
 /** Species the wound model was designed for. Other species are refused. */
-export const ASSESSABLE_SPECIES = ['DOG', 'CAT'] as const;
+export const ASSESSABLE_SPECIES = SPECIES;
 
 /** Text fields sent with the photo (multipart/form-data) when requesting an assessment. */
 export const assessmentRequestSchema = z.object({

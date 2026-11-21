@@ -1,7 +1,7 @@
 import type { Species } from '@vetnexa/shared';
-import { Bird, Cat, Dog, PawPrint, Rabbit } from 'lucide-react';
+import { Cat, Dog } from 'lucide-react';
 
-const speciesIcons = { DOG: Dog, CAT: Cat, RABBIT: Rabbit, BIRD: Bird, OTHER: PawPrint };
+const speciesIcons = { DOG: Dog, CAT: Cat };
 
 interface PetAvatarProps {
   name: string;

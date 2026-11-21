@@ -6,14 +6,11 @@ import {
 } from '@vetnexa/shared';
 import {
   Baby,
-  Bird,
   Cat,
   Check,
   Dog,
   HeartHandshake,
   MapPin,
-  PawPrint,
-  Rabbit,
   ShieldCheck,
   Syringe,
   X,
@@ -21,7 +18,7 @@ import {
 import type { Listing } from './useAdoption';
 import './adoption.css';
 
-const speciesIcons = { DOG: Dog, CAT: Cat, RABBIT: Rabbit, BIRD: Bird, OTHER: PawPrint };
+const speciesIcons = { DOG: Dog, CAT: Cat };
 
 export function ListingStatusBadge({ status }: { status: AdoptionStatus }) {
   const tone: Record<AdoptionStatus, string> = {

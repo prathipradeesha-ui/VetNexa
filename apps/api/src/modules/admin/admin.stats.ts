@@ -1,4 +1,4 @@
-import type { AdminStats } from '@vetnexa/shared';
+import { SPECIES, type AdminStats } from '@vetnexa/shared';
 import type { PrismaClient } from '../../generated/prisma/client';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -108,11 +108,7 @@ export async function collectStats(prisma: PrismaClient, now = new Date()): Prom
     assessmentsBySeverity,
     (r: (typeof assessmentsBySeverity)[number]) => r.severity,
   );
-  const species = tally(
-    ['DOG', 'CAT', 'RABBIT', 'BIRD', 'OTHER'] as const,
-    petsBySpecies,
-    (r: (typeof petsBySpecies)[number]) => r.species,
-  );
+  const species = tally(SPECIES, petsBySpecies, (r: (typeof petsBySpecies)[number]) => r.species);
   const sum = (record: Record<string, number>) => Object.values(record).reduce((a, b) => a + b, 0);
 
   return {

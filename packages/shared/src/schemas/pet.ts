@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PET_SEX, SPECIES } from '../enums';
+import { PET_SEX, SPECIES, SPECIES_ERROR } from '../enums';
 import { optionalText } from './auth';
 
 /** "YYYY-MM-DD" date that is not in the future. Empty input means "unknown". */
@@ -41,7 +41,7 @@ const optionalWeight = z
  */
 export const petSchema = z.object({
   name: z.string().trim().min(1, 'Please enter your pet’s name').max(60),
-  species: z.enum(SPECIES, { error: 'Please choose a species' }),
+  species: z.enum(SPECIES, { error: SPECIES_ERROR }),
   breed: optionalText(80),
   sex: z.enum(PET_SEX).default('UNKNOWN'),
   dateOfBirth: pastDate,
@@ -65,9 +65,6 @@ export type PetData = z.output<typeof petSchema>;
 export const SPECIES_LABELS: Record<(typeof SPECIES)[number], string> = {
   DOG: 'Dog',
   CAT: 'Cat',
-  RABBIT: 'Rabbit',
-  BIRD: 'Bird',
-  OTHER: 'Other',
 };
 
 export const PET_SEX_LABELS: Record<(typeof PET_SEX)[number], string> = {

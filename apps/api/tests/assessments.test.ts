@@ -53,7 +53,7 @@ const photo = () =>
     .jpeg()
     .toBuffer();
 
-async function ownerWithPet(species: 'DOG' | 'CAT' | 'RABBIT' = 'DOG', ai: AiClient = fakeAi()) {
+async function ownerWithPet(species: 'DOG' | 'CAT' = 'DOG', ai: AiClient = fakeAi()) {
   const owner = await createUser('OWNER');
   const pet = await testPrisma.pet.create({ data: { ownerId: owner.id, name: 'Bruno', species } });
   return { owner, pet, agent: await signedInAgent(owner.email, { aiClient: ai }) };
@@ -127,18 +127,6 @@ describe('AI wound assessments', () => {
       details: { problems: ['The photo is too dark.'] },
     });
     expect(await testPrisma.woundAssessment.count()).toBe(0);
-  });
-
-  it('only assesses dogs and cats', async () => {
-    const ai = fakeAi();
-    const { agent, pet } = await ownerWithPet('RABBIT', ai);
-    const res = await agent
-      .post('/api/assessments')
-      .field('petId', pet.id)
-      .attach('photo', await photo(), 'wound.jpg')
-      .expect(422);
-    expect(res.body.error.details[0].field).toBe('petId');
-    expect(ai.assess).not.toHaveBeenCalled();
   });
 
   it("cannot assess, view or delete another owner's records", async () => {

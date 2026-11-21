@@ -13,8 +13,11 @@ export const SELF_REGISTER_ROLES = [
   'RESCUER',
 ] as const satisfies readonly UserRole[];
 
-export const SPECIES = ['DOG', 'CAT', 'RABBIT', 'BIRD', 'OTHER'] as const;
+/** VetNexa is for dogs and cats only. Every species field in the platform uses this list. */
+export const SPECIES = ['DOG', 'CAT'] as const;
 export type Species = (typeof SPECIES)[number];
+/** Shown when a species is missing or is not a dog or cat. */
+export const SPECIES_ERROR = 'Please choose dog or cat. VetNexa is for dogs and cats only.';
 
 export const PET_SEX = ['MALE', 'FEMALE', 'UNKNOWN'] as const;
 export type PetSex = (typeof PET_SEX)[number];

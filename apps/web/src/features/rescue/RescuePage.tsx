@@ -66,7 +66,7 @@ export function RescuePage() {
                 ? view === 'open'
                   ? 'No animals are waiting for help right now.'
                   : 'Nothing here yet.'
-                : 'You have not reported any animals. If you see an animal in trouble, report it here.'}
+                : 'You have not reported any animals. If you see a dog or cat in trouble, report it here.'}
             </p>
           </div>
         )}

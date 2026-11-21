@@ -6,6 +6,11 @@ All requests and responses use JSON. Authenticated routes rely on the `vetnexa_s
 HttpOnly cookie set by login or registration, so browser clients must send requests with
 `credentials: 'include'`.
 
+## Species
+
+VetNexa is for dogs and cats only. Every `species` field accepts `DOG` or `CAT`; any other
+value is rejected with `422`.
+
 ## Error format
 
 Every error has the same shape:

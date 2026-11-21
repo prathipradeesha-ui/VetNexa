@@ -77,7 +77,7 @@ describe('admin statistics', () => {
     expect(stats.vets).toEqual({ verified: 0, pending: 1 });
     expect(stats.pets).toEqual({
       total: 2,
-      bySpecies: { DOG: 1, CAT: 1, RABBIT: 0, BIRD: 0, OTHER: 0 },
+      bySpecies: { DOG: 1, CAT: 1 },
     });
     expect(stats.assistant).toEqual({ questions: 1, emergencies: 1 });
     expect(stats.moderation.newMessages).toBe(1);

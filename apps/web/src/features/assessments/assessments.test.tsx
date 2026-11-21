@@ -96,20 +96,19 @@ describe('wound check history', () => {
 });
 
 describe('new wound check', () => {
-  it('only offers dogs and cats and requires photo and acknowledgement', async () => {
+  it('requires a pet, a photo and the acknowledgement', async () => {
     const fetchMock = mockApi({
       'GET /api/auth/me': signedInOwner,
       'GET /api/assessments/status': available,
       'GET /api/pets': {
         status: 200,
-        body: { pets: [pet('pet-1', 'Bruno', 'DOG'), pet('pet-2', 'Coco', 'RABBIT')] },
+        body: { pets: [pet('pet-1', 'Bruno', 'DOG')] },
       },
     });
     renderRoute('/dashboard/assessments/new');
 
     const select = await screen.findByLabelText('Which pet?');
     expect(within(select).getByRole('option', { name: 'Bruno' })).toBeInTheDocument();
-    expect(within(select).queryByRole('option', { name: 'Coco' })).not.toBeInTheDocument();
     expect(screen.getByText(/Demonstration model/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Check wound' }));

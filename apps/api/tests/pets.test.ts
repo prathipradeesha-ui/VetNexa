@@ -38,6 +38,17 @@ const uploadPath = (url: string) =>
   path.join(process.env['UPLOAD_DIR']!, url.replace('/uploads/', ''));
 
 describe('pet profiles', () => {
+  it('accepts only dogs and cats', async () => {
+    const { agent } = await ownerWithAgent();
+    for (const species of ['RABBIT', 'BIRD', 'OTHER']) {
+      const res = await agent
+        .post('/api/pets')
+        .send({ ...bruno, species })
+        .expect(422);
+      expect(res.body.error.details[0].field).toBe('species');
+    }
+  });
+
   it('creates, lists, updates and deletes a pet', async () => {
     const { agent } = await ownerWithAgent();
 

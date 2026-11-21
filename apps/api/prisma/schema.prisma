@@ -77,12 +77,10 @@ model VetProfile {
 
 // ─────────────────────────────── Pets and health ───────────────────────────────
 
+/// VetNexa is for dogs and cats only: pets, rescue reports and adoption listings.
 enum Species {
   DOG
   CAT
-  RABBIT
-  BIRD
-  OTHER
 }
 
 enum PetSex {

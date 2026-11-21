@@ -31,7 +31,7 @@ export function AuthLayout({
           </span>
         </Link>
         <div className="auth__pitch">
-          <h2>Pet healthcare, connected.</h2>
+          <h2>Dog and cat healthcare, connected.</h2>
           <ul>
             {benefits.map((benefit) => (
               <li key={benefit}>

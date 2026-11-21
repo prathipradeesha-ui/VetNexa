@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PET_SEX, SPECIES } from '../enums';
+import { PET_SEX, SPECIES, SPECIES_ERROR } from '../enums';
 import { optionalText, phoneSchema } from './auth';
 
 // ─────────────────────────────── Rescue reports ───────────────────────────────
@@ -26,7 +26,7 @@ const optionalPhone = phoneSchema.optional().or(z.literal('').transform(() => un
 
 /** Anyone signed in can report an animal that needs help. */
 export const rescueReportSchema = z.object({
-  species: z.enum(SPECIES, { error: 'Please choose the type of animal' }),
+  species: z.enum(SPECIES, { error: SPECIES_ERROR }),
   title: z
     .string()
     .trim()
@@ -84,7 +84,7 @@ const triState = z
 
 export const adoptionListingSchema = z.object({
   name: z.string().trim().min(1, 'Please enter the animal’s name').max(60),
-  species: z.enum(SPECIES, { error: 'Please choose a species' }),
+  species: z.enum(SPECIES, { error: SPECIES_ERROR }),
   breed: optionalText(80),
   sex: z.enum(PET_SEX).default('UNKNOWN'),
   ageGroup: z.enum(AGE_GROUPS, { error: 'Please choose an age group' }),

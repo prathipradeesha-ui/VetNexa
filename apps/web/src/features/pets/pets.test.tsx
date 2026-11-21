@@ -85,7 +85,7 @@ describe('add a pet', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Add pet' }));
 
     expect(await screen.findByText('Please enter your pet’s name')).toBeInTheDocument();
-    expect(screen.getByText('Please choose a species')).toBeInTheDocument();
+    expect(screen.getByText(/Please choose dog or cat/)).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalledWith('/api/pets', expect.anything());
   });
 
