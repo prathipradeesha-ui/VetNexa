@@ -5,7 +5,7 @@
 # The trained model is NOT baked into the image: mount it at /app/models (see Compose).
 # Without a model the service still starts; wound assessment answers 503 and the assistant works.
 
-FROM python:3.11-slim-bookworm
+FROM python:3.15-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
