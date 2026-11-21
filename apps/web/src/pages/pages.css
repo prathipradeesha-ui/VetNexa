@@ -151,6 +151,13 @@
   padding-block: var(--space-9);
   text-align: center;
 }
+.not-found__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
 .not-found__code {
   font-size: 4rem;
   font-weight: 800;

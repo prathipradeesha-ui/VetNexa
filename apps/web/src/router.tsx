@@ -5,6 +5,7 @@ import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { AboutPage } from './pages/about/AboutPage';
 import { HomePage } from './pages/home/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { RouteError } from './pages/RouteError';
 
 /*
  * Pages with forms and the signed-in area are loaded on demand ("code splitting"), so the
@@ -24,6 +25,8 @@ export const routes: RouteObject[] = [
         <Outlet />
       </>
     ),
+    // Any page that fails (including one whose code cannot be downloaded) shows this instead.
+    errorElement: <RouteError />,
     children: [
       {
         element: <PublicLayout />,
