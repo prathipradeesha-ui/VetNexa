@@ -46,7 +46,7 @@ def test_training_saves_a_calibrated_checkpoint_and_split(trained):
     root, result = trained
     assert (root / "models" / "wound-classifier.pt").exists()
     assert (root / "models" / "split.json").exists()
-    assert result["version"].startswith("wound-resnet18-")
+    assert result["version"].startswith("wound-efficientnetb0-")
     assert result["temperature"] > 0
     assert len(result["history"]) >= 2
 
@@ -99,15 +99,71 @@ def test_init_from_copies_matching_weights_and_skips_a_different_head(trained):
     checkpoint = root / "models" / "wound-classifier.pt"
     saved = torch.load(checkpoint, weights_only=False)["state_dict"]
 
+    first_backbone_key = next(k for k in saved if k.startswith("backbone."))
     same_classes = build_model(5, pretrained=False)
     load_initial_weights(same_classes, checkpoint)
-    assert torch.equal(same_classes.state_dict()["conv1.weight"], saved["conv1.weight"])
-    assert torch.equal(same_classes.state_dict()["fc.1.weight"], saved["fc.1.weight"])
+    state = same_classes.state_dict()
+    assert torch.equal(state[first_backbone_key], saved[first_backbone_key])
+    assert torch.equal(state["head.1.weight"], saved["head.1.weight"])
 
     # A model for a different number of classes keeps the backbone but gets a fresh head.
     other_classes = build_model(3, pretrained=False)
     load_initial_weights(other_classes, checkpoint)
-    assert torch.equal(
-        other_classes.state_dict()["layer4.1.conv2.weight"], saved["layer4.1.conv2.weight"]
+    assert torch.equal(other_classes.state_dict()[first_backbone_key], saved[first_backbone_key])
+    assert other_classes.state_dict()["head.1.weight"].shape == (3, 1280)
+
+
+def test_checkpoint_contains_a_fitted_ood_detector(trained):
+    import torch
+
+    from vetnexa_ai.ood import OODDetector
+
+    root, _ = trained
+    checkpoint = torch.load(root / "models" / "wound-classifier.pt", weights_only=False)
+    assert checkpoint["arch"] == "efficientnet_b0"
+    detector = OODDetector.from_dict(checkpoint["ood"])
+    assert detector.class_means.shape == (5, 1280)
+    assert detector.energy_scale > 0 and detector.distance_scale > 0
+
+
+def test_ood_flags_features_far_from_every_class():
+    import torch
+
+    from vetnexa_ai.ood import OODDetector
+
+    detector = OODDetector(
+        class_means=torch.zeros(2, 3),
+        precision=torch.eye(3),
+        temperature=1.0,
+        energy_threshold=0.0,
+        energy_scale=1.0,
+        distance_threshold=9.0,  # three standard deviations
+        distance_scale=1.0,
     )
-    assert other_classes.state_dict()["fc.1.weight"].shape == (3, 512)
+    logits = torch.tensor([[5.0, -5.0], [5.0, -5.0]])  # confident in both cases
+    near, far = detector.familiarity(torch.tensor([[0.1, 0.0, 0.0], [10.0, 10.0, 10.0]]), logits)
+    assert not near["outOfDistribution"]
+    assert far["outOfDistribution"] and far["familiarity"] < 0.01
+
+
+def test_legacy_resnet_checkpoints_still_load(tmp_path):
+    import torch
+    from torchvision.models import resnet18
+
+    from vetnexa_ai.model import load_checkpoint
+
+    legacy = resnet18(weights=None)
+    legacy.fc = torch.nn.Sequential(torch.nn.Dropout(0.3), torch.nn.Linear(512, 5))
+    path = tmp_path / "old.pt"
+    torch.save(
+        {
+            "classes": list("abcde"),
+            "temperature": 1.0,
+            "version": "old",
+            "state_dict": legacy.state_dict(),
+        },
+        path,
+    )
+    model, checkpoint = load_checkpoint(path)
+    assert checkpoint["arch"] == "resnet18"
+    assert model(torch.zeros(1, 3, 224, 224)).shape == (1, 5)

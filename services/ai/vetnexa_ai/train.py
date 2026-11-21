@@ -8,7 +8,8 @@ Steps:
  2. Train the new head for a few epochs with the backbone frozen, then fine-tune everything.
  3. Keep the epoch with the best validation macro-F1 (treats every wound type equally), and
     stop early when it stops improving.
- 4. Calibrate confidence on the validation set (temperature scaling) and save the model.
+ 4. Calibrate confidence on the validation set (temperature scaling).
+ 5. Fit the out-of-distribution detector (ood.py) and save everything in one checkpoint.
 
 Two-stage training (e.g. human wound photos first, then dog and cat photos):
 
@@ -34,7 +35,8 @@ from torch.utils.data import DataLoader
 from .calibration import fit_temperature
 from .config import CLASSES, IMAGE_SIZE
 from .dataset import WoundDataset, class_weights, scan_dataset, split_dataset
-from .model import build_model, save_checkpoint, set_backbone_trainable
+from .model import ARCHITECTURES, DEFAULT_ARCH, build_model, save_checkpoint, set_backbone_trainable
+from .ood import fit_ood
 from .preprocessing import eval_transform, train_transform
 
 
@@ -106,7 +108,7 @@ def train(args: argparse.Namespace) -> dict:
         ),
     }
 
-    model = build_model(len(CLASSES), pretrained=not args.no_pretrained).to(device)
+    model = build_model(len(CLASSES), pretrained=not args.no_pretrained, arch=args.arch).to(device)
     if args.init_from:
         load_initial_weights(model, Path(args.init_from))
     loss_fn = nn.CrossEntropyLoss(
@@ -155,6 +157,13 @@ def train(args: argparse.Namespace) -> dict:
     model.load_state_dict(best["state"])
     logits, labels = predict_logits(model, loaders["val"], device)
     temperature = fit_temperature(logits, labels)
+    # The detector uses un-augmented training photos for class centres.
+    plain_train = DataLoader(
+        WoundDataset(split.train, eval_transform),
+        batch_size=args.batch_size,
+        num_workers=args.workers,
+    )
+    ood = fit_ood(model, plain_train, loaders["val"], temperature, device)
     metrics = {
         "best_epoch": best["epoch"],
         "val_macro_f1": round(best["f1"], 4),
@@ -170,6 +179,8 @@ def train(args: argparse.Namespace) -> dict:
         split.summary(),
         IMAGE_SIZE,
         demo=args.demo,
+        arch=args.arch,
+        ood=ood.to_dict(),
     )
     print(
         f"Saved {version} (best epoch {best['epoch']}, val macro-F1 {best['f1']:.3f}, "
@@ -181,6 +192,12 @@ def train(args: argparse.Namespace) -> dict:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train the VetNexa wound classifier.")
     parser.add_argument("--data-dir", default="data/wounds")
+    parser.add_argument(
+        "--arch",
+        choices=ARCHITECTURES,
+        default=DEFAULT_ARCH,
+        help="backbone: efficientnet_b0 (default) or the resnet18 baseline",
+    )
     parser.add_argument("--output-dir", default="models")
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--frozen-epochs", type=int, default=3)
