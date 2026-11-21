@@ -3,6 +3,8 @@ import {
   ASSESSMENT_DISCLAIMER,
   type AssessmentRequest,
   type AssessmentServiceStatus,
+  type SymptomAnswers,
+  type SymptomEvidence,
   type WoundAssessmentResult,
 } from '@vetnexa/shared';
 import type { Pet, PrismaClient, WoundAssessment } from '../../generated/prisma/client';
@@ -31,6 +33,8 @@ export function toAssessmentResponse(row: AssessmentWithPet): WoundAssessmentRes
     modelVersion: row.modelVersion,
     demoModel: row.demoModel,
     ownerNotes: row.ownerNotes,
+    answers: (row.answers as SymptomAnswers | null) ?? null,
+    symptoms: (row.symptomEvidence as SymptomEvidence | null) ?? null,
     disclaimer: ASSESSMENT_DISCLAIMER,
     createdAt: row.createdAt.toISOString(),
   };
@@ -74,7 +78,11 @@ export function assessmentsService(prisma: PrismaClient, ai: AiClient) {
         throw HttpError.validation([{ field: 'petId', message }], message);
       }
 
-      const result = await ai.assess(photo.buffer, photo.mimetype);
+      // The questionnaire is the second input; the pet's species comes from its profile.
+      const answers = data.answers
+        ? { ...data.answers, species: pet.species.toLowerCase() }
+        : undefined;
+      const result = await ai.assess(photo.buffer, photo.mimetype, answers);
 
       // A poor photo is not stored: the owner is told how to take a better one.
       if (result.status === 'REJECTED_QUALITY') {
@@ -105,6 +113,8 @@ export function assessmentsService(prisma: PrismaClient, ai: AiClient) {
           modelVersion: result.modelVersion.slice(0, 40),
           demoModel: result.demoModel,
           ownerNotes: data.ownerNotes ?? null,
+          answers: data.answers ?? undefined,
+          symptomEvidence: (result.symptoms ?? undefined) as object | undefined,
         },
         include: withPet,
       });

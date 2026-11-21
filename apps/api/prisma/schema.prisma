@@ -165,25 +165,29 @@ enum AssessmentStatus {
 /// Result of one AI wound assessment. The model output is stored exactly as returned
 /// (class, confidence and per-class probabilities) so results can be audited later.
 model WoundAssessment {
-  id             String           @id @default(cuid())
-  petId          String
-  userId         String
-  imageUrl       String
-  status         AssessmentStatus
-  predictedClass String           @db.VarChar(60)
-  confidence     Decimal          @db.Decimal(5, 4)
-  severity       WoundSeverity
-  referToVet     Boolean
+  id              String           @id @default(cuid())
+  petId           String
+  userId          String
+  imageUrl        String
+  status          AssessmentStatus
+  predictedClass  String           @db.VarChar(60)
+  confidence      Decimal          @db.Decimal(5, 4)
+  severity        WoundSeverity
+  referToVet      Boolean
   /// True when the severity was raised because a more serious class was also likely.
-  escalated      Boolean          @default(false)
-  probabilities  Json
-  summary        String           @db.VarChar(200)
-  guidance       String           @db.Text
-  modelVersion   String           @db.VarChar(40)
+  escalated       Boolean          @default(false)
+  probabilities   Json
+  /// The owner's questionnaire answers (symptoms and context), when given.
+  answers         Json?
+  /// Symptom evidence from the AI service: red flags, triggered rules, risk and completeness.
+  symptomEvidence Json?
+  summary         String           @db.VarChar(200)
+  guidance        String           @db.Text
+  modelVersion    String           @db.VarChar(40)
   /// True when the result came from a demonstration model trained on synthetic images.
-  demoModel      Boolean          @default(false)
-  ownerNotes     String?          @db.Text
-  createdAt      DateTime         @default(now())
+  demoModel       Boolean          @default(false)
+  ownerNotes      String?          @db.Text
+  createdAt       DateTime         @default(now())
 
   pet  Pet  @relation(fields: [petId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -31,6 +31,7 @@ const assessed: AiAssessment = {
   demoModel: true,
   disclaimer: 'Not a diagnosis.',
   quality: { ok: true, problems: [] },
+  symptoms: null,
 };
 
 /** A fake AI service that returns the given answer and records what it was sent. */
@@ -63,6 +64,65 @@ const uploadPath = (url: string) =>
   path.join(process.env['UPLOAD_DIR']!, url.replace('/uploads/', ''));
 
 describe('AI wound assessments', () => {
+  it('sends the questionnaire with the pet species and stores answers and evidence', async () => {
+    const evidence = {
+      species: 'cat',
+      redFlags: [],
+      risk: 0.35,
+      level: 'consult',
+      rules: [{ id: 'bite', weight: 0.35, reason: 'Bite wounds often become infected.' }],
+      completeness: 2 / 7,
+      missing: ['bodyLocation', 'signs', 'appetite', 'energy', 'pain'],
+      questionnaireVersion: 'test',
+    };
+    const ai = fakeAi({ symptoms: evidence as never });
+    const { agent, pet } = await ownerWithPet('CAT', ai);
+
+    const res = await agent
+      .post('/api/assessments')
+      .field('petId', pet.id)
+      .field('answers', JSON.stringify({ cause: 'bite_fight', duration: '1_3_days' }))
+      .attach('photo', await photo(), 'wound.jpg')
+      .expect(201);
+
+    expect(ai.assess).toHaveBeenCalledWith(
+      expect.any(Buffer),
+      'image/jpeg',
+      expect.objectContaining({ species: 'cat', cause: 'bite_fight', signs: null, redFlags: [] }),
+    );
+    expect(res.body.assessment.answers).toMatchObject({ cause: 'bite_fight', pain: null });
+    expect(res.body.assessment.symptoms).toEqual(evidence);
+    const stored = await agent.get(`/api/assessments/${res.body.assessment.id}`).expect(200);
+    expect(stored.body.assessment.symptoms.level).toBe('consult');
+  });
+
+  it('rejects unreadable or unknown questionnaire answers', async () => {
+    const ai = fakeAi();
+    const { agent, pet } = await ownerWithPet('DOG', ai);
+    for (const answers of ['{not json', JSON.stringify({ duration: 'forever' })]) {
+      const res = await agent
+        .post('/api/assessments')
+        .field('petId', pet.id)
+        .field('answers', answers)
+        .attach('photo', await photo(), 'wound.jpg')
+        .expect(422);
+      expect(res.body.error.details[0].field).toMatch(/^answers/);
+    }
+    expect(ai.assess).not.toHaveBeenCalled();
+  });
+
+  it('still works without a questionnaire (missing input)', async () => {
+    const ai = fakeAi();
+    const { agent, pet } = await ownerWithPet('DOG', ai);
+    const res = await agent
+      .post('/api/assessments')
+      .field('petId', pet.id)
+      .attach('photo', await photo(), 'wound.jpg')
+      .expect(201);
+    expect(ai.assess).toHaveBeenCalledWith(expect.any(Buffer), 'image/jpeg', undefined);
+    expect(res.body.assessment).toMatchObject({ answers: null, symptoms: null });
+  });
+
   it('assesses a photo, stores the result and the photo, and lists it', async () => {
     const ai = fakeAi();
     const { agent, pet } = await ownerWithPet('DOG', ai);
@@ -74,7 +134,7 @@ describe('AI wound assessments', () => {
       .attach('photo', await photo(), 'wound.jpg')
       .expect(201);
 
-    expect(ai.assess).toHaveBeenCalledWith(expect.any(Buffer), 'image/jpeg');
+    expect(ai.assess).toHaveBeenCalledWith(expect.any(Buffer), 'image/jpeg', undefined);
     expect(res.body.assessment).toMatchObject({
       pet: { id: pet.id, name: 'Bruno' },
       status: 'ASSESSED',
@@ -219,24 +279,34 @@ describe('HTTP AI client', () => {
     return `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   }
 
-  it('sends the image and the service token', async () => {
-    let seen: { token?: string; type?: string; bytes: number } = { bytes: 0 };
+  it('sends the photo and answers as a form, with the service token', async () => {
+    let token: string | undefined;
+    let form: FormData | undefined;
     const url = await serve((req, res) => {
       const chunks: Buffer[] = [];
       req.on('data', (chunk: Buffer) => chunks.push(chunk));
-      req.on('end', () => {
-        seen = {
-          token: req.headers['x-service-token'] as string,
-          type: req.headers['content-type'],
-          bytes: Buffer.concat(chunks).length,
-        };
+      req.on('end', async () => {
+        token = req.headers['x-service-token'] as string;
+        // Parse the multipart body the same way a server framework would.
+        form = await new Response(Buffer.concat(chunks), {
+          headers: { 'content-type': req.headers['content-type']! },
+        }).formData();
         res.setHeader('content-type', 'application/json');
         res.end(JSON.stringify(assessed));
       });
     });
-    const result = await httpAiClient(url, 'secret', 2000).assess(Buffer.alloc(10), 'image/png');
+    const answers = { species: 'dog', redFlags: ['collapse'] };
+    const result = await httpAiClient(url, 'secret', 2000).assess(
+      Buffer.alloc(10),
+      'image/png',
+      answers,
+    );
     expect(result.predictedClass).toBe('laceration');
-    expect(seen).toEqual({ token: 'secret', type: 'image/png', bytes: 10 });
+    expect(token).toBe('secret');
+    const image = form!.get('image') as File;
+    expect(image.type).toBe('image/png');
+    expect(image.size).toBe(10);
+    expect(JSON.parse(String(form!.get('answers')))).toEqual(answers);
   });
 
   it('turns an unreachable service into a 503', async () => {

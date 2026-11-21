@@ -1,5 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "noEmit": true },
+  "compilerOptions": {
+    "noEmit": true,
+    // Only the tests use Node APIs (to compare with the AI service's questionnaire file).
+    "types": ["node"]
+  },
   "include": ["src"]
 }

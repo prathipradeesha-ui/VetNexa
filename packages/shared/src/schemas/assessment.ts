@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { SPECIES, type WoundSeverity } from '../enums';
 import { optionalText } from './auth';
+import { symptomAnswersSchema, type SymptomAnswers, type SymptomEvidence } from './questionnaire';
 
 /** Species the wound model was designed for. Other species are refused. */
 export const ASSESSABLE_SPECIES = SPECIES;
@@ -9,6 +10,21 @@ export const ASSESSABLE_SPECIES = SPECIES;
 export const assessmentRequestSchema = z.object({
   petId: z.string().trim().min(1, 'Please choose which pet the photo is of').max(40),
   ownerNotes: optionalText(1000),
+  /** Questionnaire answers as a JSON string (multipart forms only carry text). Optional. */
+  answers: z
+    .string()
+    .max(4000)
+    .optional()
+    .transform((text, ctx) => {
+      if (!text?.trim()) return undefined;
+      try {
+        return JSON.parse(text) as unknown;
+      } catch {
+        ctx.addIssue({ code: 'custom', message: 'The symptom answers could not be read' });
+        return z.NEVER;
+      }
+    })
+    .pipe(symptomAnswersSchema.optional()),
 });
 
 export type AssessmentRequest = z.infer<typeof assessmentRequestSchema>;
@@ -51,6 +67,9 @@ export interface WoundAssessmentResult {
   modelVersion: string;
   demoModel: boolean;
   ownerNotes: string | null;
+  /** What the owner told us, or null for checks made before the questionnaire existed. */
+  answers: SymptomAnswers | null;
+  symptoms: SymptomEvidence | null;
   disclaimer: string;
   createdAt: string;
 }

@@ -1,4 +1,4 @@
-import type { ChatReply } from '@vetnexa/shared';
+import type { ChatReply, SymptomEvidence } from '@vetnexa/shared';
 import { env } from '../config/env';
 import { HttpError } from './http-error';
 import { logger } from './logger';
@@ -18,6 +18,7 @@ export interface AiAssessment {
   demoModel: boolean;
   disclaimer: string;
   quality: { ok: boolean; problems: string[] };
+  symptoms: SymptomEvidence | null;
 }
 
 export interface AiHealth {
@@ -28,7 +29,8 @@ export interface AiHealth {
 
 /** What the rest of the API needs from the AI service. Tests pass in a fake. */
 export interface AiClient {
-  assess(image: Buffer, contentType: string): Promise<AiAssessment>;
+  /** `answers` are the questionnaire answers plus the pet's species ('dog' or 'cat'). */
+  assess(image: Buffer, contentType: string, answers?: object): Promise<AiAssessment>;
   health(): Promise<AiHealth>;
   chat(message: string): Promise<ChatReply>;
 }
@@ -64,13 +66,21 @@ export function httpAiClient(
   }
 
   return {
-    async assess(image, contentType) {
-      const response = await call('/assess', {
-        method: 'POST',
-        headers: { 'content-type': contentType },
-        body: new Uint8Array(image),
-      });
+    async assess(image, contentType, answers) {
+      // Multipart form: the photo plus the questionnaire answers as JSON.
+      const form = new FormData();
+      form.append('image', new Blob([new Uint8Array(image)], { type: contentType }), 'photo');
+      if (answers) form.append('answers', JSON.stringify(answers));
+      const response = await call('/assess', { method: 'POST', body: form });
       if (response.status === 422) {
+        const detail = (await response.json().catch(() => null)) as {
+          error?: { code?: string };
+        } | null;
+        if (detail?.error?.code === 'INVALID_ANSWERS') {
+          throw HttpError.validation([
+            { field: 'answers', message: 'Some symptom answers are not valid' },
+          ]);
+        }
         throw HttpError.validation(
           [{ field: 'photo', message: 'This file is not a valid image' }],
           'This file is not a valid image',
