@@ -8,3 +8,4 @@ export * from './schemas/consultation';
 export * from './schemas/rescue-adoption';
 export * from './schemas/assessment';
 export * from './schemas/chat';
+export * from './schemas/admin';

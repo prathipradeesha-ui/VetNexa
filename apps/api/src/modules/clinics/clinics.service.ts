@@ -40,6 +40,25 @@ const reviewerName = (user: { firstName: string; lastName: string }) =>
 /** Roles allowed to review clinics. Vets and admins are excluded to avoid conflicts of interest. */
 const REVIEWER_ROLES = new Set(['OWNER', 'RESCUER']);
 
+/**
+ * Recalculates a clinic's cached average rating and review count from its approved reviews.
+ * Called whenever reviews are added, changed, hidden or shown again.
+ */
+export async function refreshClinicRating(tx: Prisma.TransactionClient, clinicId: string) {
+  const stats = await tx.review.aggregate({
+    where: { clinicId, status: 'APPROVED' },
+    _avg: { rating: true },
+    _count: true,
+  });
+  await tx.clinic.update({
+    where: { id: clinicId },
+    data: {
+      averageRating: Math.round((stats._avg.rating ?? 0) * 100) / 100,
+      reviewCount: stats._count,
+    },
+  });
+}
+
 export function clinicsService(prisma: PrismaClient) {
   async function findActiveClinic(slug: string) {
     const clinic = await prisma.clinic.findFirst({ where: { slug, isActive: true } });
@@ -47,21 +66,7 @@ export function clinicsService(prisma: PrismaClient) {
     return clinic;
   }
 
-  /** Recalculates the cached average and count after reviews change. */
-  async function refreshRating(tx: Prisma.TransactionClient, clinicId: string) {
-    const stats = await tx.review.aggregate({
-      where: { clinicId, status: 'APPROVED' },
-      _avg: { rating: true },
-      _count: true,
-    });
-    await tx.clinic.update({
-      where: { id: clinicId },
-      data: {
-        averageRating: Math.round((stats._avg.rating ?? 0) * 100) / 100,
-        reviewCount: stats._count,
-      },
-    });
-  }
+  const refreshRating = refreshClinicRating;
 
   return {
     /**
