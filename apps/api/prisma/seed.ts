@@ -592,28 +592,7 @@ async function main() {
     ],
   });
 
-  // ── AI wound assessments (historic examples) ──
-  await prisma.woundAssessment.create({
-    data: {
-      petId: bruno.id,
-      userId: nimali.id,
-      imageUrl: '/uploads/samples/paw-laceration.jpg',
-      predictedClass: 'laceration',
-      confidence: 0.8125,
-      severity: 'MODERATE',
-      probabilities: {
-        laceration: 0.8125,
-        abrasion: 0.1102,
-        abscess: 0.0451,
-        healthy_skin: 0.0322,
-      },
-      guidance:
-        'The image suggests a cut (laceration). Clean gently with saline, prevent licking and contact a veterinarian within 24 hours, especially if bleeding continues.',
-      modelVersion: 'wound-resnet18-v0.1',
-      ownerNotes: 'Cut his paw on broken glass during evening walk.',
-      createdAt: daysFromNow(-45, 8),
-    },
-  });
+  // No AI wound assessments are seeded: every stored result must come from the model.
 
   // ── Reviews (and cached rating totals on each clinic) ──
   const reviews = [

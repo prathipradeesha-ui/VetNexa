@@ -157,21 +157,35 @@ enum WoundSeverity {
   UNCERTAIN
 }
 
+/// Whether the model gave an answer or declined because it was not confident enough.
+/// Photos that fail the quality checks are not stored at all.
+enum AssessmentStatus {
+  ASSESSED
+  UNCERTAIN
+}
+
 /// Result of one AI wound assessment. The model output is stored exactly as returned
 /// (class, confidence and per-class probabilities) so results can be audited later.
 model WoundAssessment {
-  id             String        @id @default(cuid())
+  id             String           @id @default(cuid())
   petId          String
   userId         String
   imageUrl       String
-  predictedClass String        @db.VarChar(60)
-  confidence     Decimal       @db.Decimal(5, 4)
+  status         AssessmentStatus
+  predictedClass String           @db.VarChar(60)
+  confidence     Decimal          @db.Decimal(5, 4)
   severity       WoundSeverity
+  referToVet     Boolean
+  /// True when the severity was raised because a more serious class was also likely.
+  escalated      Boolean          @default(false)
   probabilities  Json
-  guidance       String        @db.Text
-  modelVersion   String        @db.VarChar(40)
-  ownerNotes     String?       @db.Text
-  createdAt      DateTime      @default(now())
+  summary        String           @db.VarChar(200)
+  guidance       String           @db.Text
+  modelVersion   String           @db.VarChar(40)
+  /// True when the result came from a demonstration model trained on synthetic images.
+  demoModel      Boolean          @default(false)
+  ownerNotes     String?          @db.Text
+  createdAt      DateTime         @default(now())
 
   pet  Pet  @relation(fields: [petId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

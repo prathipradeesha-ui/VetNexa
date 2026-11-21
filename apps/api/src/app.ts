@@ -6,10 +6,12 @@ import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
 import { env } from './config/env';
 import type { PrismaClient } from './generated/prisma/client';
+import { httpAiClient, type AiClient } from './lib/ai-client';
 import { HttpError } from './lib/http-error';
 import { logger } from './lib/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { adminRouter } from './modules/admin/admin.routes';
+import { assessmentsRouter } from './modules/assessments/assessments.routes';
 import { authRouter } from './modules/auth/auth.routes';
 import { adoptionRouter } from './modules/adoption/adoption.routes';
 import { clinicsRouter } from './modules/clinics/clinics.routes';
@@ -29,6 +31,8 @@ export interface AppDependencies {
   prisma: PrismaClient;
   /** Rate limiting is off by default in tests; a test can switch it on to check it works. */
   rateLimits?: boolean;
+  /** Client for the Python AI service. Tests pass a fake so they do not need the service. */
+  aiClient?: AiClient;
 }
 
 /**
@@ -36,7 +40,11 @@ export interface AppDependencies {
  * Dependencies are passed in (instead of imported) so tests can supply a test database
  * or a fake client, and so Supertest can use the app without starting a real server.
  */
-export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppDependencies) {
+export function createApp({
+  prisma,
+  rateLimits = env.NODE_ENV !== 'test',
+  aiClient = httpAiClient(),
+}: AppDependencies) {
   const app = express();
 
   // Behind Nginx / Docker the real client IP comes from X-Forwarded-For (needed for rate limiting).
@@ -139,6 +147,17 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
     handler: (_req, _res, next) => next(HttpError.tooManyRequests()),
   });
 
+  // AI assessments: 20 photos per hour per IP. Each one costs real computation.
+  const assessmentLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 20,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) =>
+      next(HttpError.tooManyRequests('You have assessed many photos. Please try again later.')),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
   app.use('/api/auth', authRouter(prisma, loginLimiter));
@@ -147,6 +166,7 @@ export function createApp({ prisma, rateLimits = env.NODE_ENV !== 'test' }: AppD
   app.use('/api/pets/:petId/records', recordsRouter(prisma));
   app.use('/api/pets', petsRouter(prisma));
   app.use('/api/reminders', remindersRouter(prisma));
+  app.use('/api/assessments', assessmentsRouter(prisma, aiClient, assessmentLimiter));
   app.use('/api/clinics', clinicsRouter(prisma, reviewLimiter));
   app.use('/api/consultations', consultationsRouter(prisma));
   app.use('/api/vet', vetPortalRouter(prisma));

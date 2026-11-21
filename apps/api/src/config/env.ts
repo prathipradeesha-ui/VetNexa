@@ -19,6 +19,12 @@ const envSchema = z.object({
   SESSION_HOURS: z.coerce.number().positive().max(720).default(12),
   // Where uploaded photos are stored. Defaults to apps/api/uploads.
   UPLOAD_DIR: z.string().default(fileURLToPath(new URL('../../uploads', import.meta.url))),
+  // Internal AI inference service (services/ai). Only the API talks to it, never the browser.
+  AI_SERVICE_URL: z.url().default('http://127.0.0.1:8000'),
+  // Shared secret sent to the AI service; must match VETNEXA_AI_TOKEN there when it is set.
+  AI_SERVICE_TOKEN: z.string().optional(),
+  // How long to wait for one assessment before giving up, in milliseconds.
+  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 });
 
