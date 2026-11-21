@@ -5,6 +5,9 @@ Assessment Using Reliability-Weighted Evidence Fusion and Uncertainty-Aware Tria
 what VetNexa must deliver. This document maps every poster idea to the system and lists the
 work that closes the remaining gaps (stages 19–24 in [project-plan.md](project-plan.md)).
 
+The final AI results are in the [AI evaluation report](ai-evaluation-report.md); how each feature
+looks and works is in the [user guide](user-guide.md).
+
 Status: **Done** = implemented and tested · **Partial** = some of it exists · **Planned** = not
 built yet.
 

@@ -125,7 +125,8 @@ until it is sent, a rescue report the person wrote themselves.
 
 ## Development setup
 
-Requirements: Node.js 20+, Docker Desktop.
+Requirements: Node.js 24 (20 or newer), Docker Desktop, and Python 3.11 for the AI service.
+The [setup guide](docs/setup-guide.md) covers every step, all settings and common problems.
 
 ```bash
 npm install                                  # install all workspaces
@@ -159,6 +160,7 @@ All demo accounts use the password `VetNexa@2026` (defined in `apps/api/prisma/s
 | ------------------------------------ | ------------------------------ |
 | Administrator                        | admin@vetnexa.lk               |
 | Pet owner                            | nimali.perera@example.com      |
+| Veterinarian (verified)              | dr.ruwan@example.com           |
 | Veterinarian (verified)              | dr.anjali@example.com          |
 | Veterinarian (awaiting verification) | dr.shalini@example.com         |
 | Rescuer                              | rescue@helpingpaws.example.com |
@@ -172,12 +174,36 @@ GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on 
 | --------------------------- | ------------------------------------------------------------------------------------------------ |
 | Web, API and shared package | Prettier, ESLint, type-check, all Vitest suites (API tests against MySQL 8.4), production builds |
 | AI service                  | ruff lint and format, pytest (CPU-only PyTorch)                                                  |
-| Docker images               | Compose file validation, API, web and AI image builds with layer caching                         |
+| Docker images               | Compose file validation, API, web, MinIO and AI image builds with layer caching                  |
 
 Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) proposes weekly updates for npm,
 pip, GitHub Actions and Docker base images; each update must pass CI before it is merged.
 
+## Project status
+
+All 26 planned stages are complete (see the [project plan](docs/project-plan.md) and the
+[development history](docs/development-history.md)), and every idea from the project poster is
+built and tested ([poster alignment](docs/poster-alignment.md)). The AI results so far come from
+a demonstration model and simulated answers; the
+[AI evaluation report](docs/ai-evaluation-report.md) explains what they show and what they do
+not. Still to do before real use:
+
+- train and evaluate on real, veterinarian-labelled dog and cat wound photos (PetWound and a
+  partner clinic have been asked), after ethics approval;
+- veterinary review of the symptom rules, the knowledge base and the triage thresholds;
+- the deployment steps in the [security review](docs/security-accessibility-review.md)
+  (HTTPS, secrets, ending sessions on sign-out);
+- follow-up check-ins after a wound check, and skin conditions as separate model classes.
+
 ## Documentation
+
+**Guides**
+
+- [User guide](docs/user-guide.md) – how to use VetNexa, with screenshots
+- [Setup guide](docs/setup-guide.md) – install, run, test and deploy
+- [AI evaluation report](docs/ai-evaluation-report.md) – final results of the wound assessment
+
+**Reference**
 
 - [Architecture](docs/architecture.md)
 - [API reference](docs/api.md)

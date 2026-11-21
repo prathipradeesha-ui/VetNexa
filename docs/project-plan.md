@@ -31,12 +31,16 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 23  | Object storage                    | MinIO for uploaded photos                                                                          | Done        |
 | 24  | Mobile application                | Installable PWA, camera capture                                                                    | Done        |
 | 25  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                                         | Done        |
-| 26  | Final documentation               | User guide, setup guide, AI evaluation report                                                      | Planned     |
+| 26  | Final documentation               | User guide, setup guide, AI evaluation report                                                      | Done        |
 
 Also delivered alongside stage 22: emergency mode without an account (nearest emergency
 clinics, camera wound check that is not stored, guest rescue reports) and a floating chat
 assistant on every page. Stages 19–24 implement the ideas presented in the project poster; see
 [poster-alignment.md](poster-alignment.md) for the full comparison.
+
+All stages are complete. Stage 13 stays _in progress_ because training and evaluation on real
+wound photos are waiting for veterinarian-labelled data; see the
+[AI evaluation report](ai-evaluation-report.md#8-conclusions-and-next-steps).
 
 ## Working conventions
 

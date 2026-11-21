@@ -162,9 +162,10 @@ veterinarian.
 | **Under-triage rate**                               | How often a moderate or severe wound would be shown as minor – the most important safety number |
 
 Triage-level evaluation (baselines, ablation, risk–coverage, OOD, calibration): see
-[evaluation.md](evaluation.md). Results on real wounds: _to be completed after training on real
-data._ Results from synthetic test images are
-not reported because they say nothing about real wounds.
+[evaluation.md](evaluation.md), and the final results in the
+[AI evaluation report](ai-evaluation-report.md). Results on real wounds: _to be completed after
+training on real data._ Results on synthetic test images are reported there only to show that
+the method works as designed; they say nothing about real wounds.
 
 ## Known limitations and risks
 
