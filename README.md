@@ -2,9 +2,9 @@
 
 # VetNexa
 
-**AI-assisted pet healthcare and animal welfare platform.**
+**AI-assisted healthcare and welfare platform for dogs and cats.**
 
-VetNexa connects pet owners, veterinarians, veterinary clinics, animal rescuers and adopters in one place. Owners keep their pets' health records organised, find nearby clinics, book consultations and get an early, AI-supported indication of whether a wound needs veterinary attention. Rescuers and adopters use the same platform to give animals in need a new home.
+VetNexa is built for **dogs and cats only**. It connects their owners, veterinarians, veterinary clinics, animal rescuers and adopters in one place. Owners keep their pets' health records organised, find nearby clinics, book consultations and get an early, AI-supported indication of whether a wound needs veterinary attention. Rescuers and adopters use the same platform to give animals in need a new home.
 
 > **AI safety notice:** VetNexa's wound assessment is a decision-support prototype. It does not diagnose and is not a substitute for examination by a qualified veterinarian.
 
@@ -31,7 +31,30 @@ VetNexa connects pet owners, veterinarians, veterinary clinics, animal rescuers 
 | Quality   | ESLint, Prettier                       |
 | DevOps    | Docker, Docker Compose, GitHub Actions |
 
-## Getting started
+## Running with Docker (whole platform)
+
+Requirements: Docker Desktop.
+
+```bash
+cp .env.example .env                                  # then set JWT_SECRET and the passwords
+docker compose up -d --build                          # build and start all five services
+docker compose run --rm migrate npm run db:seed       # optional: demo data (development only)
+```
+
+Open http://localhost:8080 (change `WEB_PORT` in `.env` if the port is taken). The API and AI
+service are not published on the host; Nginx in the `web` container forwards `/api` and
+`/uploads` to the API. To enable wound assessment, place a trained checkpoint at
+`services/ai/models/wound-classifier.pt`; it is mounted read-only into the AI container.
+
+| Container | Image                        | Role                                                 |
+| --------- | ---------------------------- | ---------------------------------------------------- |
+| `web`     | Nginx 1.28 + Vite build      | Website, security headers, proxy to the API          |
+| `api`     | Node.js 24 (bundled Express) | REST API, runs as a non-root user, uploads in volume |
+| `migrate` | API build stage              | Applies Prisma migrations once, then exits           |
+| `ai`      | Python 3.11 + CPU PyTorch    | Wound assessment and pet-care assistant (internal)   |
+| `db`      | MySQL 8.4                    | Database, data in the `db-data` volume               |
+
+## Development setup
 
 Requirements: Node.js 20+, Docker Desktop.
 

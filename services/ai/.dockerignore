@@ -1,0 +1,9 @@
+# Build context for the AI service. Images, trained models and the local virtualenv stay out.
+.venv
+data
+models
+reports
+tests
+**/__pycache__
+.pytest_cache
+.ruff_cache

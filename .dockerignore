@@ -1,0 +1,17 @@
+# Build context for apps/api and apps/web (repository root). Keep it small and secret-free.
+**/node_modules
+**/dist
+**/coverage
+**/*.tsbuildinfo
+.git
+.claude
+.ruff_cache
+**/.env
+**/.env.*
+!**/.env.example
+apps/api/uploads
+apps/api/src/generated
+services
+brand
+docs
+infra/mysql

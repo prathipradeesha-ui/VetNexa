@@ -22,7 +22,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 14  | AI wound assessment integration   | Inference API, upload flow, results with uncertainty and guidance                  | Done        |
 | 15  | AI chatbot                        | Knowledge base, retrieval, chat UI with safety redirects                           | Done        |
 | 16  | Admin dashboard                   | User and vet verification, clinic and content management, statistics               | Done        |
-| 17  | Containerisation                  | Dockerfiles, Docker Compose for all services                                       | Planned     |
+| 17  | Containerisation                  | Dockerfiles, Docker Compose for all services                                       | Done        |
 | 18  | Continuous integration            | GitHub Actions: lint, type-check, tests                                            | Planned     |
 | 19  | Security and accessibility review | Hardening, audit fixes, accessibility pass                                         | Planned     |
 | 20  | Final documentation               | User guide, setup guide, AI evaluation report                                      | Planned     |

@@ -1,6 +1,17 @@
-# VetNexa local services.
-# Stage 4 starts with the database only; the API, AI service and web app are added in later stages.
+# VetNexa – complete stack.
+#
+#   cp .env.example .env            # then set JWT_SECRET and the passwords
+#   docker compose up -d --build    # web app on http://localhost:8080
+#   docker compose run --rm migrate npm run db:seed   # optional demo data
+#
+# Local development of the API and web app can keep using only the database:
+#   docker compose up -d db
+#
+# Only the web server (and, for local development, MySQL) are published on the host.
+# The API and AI service are reachable only inside the private "backend" network.
 name: vetnexa
+
+x-database-url: &database-url mysql://${MYSQL_USER:-vetnexa}:${MYSQL_PASSWORD:-vetnexa_dev_password}@db:3306/${MYSQL_DATABASE:-vetnexa}
 
 services:
   db:
@@ -19,6 +30,7 @@ services:
       - db-data:/var/lib/mysql
       # Grants the app user permission to create Prisma's temporary "shadow" database during migrations.
       - ./infra/mysql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks: [backend]
     healthcheck:
       test:
         ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
@@ -26,5 +38,78 @@ services:
       timeout: 5s
       retries: 20
 
+  # Applies database migrations once, then exits. The API waits for it to succeed.
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: migrate
+    image: vetnexa-migrate
+    environment:
+      DATABASE_URL: *database-url
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [backend]
+    restart: 'no'
+
+  ai:
+    build: ./services/ai
+    image: vetnexa-ai
+    restart: unless-stopped
+    environment:
+      # Same shared secret as the API's AI_SERVICE_TOKEN; empty means no token check.
+      VETNEXA_AI_TOKEN: ${AI_SERVICE_TOKEN:-}
+    volumes:
+      # Trained checkpoint (models/wound-classifier.pt). Read-only; never baked into the image.
+      - ./services/ai/models:/app/models:ro
+    networks: [backend]
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: runtime
+    image: vetnexa-api
+    restart: unless-stopped
+    # Secrets such as JWT_SECRET come from .env. The API refuses to start with a clear message
+    # if a required one is missing or too short.
+    env_file:
+      - path: ./.env
+        required: false
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: *database-url
+      AI_SERVICE_URL: http://ai:8000
+      CORS_ORIGIN: ${PUBLIC_URL:-http://localhost:8080}
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      ai:
+        condition: service_started
+    networks: [backend]
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: vetnexa-web
+    restart: unless-stopped
+    ports:
+      - '${WEB_PORT:-8080}:80'
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [backend]
+
+networks:
+  backend:
+
 volumes:
   db-data:
+  uploads:

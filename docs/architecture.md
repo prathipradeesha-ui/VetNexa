@@ -2,6 +2,11 @@
 
 This document describes how VetNexa is structured, how its services communicate, and the main design decisions behind it.
 
+> **Scope: dogs and cats only.** Every species field (pets, rescue reports, adoption listings)
+> accepts only `DOG` or `CAT`, enforced by the shared validation and by the database enum. The
+> wound model, the image collection and the pet-care assistant cover dogs and cats only, and the
+> assistant politely declines questions about other animals.
+
 ## 1. High-level view
 
 VetNexa is split into three independently deployable services plus a shared package, kept together in one Git repository (a _monorepo_).
@@ -144,4 +149,31 @@ Two responsibilities:
 
 ## 9. Deployment
 
-`docker-compose.yml` runs four containers: `db` (MySQL 8), `ai` (FastAPI), `api` (Express) and `web` (static build served by Nginx, which also proxies `/api` to the API). Configuration is passed through environment variables; `.env.example` documents every variable.
+`docker-compose.yml` runs the whole platform:
+
+```
+ browser ──► web (Nginx :80, published as WEB_PORT)
+              ├─ static React build (SPA fallback to index.html)
+              └─ /api, /uploads ──► api (Express :4100) ──► db (MySQL :3306)
+                                         └──────────────► ai (FastAPI :8000)
+ migrate: runs `prisma migrate deploy` once; the API starts only after it succeeds
+```
+
+- **Images.** Multi-stage builds keep build tools out of the runtime images. The API is bundled
+  with esbuild into one file and runs on Node.js 24 with production packages only; the web app
+  is a static Vite build served by Nginx; the AI service uses CPU-only PyTorch.
+- **Network.** All containers share a private `backend` network. Only `web` is published (and
+  MySQL on 3307 for local development tools); the API and AI service cannot be reached from
+  outside. The API and AI service can share a secret token (`AI_SERVICE_TOKEN`).
+- **Security.** The API and AI containers run as non-root users. Nginx adds a Content Security
+  Policy, `X-Frame-Options: DENY`, `nosniff` and a referrer policy; the API adds Helmet's
+  headers. Secrets come from `.env`, which is never committed; the API refuses to start if
+  `JWT_SECRET` is missing or too short.
+- **Data.** MySQL data and uploaded photos live in named volumes (`db-data`, `uploads`). The
+  trained wound model is mounted read-only from `services/ai/models`, so images contain no
+  model weights or personal data.
+- **Health.** Every service has a health check; `web` waits for a healthy API, and the API waits
+  for the database and the migrations.
+- **HTTPS.** For a public deployment, put a TLS-terminating proxy or load balancer in front of
+  `web` and set `PUBLIC_URL` to the https address. Session cookies are marked `Secure` in
+  production.
