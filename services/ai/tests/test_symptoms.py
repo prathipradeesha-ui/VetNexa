@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from vetnexa_ai.assessment import Assessor, combine_with_symptoms
+from vetnexa_ai.assessment import Assessor
 from vetnexa_ai.config import CLASSES
 from vetnexa_ai.model import build_model
 from vetnexa_ai.service import create_app
@@ -118,41 +118,6 @@ def test_unanswered_questions_are_missing_inputs():
     assert result["level"] == "routine"
 
 
-# ── Combining with the image result ──
-
-IMAGE_MINOR = {
-    "status": "ASSESSED",
-    "severity": "MINOR",
-    "referToVet": False,
-    "escalated": False,
-    "summary": "The photo most likely shows a graze or abrasion.",
-    "guidance": "Clean it gently.",
-}
-
-
-def test_symptoms_raise_but_never_lower_image_severity():
-    raised = combine_with_symptoms(IMAGE_MINOR, evidence(cause="bite_fight"))
-    assert raised["severity"] == "MODERATE" and raised["referToVet"] and raised["escalated"]
-
-    severe = {**IMAGE_MINOR, "severity": "SEVERE", "referToVet": True}
-    kept = combine_with_symptoms(severe, evidence())
-    assert kept["severity"] == "SEVERE" and not kept["escalated"]
-
-
-def test_red_flags_override_the_image():
-    result = combine_with_symptoms(IMAGE_MINOR, evidence(redFlags=["breathing_difficulty"]))
-    assert result["severity"] == "SEVERE"
-    assert result["summary"] == "Emergency signs were reported."
-    assert "difficulty breathing" in result["guidance"]
-
-
-def test_uncertain_image_stays_uncertain_but_urgency_can_rise():
-    uncertain = {**IMAGE_MINOR, "status": "UNCERTAIN", "severity": "UNCERTAIN"}
-    assert combine_with_symptoms(uncertain, evidence())["severity"] == "UNCERTAIN"
-    raised = combine_with_symptoms(uncertain, evidence(energy="very_low", appetite="not_eating"))
-    assert raised["status"] == "UNCERTAIN" and raised["severity"] == "SEVERE"
-
-
 # ── Service ──
 
 
@@ -181,7 +146,7 @@ def test_poor_photo_with_red_flag_is_still_urgent(client):
         files={"image": ("dark.jpg", encode(dark), "image/jpeg")},
         data={"answers": json.dumps({**COMPLETE, "redFlags": ["collapse"]})},
     ).json()
-    assert body["status"] == "UNCERTAIN"
+    assert body["triage"]["outcome"] == "URGENT"
     assert body["severity"] == "SEVERE" and body["referToVet"]
 
 
