@@ -150,6 +150,7 @@ pip, GitHub Actions and Docker base images; each update must pass CI before it i
 - [Architecture](docs/architecture.md)
 - [API reference](docs/api.md)
 - [Project plan](docs/project-plan.md)
+- [Development history (commits for each stage)](docs/development-history.md)
 - [Brand guidelines](docs/brand-guidelines.md)
 - [AI wound assessment – model card](docs/ai-model.md)
 - [AI service setup](services/ai/README.md)
