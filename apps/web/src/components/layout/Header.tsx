@@ -1,4 +1,4 @@
-import { LayoutDashboard, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Menu, Siren, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router';
 import { useCurrentUser } from '../../features/auth/useAuth';
@@ -60,6 +60,9 @@ export function Header() {
           ))}
         </nav>
 
+        <Link to="/emergency" className="btn btn--sm btn--emergency">
+          <Siren size={16} aria-hidden="true" /> Emergency
+        </Link>
         <div className="site-header__actions">{accountActions}</div>
 
         <button

@@ -1,4 +1,5 @@
 import {
+  Siren,
   ArrowRight,
   Bot,
   CalendarCheck,
@@ -123,6 +124,9 @@ export function HomePage() {
               </Link>
               <Link to="/clinics" className="btn btn--secondary">
                 Find a clinic
+              </Link>
+              <Link to="/emergency" className="btn btn--emergency">
+                <Siren size={18} aria-hidden="true" /> Emergency help
               </Link>
             </div>
             <ul className="hero__points">

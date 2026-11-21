@@ -1,4 +1,4 @@
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Siren } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { LogoMark } from '../../components/brand/Logo';
@@ -54,6 +54,10 @@ export function AuthLayout({
           <h1>{title}</h1>
           <p className="muted auth__subtitle">{subtitle}</p>
           {children}
+          <p className="auth__emergency">
+            <Siren size={16} aria-hidden="true" /> Emergency with your dog or cat?{' '}
+            <Link to="/emergency">Get help now without an account</Link>
+          </p>
         </div>
       </main>
     </div>

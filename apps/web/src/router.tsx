@@ -50,6 +50,11 @@ export const routes: RouteObject[] = [
             lazy: lazyPage(() => import('./features/clinics/ClinicDetailPage'), 'ClinicDetailPage'),
           },
           {
+            // Essential help without an account: clinics, wound check, rescue report.
+            path: '/emergency',
+            lazy: lazyPage(() => import('./features/emergency/EmergencyPage'), 'EmergencyPage'),
+          },
+          {
             path: '/assistant',
             lazy: lazyPage(() => import('./features/assistant/AssistantPage'), 'AssistantPage'),
           },

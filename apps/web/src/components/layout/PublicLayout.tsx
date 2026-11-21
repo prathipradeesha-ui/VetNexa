@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router';
+import { ChatLauncher } from './ChatLauncher';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import './layout.css';
@@ -15,6 +16,7 @@ export function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      <ChatLauncher />
     </>
   );
 }

@@ -694,3 +694,15 @@
   flex-basis: 100%;
   margin: 0;
 }
+
+/* ── Emergency button (header and emergency page) ── */
+.btn--emergency {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-white);
+}
+.btn--emergency:hover {
+  background: #a33522;
+  border-color: #a33522;
+  color: var(--color-white);
+}

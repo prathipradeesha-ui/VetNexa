@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   LayoutDashboard,
   LogOut,
+  Siren,
   MessageCircleQuestion,
   Menu,
   PawPrint,
@@ -19,6 +20,7 @@ import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useCurrentUser, useLogout } from '../../features/auth/useAuth';
 import { Logo } from '../brand/Logo';
+import { ChatLauncher } from './ChatLauncher';
 import './app-layout.css';
 
 interface NavItem {
@@ -33,6 +35,7 @@ interface NavItem {
 /** Sidebar items. Each module adds its entry here, with the roles that may see it. */
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/emergency', label: 'Emergency help', icon: Siren },
   { to: '/dashboard/pets', label: 'My pets', icon: PawPrint, roles: ['OWNER'] },
   { to: '/dashboard/assessments', label: 'Wound check', icon: ScanSearch, roles: ['OWNER'] },
   {
@@ -165,6 +168,7 @@ export function AppLayout() {
       <main id="main" className="app-main" tabIndex={-1}>
         <Outlet />
       </main>
+      <ChatLauncher />
     </div>
   );
 }

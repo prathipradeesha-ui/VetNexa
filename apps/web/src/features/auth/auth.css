@@ -193,3 +193,20 @@
   color: var(--color-text-subtle);
   margin-top: var(--space-3);
 }
+
+.auth__emergency {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-5);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-bg);
+  color: #7a2617;
+  font-size: var(--text-sm);
+}
+.auth__emergency a {
+  color: #7a2617;
+  font-weight: 700;
+}

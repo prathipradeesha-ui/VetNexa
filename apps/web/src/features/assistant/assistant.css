@@ -257,3 +257,20 @@
   font-weight: 600;
   color: var(--color-navy);
 }
+
+/* ── Compact chat in the floating panel ── */
+.chat--compact .chat-window {
+  border: 0;
+  box-shadow: none;
+}
+.chat--compact .chat-log {
+  min-height: 240px;
+  max-height: none;
+  padding: var(--space-3);
+}
+.chat--compact .chat-bubble--assistant {
+  max-width: 100%;
+}
+.chat--compact .chat-footer {
+  font-size: var(--text-xs);
+}

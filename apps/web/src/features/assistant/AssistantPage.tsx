@@ -20,7 +20,8 @@ const STARTERS = [
   'My cat keeps sneezing',
 ];
 
-function AssistantChat() {
+/** The chat itself; `compact` is the version shown in the floating panel. */
+export function AssistantChat({ compact = false }: { compact?: boolean }) {
   const { data: user, isPending: checkingUser } = useCurrentUser();
   const signedIn = Boolean(user);
   const chat = useChat(signedIn);
@@ -58,8 +59,8 @@ function AssistantChat() {
   };
 
   return (
-    <div className="chat">
-      <EmergencyNotice />
+    <div className={compact ? 'chat chat--compact' : 'chat'}>
+      {!compact && <EmergencyNotice />}
 
       <div className="card chat-window">
         <div
