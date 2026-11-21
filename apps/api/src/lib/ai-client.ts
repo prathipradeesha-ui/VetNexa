@@ -1,4 +1,4 @@
-import type { ChatReply, SymptomEvidence } from '@vetnexa/shared';
+import type { ChatReply, SymptomEvidence, TriageDetails } from '@vetnexa/shared';
 import { env } from '../config/env';
 import { HttpError } from './http-error';
 import { logger } from './logger';
@@ -19,6 +19,9 @@ export interface AiAssessment {
   disclaimer: string;
   quality: { ok: boolean; problems: string[] };
   symptoms: SymptomEvidence | null;
+  /** Null only when the photo was rejected for quality without red flags. */
+  triage: TriageDetails | null;
+  ood: { familiarity: number; outOfDistribution: boolean } | null;
 }
 
 export interface AiHealth {

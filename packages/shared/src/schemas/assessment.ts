@@ -61,6 +61,50 @@ export const ASSESSMENT_DISCLAIMER =
   'This is a preliminary, AI-generated assessment from a research prototype. It is not a ' +
   'diagnosis and does not replace examination by a qualified veterinarian.';
 
+// ─────────────────────────────── Triage ───────────────────────────────
+
+export const TRIAGE_OUTCOMES = ['ROUTINE', 'CONSULT', 'URGENT', 'UNABLE'] as const;
+export type TriageOutcome = (typeof TRIAGE_OUTCOMES)[number];
+
+export const TRIAGE_OUTCOME_LABELS: Record<TriageOutcome, string> = {
+  ROUTINE: 'Routine care – monitor at home',
+  CONSULT: 'Veterinary consultation recommended',
+  URGENT: 'Urgent veterinary attention',
+  UNABLE: 'Unable to assess safely',
+};
+
+/** Outcome of results stored before Stage 20, derived from their severity. */
+export const SEVERITY_TO_TRIAGE: Record<WoundSeverity, TriageOutcome> = {
+  MINOR: 'ROUTINE',
+  MODERATE: 'CONSULT',
+  SEVERE: 'URGENT',
+  UNCERTAIN: 'UNABLE',
+};
+
+export interface TriageInput {
+  source: 'image' | 'symptoms';
+  risk: number;
+  level: 'ROUTINE' | 'CONSULT' | 'URGENT';
+  reliability: number;
+  weight: number;
+  notes: string[];
+  quality?: number;
+  familiarity?: number | null;
+  certainty?: number;
+  topClass?: string;
+}
+
+/** How the result was reached (services/ai/vetnexa_ai/triage.py). */
+export interface TriageDetails {
+  outcome: TriageOutcome;
+  label: string;
+  combinedRisk: number | null;
+  reliability: number;
+  inputs: TriageInput[];
+  overrides: string[];
+  fusion: 'reliability' | 'unweighted' | 'image_only';
+}
+
 /** One stored assessment as returned by the API. */
 export interface WoundAssessmentResult {
   id: string;
@@ -81,6 +125,9 @@ export interface WoundAssessmentResult {
   /** What the owner told us, or null for checks made before the questionnaire existed. */
   answers: SymptomAnswers | null;
   symptoms: SymptomEvidence | null;
+  triage: TriageOutcome;
+  /** Null for results stored before reliability-weighted triage existed. */
+  triageDetails: TriageDetails | null;
   disclaimer: string;
   createdAt: string;
 }

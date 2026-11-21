@@ -4,7 +4,9 @@ import {
   type AssessmentRequest,
   type AssessmentServiceStatus,
   type SymptomAnswers,
+  SEVERITY_TO_TRIAGE,
   type SymptomEvidence,
+  type TriageDetails,
   type WoundAssessmentResult,
 } from '@vetnexa/shared';
 import type { Pet, PrismaClient, WoundAssessment } from '../../generated/prisma/client';
@@ -35,6 +37,8 @@ export function toAssessmentResponse(row: AssessmentWithPet): WoundAssessmentRes
     ownerNotes: row.ownerNotes,
     answers: (row.answers as SymptomAnswers | null) ?? null,
     symptoms: (row.symptomEvidence as SymptomEvidence | null) ?? null,
+    triage: row.triage ?? SEVERITY_TO_TRIAGE[row.severity],
+    triageDetails: (row.triageDetails as TriageDetails | null) ?? null,
     disclaimer: ASSESSMENT_DISCLAIMER,
     createdAt: row.createdAt.toISOString(),
   };
@@ -115,6 +119,8 @@ export function assessmentsService(prisma: PrismaClient, ai: AiClient) {
           ownerNotes: data.ownerNotes ?? null,
           answers: data.answers ?? undefined,
           symptomEvidence: (result.symptoms ?? undefined) as object | undefined,
+          triage: result.triage?.outcome ?? SEVERITY_TO_TRIAGE[result.severity],
+          triageDetails: (result.triage ?? undefined) as object | undefined,
         },
         include: withPet,
       });

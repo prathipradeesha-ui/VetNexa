@@ -32,6 +32,29 @@ const assessed: AiAssessment = {
   disclaimer: 'Not a diagnosis.',
   quality: { ok: true, problems: [] },
   symptoms: null,
+  triage: {
+    outcome: 'CONSULT',
+    label: 'Veterinary consultation recommended',
+    combinedRisk: 0.45,
+    reliability: 0.82,
+    inputs: [
+      {
+        source: 'image',
+        risk: 0.45,
+        level: 'CONSULT',
+        reliability: 0.82,
+        weight: 1,
+        notes: [],
+        quality: 1,
+        familiarity: 0.9,
+        certainty: 0.7,
+        topClass: 'laceration',
+      },
+    ],
+    overrides: [],
+    fusion: 'reliability',
+  },
+  ood: { familiarity: 0.9, outOfDistribution: false },
 };
 
 /** A fake AI service that returns the given answer and records what it was sent. */
@@ -145,6 +168,8 @@ describe('AI wound assessments', () => {
       demoModel: true,
       ownerNotes: 'Cut on the paw after a walk',
     });
+    expect(res.body.assessment.triage).toBe('CONSULT');
+    expect(res.body.assessment.triageDetails.inputs[0].source).toBe('image');
     expect(res.body.assessment.disclaimer).toMatch(/not a diagnosis/i);
     expect(res.body.assessment.imageUrl).toMatch(/^\/uploads\/wounds\/[a-f0-9]{32}\.webp$/);
     expect(existsSync(uploadPath(res.body.assessment.imageUrl))).toBe(true);

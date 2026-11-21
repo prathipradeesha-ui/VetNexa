@@ -155,6 +155,14 @@ enum WoundSeverity {
   UNCERTAIN
 }
 
+/// The four triage outcomes of the reliability-weighted assessment.
+enum TriageOutcome {
+  ROUTINE
+  CONSULT
+  URGENT
+  UNABLE
+}
+
 /// Whether the model gave an answer or declined because it was not confident enough.
 /// Photos that fail the quality checks are not stored at all.
 enum AssessmentStatus {
@@ -173,6 +181,10 @@ model WoundAssessment {
   predictedClass  String           @db.VarChar(60)
   confidence      Decimal          @db.Decimal(5, 4)
   severity        WoundSeverity
+  /// Final outcome after reliability-weighted fusion of the photo and the symptom answers.
+  triage          TriageOutcome?
+  /// Explanation: each input's risk, reliability and weight, overrides and OOD result.
+  triageDetails   Json?
   referToVet      Boolean
   /// True when the severity was raised because a more serious class was also likely.
   escalated       Boolean          @default(false)

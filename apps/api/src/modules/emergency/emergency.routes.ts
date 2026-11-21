@@ -2,6 +2,7 @@ import {
   ASSESSMENT_DISCLAIMER,
   guestAssessmentRequestSchema,
   guestRescueReportSchema,
+  SEVERITY_TO_TRIAGE,
   type GuestAssessmentRequest,
   type GuestAssessmentResult,
   type GuestRescueReportData,
@@ -81,6 +82,8 @@ export function emergencyRouter(
         demoModel: result.demoModel,
         answers: (answers as GuestAssessmentResult['answers']) ?? null,
         symptoms: result.symptoms ?? null,
+        triage: result.triage?.outcome ?? SEVERITY_TO_TRIAGE[result.severity],
+        triageDetails: result.triage ?? null,
         disclaimer: ASSESSMENT_DISCLAIMER,
       };
       res.json({ assessment, stored: false });
