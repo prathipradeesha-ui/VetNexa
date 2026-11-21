@@ -54,7 +54,8 @@ python -m vetnexa_ai.service          # http://127.0.0.1:8000
 | `VETNEXA_AI_HOST` / `VETNEXA_AI_PORT` | `127.0.0.1` / `8000` | Where to listen |
 
 `GET /health` reports whether a model is loaded and whether it is a demo model;
-`POST /assess` takes the raw image bytes and returns the assessment. Without a checkpoint the
+`POST /assess` takes the raw image bytes and returns the assessment; `POST /chat` answers a
+pet-care question from the knowledge base in `knowledge/` (see `docs/assistant.md`). Without a checkpoint the
 service still starts and `/assess` answers `503`.
 
 **Demo model.** Until real veterinary data is available, the feature can be demonstrated with
@@ -78,13 +79,14 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epoch
 | `train.py` | Two-phase training, class weighting, early stopping, calibration |
 | `evaluate.py` | Test metrics, confusion matrix, coverage and under-triage rate |
 | `assessment.py` | Safety rules and the `Assessor` used by the inference API |
+| `chat/` | Pet-care assistant: knowledge loading, safety triage, TF-IDF retrieval, replies |
 | `service.py` | FastAPI inference service (`/health`, `/assess`) used by the Node API |
 | `synthetic.py` | Synthetic drawings for automated tests |
 
 ## Tests and code quality
 
 ```bash
-pytest            # 34 tests, including an end-to-end train → evaluate → assess run
+pytest            # 96 tests, including an end-to-end train → evaluate → assess run
 ruff check .
 ruff format .
 ```

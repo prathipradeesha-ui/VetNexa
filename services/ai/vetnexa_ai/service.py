@@ -5,6 +5,7 @@ the user is and stores the result; this service only turns a photo into a cautio
 
     GET  /health   whether a model is loaded, its version and whether it is a demo model
     POST /assess   body = the image bytes (JPEG, PNG or WebP), returns the assessment JSON
+    POST /chat     body = { "message": "..." }, returns the pet-care assistant's reply
 
 Run it with:
 
@@ -33,12 +34,14 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 from .assessment import Assessor
+from .chat import Assistant
 from .quality import InvalidImageError
 
 logger = logging.getLogger("vetnexa_ai.service")
 
 #: Larger uploads are refused before decoding (the API already limits photos to 5 MB).
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
+MAX_MESSAGE_CHARS = 500
 DEFAULT_MODEL = Path(__file__).resolve().parent.parent / "models" / "wound-classifier.pt"
 
 
@@ -56,8 +59,12 @@ def load_assessor(path: Path) -> Assessor | None:
     return assessor
 
 
-def create_app(assessor: Assessor | None, token: str | None = None) -> FastAPI:
-    """Builds the app. The assessor is passed in so tests can use a small model."""
+def create_app(
+    assessor: Assessor | None,
+    token: str | None = None,
+    assistant: Assistant | None = None,
+) -> FastAPI:
+    """Builds the app. Model and assistant are passed in so tests can use small versions."""
     app = FastAPI(title="VetNexa AI service", docs_url=None, redoc_url=None, openapi_url=None)
 
     @app.middleware("http")
@@ -75,7 +82,23 @@ def create_app(assessor: Assessor | None, token: str | None = None) -> FastAPI:
             "modelLoaded": assessor is not None,
             "modelVersion": assessor.version if assessor else None,
             "demoModel": assessor.demo if assessor else None,
+            "chatArticles": len(assistant.articles) if assistant else 0,
         }
+
+    @app.post("/chat")
+    async def chat(request: Request):
+        if assistant is None:
+            return error(503, "CHAT_UNAVAILABLE", "The pet-care assistant is not available.")
+        try:
+            body = await request.json()
+        except ValueError:
+            return error(422, "INVALID_MESSAGE", "Send JSON with a message.")
+        message = body.get("message") if isinstance(body, dict) else None
+        if not isinstance(message, str) or not message.strip():
+            return error(422, "INVALID_MESSAGE", "Please type a question.")
+        if len(message) > MAX_MESSAGE_CHARS:
+            return error(422, "INVALID_MESSAGE", "Please keep questions under 500 characters.")
+        return assistant.reply(message)
 
     @app.post("/assess")
     async def assess(request: Request):
@@ -105,7 +128,11 @@ def main() -> None:
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     model_path = Path(os.environ.get("VETNEXA_AI_MODEL", DEFAULT_MODEL))
-    app = create_app(load_assessor(model_path), os.environ.get("VETNEXA_AI_TOKEN") or None)
+    assistant = Assistant()
+    logger.info("Pet-care assistant ready with %d articles", len(assistant.articles))
+    app = create_app(
+        load_assessor(model_path), os.environ.get("VETNEXA_AI_TOKEN") or None, assistant
+    )
     uvicorn.run(
         app,
         host=os.environ.get("VETNEXA_AI_HOST", "127.0.0.1"),

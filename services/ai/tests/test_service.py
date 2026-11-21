@@ -5,6 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from vetnexa_ai.assessment import Assessor
+from vetnexa_ai.chat import Assistant
 from vetnexa_ai.config import CLASSES, DISCLAIMER
 from vetnexa_ai.model import build_model
 from vetnexa_ai.service import create_app
@@ -31,6 +32,7 @@ def test_health_reports_the_loaded_model(client):
         "modelLoaded": True,
         "modelVersion": "wound-test-1",
         "demoModel": True,
+        "chatArticles": 0,
     }
 
 
@@ -80,3 +82,28 @@ def test_token_is_required_when_configured(assessor, good_image):
         "/assess", content=encode(good_image), headers={"x-service-token": "s3cret-token"}
     )
     assert ok.status_code == 200
+
+
+@pytest.fixture(scope="module")
+def chat_client():
+    return TestClient(create_app(None, assistant=Assistant()))
+
+
+def test_chat_answers_a_question(chat_client):
+    response = chat_client.post("/chat", json={"message": "How often should I deworm my dog?"})
+    assert response.status_code == 200
+    assert response.json()["article"]["id"] == "deworming"
+
+
+def test_chat_flags_an_emergency(chat_client):
+    body = chat_client.post("/chat", json={"message": "My dog ate rat poison"}).json()
+    assert body["kind"] == "emergency"
+
+
+@pytest.mark.parametrize("payload", [{}, {"message": "   "}, {"message": "x" * 501}, [1, 2]])
+def test_chat_rejects_invalid_messages(chat_client, payload):
+    assert chat_client.post("/chat", json=payload).status_code == 422
+
+
+def test_chat_without_assistant_is_unavailable(client):
+    assert client.post("/chat", json={"message": "hi"}).status_code == 503
