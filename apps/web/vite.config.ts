@@ -1,9 +1,10 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { serviceWorkerFiles } from './src/pwa/swBuild';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), serviceWorkerFiles()],
   server: {
     port: 5173,
     // Forward API calls to the Express server so the browser sees one origin

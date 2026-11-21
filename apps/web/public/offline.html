@@ -72,6 +72,16 @@
         padding: 12px 20px;
         border-radius: 999px;
       }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .retry--light {
+        background: #fff;
+        color: #0a6c6c;
+        border: 2px solid #0a6c6c;
+      }
       .retry:focus-visible {
         outline: 3px solid #7fd6c2;
         outline-offset: 2px;
@@ -88,8 +98,13 @@
         <h1>You are offline</h1>
       </header>
       <p>
-        VetNexa needs an internet connection to find clinics, check a wound or report a rescue. If
-        your dog or cat is hurt, these steps can help until you reach a veterinarian.
+        This page needs an internet connection. Emergency help still works offline: your saved list
+        of emergency clinics with call buttons, a danger-sign check and first-aid guides.
+      </p>
+
+      <p class="actions">
+        <a class="retry" href="/emergency">Open emergency help</a>
+        <a class="retry retry--light" href="/">Try again</a>
       </p>
 
       <section class="urgent" aria-labelledby="now">
@@ -121,7 +136,6 @@
         </ul>
       </section>
 
-      <p><a class="retry" href="/">Try again</a></p>
       <p>
         <small>
           This is general first aid, not a diagnosis. When you are back online, VetNexa can show the
