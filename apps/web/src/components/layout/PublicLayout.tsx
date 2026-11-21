@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router';
+import { AppStatus } from '../../pwa/AppStatus';
 import { ChatLauncher } from './ChatLauncher';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -11,6 +12,7 @@ export function PublicLayout() {
       <a href="#main" className="skip-link">
         Skip to main content
       </a>
+      <AppStatus />
       <Header />
       <main id="main" tabIndex={-1}>
         <Outlet />

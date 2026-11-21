@@ -1,0 +1,91 @@
+.offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background: #7c2d12;
+  color: #ffffff;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.offline-banner svg {
+  flex-shrink: 0;
+}
+
+/* Bottom left, leaving the bottom-right corner to the chat button. */
+.install-card {
+  position: fixed;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 55;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: min(360px, calc(100% - 56px - var(--space-4) * 3));
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-raised);
+  border: 1px solid rgb(10 108 108 / 0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-raised);
+}
+
+.install-card img {
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+}
+
+.install-card__body {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  min-width: 0;
+}
+
+.install-card__title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.install-card__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.install-card__text svg {
+  vertical-align: -2px;
+}
+
+.install-card__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1) 0 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.install-card__close:hover {
+  background: var(--color-surface);
+}
+
+.install-card__close:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media print {
+  .offline-banner,
+  .install-card {
+    display: none;
+  }
+}

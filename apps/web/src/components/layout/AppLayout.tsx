@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useCurrentUser, useLogout } from '../../features/auth/useAuth';
+import { AppStatus } from '../../pwa/AppStatus';
 import { Logo } from '../brand/Logo';
 import { ChatLauncher } from './ChatLauncher';
 import './app-layout.css';
@@ -83,6 +84,8 @@ export function AppLayout() {
       <a href="#main" className="skip-link">
         Skip to main content
       </a>
+
+      <AppStatus />
 
       <header className="app-topbar">
         <button
