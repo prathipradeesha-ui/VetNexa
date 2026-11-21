@@ -1,6 +1,6 @@
 {
   "description": "Every image source considered for the VetNexa dog and cat wound / skin-condition dataset. Licence, image count and labels were read from each source's own page on the date given. Only sources marked \"included\" are used.",
-  "checked_on": "2026-11-20",
+  "checked_on": "2026-11-21",
   "rules": [
     "Dogs and cats only: images of humans or other animals are excluded.",
     "Real photographs only: no synthetic, AI-generated or augmented copies.",
@@ -47,7 +47,7 @@
         "Hypersensitivity_dermatitis"
       ],
       "access": "Kaggle sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, contradicted",
       "inspection_notes": "Inspection on 2026-11-21 found this is a compilation: it re-uploads the Mendeley CC BY 4.0 images (including multispectral band frames) under CC0, contains photos from veterinary websites (e.g. \"© SeniorTailWaggers.com\"), collages, annotated images and rotated augmented copies. The CC0 claim cannot cover third-party photos."
     },
@@ -70,7 +70,7 @@
         "ringworm"
       ],
       "access": "Kaggle sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -91,7 +91,7 @@
         "hypersensitivity dermatitis"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -112,7 +112,7 @@
         "ringworm"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -133,7 +133,7 @@
         "hypersensitivity-allergic-dermatosis"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -154,7 +154,7 @@
         "Scabies"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -174,7 +174,7 @@
         "scabbies"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -195,7 +195,7 @@
         "scabies"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "not downloaded – the project has no dataset version to export (checked 2026-11-21)",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -215,7 +215,7 @@
         "injured"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, contradicted",
       "inspection_notes": "Inspection on 2026-11-21 found web-collected photos including stock images with Shutterstock, Alamy, Getty Images and CanStockPhoto watermarks, and many cows and buffalo. The CC BY 4.0 claim cannot cover stock photos."
     },
@@ -242,7 +242,7 @@
         "(others excluded)"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -267,7 +267,7 @@
         "(others excluded)"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "excluded – provenance not verifiable (community upload); see policy",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -312,6 +312,156 @@
       "id": "roboflow-human-wound-sets",
       "name": "basic-wound-classify, Master-Wound-Classifier, WOUND v2 and similar",
       "decision": "excluded – human wounds (WOUND v2 is also empty)"
+    },
+    {
+      "id": "roboflow-school-injured-dog-detector",
+      "name": "injured dog detector",
+      "provider": "Roboflow Universe (school)",
+      "url": "https://universe.roboflow.com/school-cjswh/injured-dog-detector",
+      "version": 2,
+      "licence": "CC BY 4.0",
+      "species": [
+        "dog",
+        "cat",
+        "cow",
+        "buffalo",
+        "human"
+      ],
+      "task": "Object Detection",
+      "images": 68,
+      "labels": [
+        "injured-dogs",
+        "uninjured dogs",
+        "injured cat",
+        "uninjured cat",
+        "(others excluded)"
+      ],
+      "access": "Roboflow sign-in required to download",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
+      "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "roboflow-school-injured-animal-detector2",
+      "name": "injured animal detector2",
+      "provider": "Roboflow Universe (school)",
+      "url": "https://universe.roboflow.com/school-cjswh/injured-animal-detector2",
+      "version": 1,
+      "licence": "CC BY 4.0",
+      "species": [
+        "dog",
+        "cat",
+        "cow",
+        "buffalo",
+        "human"
+      ],
+      "task": "Object Detection",
+      "images": 127,
+      "labels": [
+        "dog",
+        "cat",
+        "injured",
+        "(others excluded)"
+      ],
+      "access": "Roboflow sign-in required to download",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
+      "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "roboflow-imtired-injured-animal-detector-new",
+      "name": "injured animal detector new",
+      "provider": "Roboflow Universe (imtired)",
+      "url": "https://universe.roboflow.com/imtired/injured-animal-detector-new",
+      "version": 2,
+      "licence": "CC BY 4.0",
+      "species": [
+        "dog",
+        "cat",
+        "cow",
+        "buffalo",
+        "human"
+      ],
+      "task": "Object Detection",
+      "images": 146,
+      "labels": [
+        "dog",
+        "cat",
+        "injury",
+        "(others excluded)"
+      ],
+      "access": "Roboflow sign-in required to download",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
+      "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "roboflow-fyp-cat-skin-disease",
+      "name": "Cat skin disease",
+      "provider": "Roboflow Universe (FYP)",
+      "url": "https://universe.roboflow.com/fyp-634g7/cat-skin-disease",
+      "version": 3,
+      "licence": "CC BY 4.0",
+      "species": [
+        "cat"
+      ],
+      "task": "Instance Segmentation",
+      "images": 632,
+      "labels": [
+        "Alopecia",
+        "Eosinophilic Plague (plaque)",
+        "Miliary Dermatitis"
+      ],
+      "access": "Roboflow sign-in required to download",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
+      "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "roboflow-commission-cat-infections",
+      "name": "Cat Infections",
+      "provider": "Roboflow Universe (Commission 20)",
+      "url": "https://universe.roboflow.com/commission-20/cat-infections",
+      "version": 1,
+      "licence": "CC BY 4.0",
+      "species": [
+        "cat"
+      ],
+      "task": "Object Detection",
+      "images": 96,
+      "labels": [
+        "Dandruff",
+        "Mites"
+      ],
+      "access": "Roboflow sign-in required to download",
+      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
+      "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "roboflow-final-year-cat-disease-detection",
+      "name": "cat disease detection",
+      "provider": "Roboflow Universe (Final year Project)",
+      "url": "https://universe.roboflow.com/final-year-project-4qvyv/cat-disease-detection",
+      "licence": "CC BY 4.0",
+      "images": 3662,
+      "labels": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "decision": "not used – the classes are only numbered 0–3 with no meaning given, so the images cannot be labelled",
+      "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "roboflow-emre-disease-classification-cat",
+      "name": "Disease Classification cat",
+      "provider": "Roboflow Universe (emre ozkaya)",
+      "url": "https://universe.roboflow.com/emre-ozkaya-l6w70/disease-classification-cat",
+      "licence": "CC BY 4.0",
+      "images": 3,
+      "labels": [
+        "watch",
+        "gpu"
+      ],
+      "decision": "not used – three images labelled 'watch' and 'gpu'; not a dog or cat dataset",
+      "provenance": "uploader-asserted, not yet inspected"
     }
   ],
   "provenance_levels": {
