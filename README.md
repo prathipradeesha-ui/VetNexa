@@ -2,6 +2,8 @@
 
 # VetNexa
 
+[![CI](https://github.com/prathipradeesha-ui/VetNexa/actions/workflows/ci.yml/badge.svg)](https://github.com/prathipradeesha-ui/VetNexa/actions/workflows/ci.yml)
+
 **AI-assisted healthcare and welfare platform for dogs and cats.**
 
 VetNexa is built for **dogs and cats only**. It connects their owners, veterinarians, veterinary clinics, animal rescuers and adopters in one place. Owners keep their pets' health records organised, find nearby clinics, book consultations and get an early, AI-supported indication of whether a wound needs veterinary attention. Rescuers and adopters use the same platform to give animals in need a new home.
@@ -94,6 +96,20 @@ All demo accounts use the password `VetNexa@2026` (defined in `apps/api/prisma/s
 | Veterinarian (awaiting verification) | dr.shalini@example.com         |
 | Rescuer                              | rescue@helpingpaws.example.com |
 
+## Continuous integration
+
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every push to
+`main` and every pull request:
+
+| Job                         | Checks                                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| Web, API and shared package | Prettier, ESLint, type-check, all Vitest suites (API tests against MySQL 8.4), production builds |
+| AI service                  | ruff lint and format, pytest (CPU-only PyTorch)                                                  |
+| Docker images               | Compose file validation, API, web and AI image builds with layer caching                         |
+
+Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) proposes weekly updates for npm,
+pip, GitHub Actions and Docker base images; each update must pass CI before it is merged.
+
 ## Documentation
 
 - [Architecture](docs/architecture.md)
@@ -102,6 +118,8 @@ All demo accounts use the password `VetNexa@2026` (defined in `apps/api/prisma/s
 - [Brand guidelines](docs/brand-guidelines.md)
 - [AI wound assessment – model card](docs/ai-model.md)
 - [AI service setup](services/ai/README.md)
+- [Pet-care assistant](docs/assistant.md)
+- [Alignment with the project poster](docs/poster-alignment.md)
 
 ## Project owner
 
