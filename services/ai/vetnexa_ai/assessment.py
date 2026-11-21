@@ -88,11 +88,18 @@ class Assessor:
     classes: list[str]
     temperature: float
     version: str
+    demo: bool = False
 
     @classmethod
     def from_checkpoint(cls, path: Path) -> Assessor:
         model, checkpoint = load_checkpoint(path)
-        return cls(model, checkpoint["classes"], checkpoint["temperature"], checkpoint["version"])
+        return cls(
+            model,
+            checkpoint["classes"],
+            checkpoint["temperature"],
+            checkpoint["version"],
+            bool(checkpoint.get("demo", False)),
+        )
 
     @torch.no_grad()
     def probabilities(self, image: np.ndarray) -> dict[str, float]:
@@ -106,6 +113,7 @@ class Assessor:
         quality = check_quality(image)
         base = {
             "modelVersion": self.version,
+            "demoModel": self.demo,
             "quality": quality.as_dict(),
             "disclaimer": DISCLAIMER,
         }

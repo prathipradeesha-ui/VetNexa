@@ -169,6 +169,7 @@ def train(args: argparse.Namespace) -> dict:
         metrics,
         split.summary(),
         IMAGE_SIZE,
+        demo=args.demo,
     )
     print(
         f"Saved {version} (best epoch {best['epoch']}, val macro-F1 {best['f1']:.3f}, "
@@ -190,6 +191,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
         "--init-from", help="continue from an earlier checkpoint (two-stage training)"
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="mark the model as a demonstration model (trained on synthetic images)",
     )
     parser.add_argument("--cpu", action="store_true", help="force CPU even if a GPU is available")
     parser.add_argument(

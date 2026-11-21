@@ -43,6 +43,7 @@ def save_checkpoint(
     metrics: dict,
     data_summary: dict,
     image_size: int,
+    demo: bool = False,
 ) -> str:
     """Saves the weights with everything needed to use and audit them later."""
     version = f"{MODEL_NAME}-{datetime.now(UTC):%Y%m%d-%H%M}"
@@ -54,6 +55,9 @@ def save_checkpoint(
             "created_at": datetime.now(UTC).isoformat(),
             "classes": list(classes),
             "image_size": image_size,
+            # True when trained on synthetic drawings: such a model must never be presented
+            # as assessing real photos.
+            "demo": demo,
             "temperature": temperature,
             "metrics": metrics,
             "data_summary": data_summary,

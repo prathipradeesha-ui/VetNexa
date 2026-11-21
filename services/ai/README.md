@@ -39,6 +39,32 @@ python -m vetnexa_ai.synthetic --out data/synthetic --per-class 60
 python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models/synthetic --epochs 6
 ```
 
+## Inference service
+
+The Node API calls this service to assess photos. Start it with:
+
+```bash
+python -m vetnexa_ai.service          # http://127.0.0.1:8000
+```
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `VETNEXA_AI_MODEL` | `models/wound-classifier.pt` | Checkpoint to load |
+| `VETNEXA_AI_TOKEN` | – | Shared secret; the API must send the same value (`AI_SERVICE_TOKEN`) |
+| `VETNEXA_AI_HOST` / `VETNEXA_AI_PORT` | `127.0.0.1` / `8000` | Where to listen |
+
+`GET /health` reports whether a model is loaded and whether it is a demo model;
+`POST /assess` takes the raw image bytes and returns the assessment. Without a checkpoint the
+service still starts and `/assess` answers `503`.
+
+**Demo model.** Until real veterinary data is available, the feature can be demonstrated with
+a model trained on synthetic drawings. Train it with `--demo` so the checkpoint is marked; the
+API stores `demoModel: true` with each result and the web app shows a warning on every page:
+
+```bash
+python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epochs 6 --demo
+```
+
 ## Package layout
 
 | Module | Purpose |
@@ -52,12 +78,13 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models/synthet
 | `train.py` | Two-phase training, class weighting, early stopping, calibration |
 | `evaluate.py` | Test metrics, confusion matrix, coverage and under-triage rate |
 | `assessment.py` | Safety rules and the `Assessor` used by the inference API |
+| `service.py` | FastAPI inference service (`/health`, `/assess`) used by the Node API |
 | `synthetic.py` | Synthetic drawings for automated tests |
 
 ## Tests and code quality
 
 ```bash
-pytest            # 27 tests, including an end-to-end train → evaluate → assess run
+pytest            # 34 tests, including an end-to-end train → evaluate → assess run
 ruff check .
 ruff format .
 ```
