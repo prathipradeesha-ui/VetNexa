@@ -138,6 +138,7 @@ pip, GitHub Actions and Docker base images; each update must pass CI before it i
 - [AI wound assessment – model card](docs/ai-model.md)
 - [AI service setup](services/ai/README.md)
 - [Pet-care assistant](docs/assistant.md)
+- [Triage evaluation](docs/evaluation.md)
 - [Alignment with the project poster](docs/poster-alignment.md)
 
 ## Project owner

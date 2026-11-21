@@ -161,7 +161,9 @@ veterinarian.
 | Coverage and accuracy when answered                 | How often the model answers instead of "uncertain"                                              |
 | **Under-triage rate**                               | How often a moderate or severe wound would be shown as minor – the most important safety number |
 
-Results: _to be completed after training on real data._ Results from synthetic test images are
+Triage-level evaluation (baselines, ablation, risk–coverage, OOD, calibration): see
+[evaluation.md](evaluation.md). Results on real wounds: _to be completed after training on real
+data._ Results from synthetic test images are
 not reported because they say nothing about real wounds.
 
 ## Known limitations and risks

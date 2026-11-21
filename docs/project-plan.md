@@ -26,7 +26,7 @@ VetNexa is built incrementally. Each stage is implemented, tested and committed 
 | 18  | Continuous integration            | GitHub Actions: lint, type-check, tests                                                            | Done        |
 | 19  | Multimodal input                  | Symptom and context questionnaire, red flags, missing-input checks, rule-weighted symptom evidence | Done        |
 | 20  | Reliability-weighted triage       | EfficientNet-B0, OOD detection, reliability-weighted fusion, four triage outcomes, explanation     | Done        |
-| 21  | Evaluation extensions             | Urgent-case sensitivity, risk–coverage, OOD metrics, baselines and ablations                       | Planned     |
+| 21  | Evaluation extensions             | Urgent-case sensitivity, risk–coverage, OOD metrics, baselines and ablations                       | Done        |
 | 22  | Maps                              | Clinic map with "near me", privacy-safe rescue map                                                 | Done        |
 | 23  | Object storage                    | MinIO for uploaded photos                                                                          | Planned     |
 | 24  | Mobile application                | Installable PWA, camera capture                                                                    | In progress |
