@@ -1,0 +1,257 @@
+{
+  "version": "2026-11-21",
+  "status": "Developer draft based on general veterinary first-aid guidance. Must be reviewed by a veterinarian before real-world use.",
+  "redFlags": [
+    {
+      "id": "heavy_bleeding",
+      "label": "Bleeding that does not stop after 5 minutes of firm pressure"
+    },
+    { "id": "breathing_difficulty", "label": "Difficulty breathing, gasping or blue gums" },
+    { "id": "collapse", "label": "Collapsed, unable to stand or not responding normally" },
+    {
+      "id": "deep_or_penetrating",
+      "label": "A very deep wound, bone or organs visible, or an object stuck in it"
+    },
+    { "id": "major_trauma", "label": "Hit by a vehicle or fell from a height" },
+    { "id": "eye_injury", "label": "Injury to the eye itself" },
+    { "id": "rapid_swelling", "label": "Face or throat swelling quickly, or a possible snake bite" },
+    { "id": "seizure", "label": "Seizure (fit)" }
+  ],
+  "questions": [
+    {
+      "id": "bodyLocation",
+      "label": "Where is the problem?",
+      "type": "single",
+      "options": [
+        { "id": "head_face", "label": "Head or face" },
+        { "id": "ear", "label": "Ear" },
+        { "id": "eye_area", "label": "Around the eye" },
+        { "id": "mouth", "label": "Mouth or lips" },
+        { "id": "neck", "label": "Neck" },
+        { "id": "chest", "label": "Chest" },
+        { "id": "back", "label": "Back" },
+        { "id": "belly", "label": "Belly" },
+        { "id": "front_leg", "label": "Front leg" },
+        { "id": "back_leg", "label": "Back leg" },
+        { "id": "paw", "label": "Paw or toes" },
+        { "id": "tail", "label": "Tail" },
+        { "id": "genital_anal", "label": "Genital or bottom area" },
+        { "id": "several", "label": "Several places" }
+      ]
+    },
+    {
+      "id": "duration",
+      "label": "How long has it been there?",
+      "type": "single",
+      "options": [
+        { "id": "under_24h", "label": "Less than a day" },
+        { "id": "1_3_days", "label": "1–3 days" },
+        { "id": "4_7_days", "label": "4–7 days" },
+        { "id": "over_week", "label": "More than a week" }
+      ]
+    },
+    {
+      "id": "cause",
+      "label": "Do you know what caused it?",
+      "type": "single",
+      "options": [
+        { "id": "bite_fight", "label": "A bite or a fight with another animal" },
+        { "id": "accident", "label": "An accident or a fall" },
+        { "id": "sharp_object", "label": "A sharp object, such as glass or wire" },
+        { "id": "surgery", "label": "It is a surgery or stitch site" },
+        { "id": "insect_tick", "label": "An insect bite or tick" },
+        { "id": "none_noticed", "label": "It appeared without an obvious cause" }
+      ]
+    },
+    {
+      "id": "signs",
+      "label": "What do you see? (choose all that apply)",
+      "type": "multiple",
+      "options": [
+        { "id": "open_wound", "label": "An open wound or cut" },
+        { "id": "bleeding", "label": "Some bleeding" },
+        { "id": "swelling", "label": "Swelling" },
+        { "id": "pus", "label": "Pus or yellow-green discharge" },
+        { "id": "bad_smell", "label": "A bad smell" },
+        { "id": "red_hot", "label": "Red or hot skin" },
+        { "id": "hair_loss", "label": "Hair loss" },
+        { "id": "itching", "label": "Scratching or itching" },
+        { "id": "scabs", "label": "Scabs or crusts" },
+        { "id": "lump", "label": "A lump" },
+        { "id": "licking", "label": "Keeps licking the area" },
+        { "id": "limping", "label": "Limping" }
+      ]
+    },
+    {
+      "id": "appetite",
+      "label": "Is your pet eating?",
+      "type": "single",
+      "options": [
+        { "id": "normal", "label": "Normally" },
+        { "id": "less", "label": "Less than usual" },
+        { "id": "not_eating", "label": "Not eating" }
+      ]
+    },
+    {
+      "id": "energy",
+      "label": "How is your pet's energy?",
+      "type": "single",
+      "options": [
+        { "id": "normal", "label": "Normal" },
+        { "id": "lower", "label": "Quieter than usual" },
+        { "id": "very_low", "label": "Very weak or hiding" }
+      ]
+    },
+    {
+      "id": "pain",
+      "label": "Does it seem painful?",
+      "type": "single",
+      "options": [
+        { "id": "none", "label": "No" },
+        { "id": "mild", "label": "A little, when touched" },
+        { "id": "severe", "label": "Very painful, cries or will not let you touch" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "pus",
+      "when": { "signs": "pus" },
+      "weight": 0.35,
+      "reason": "Pus suggests an infection, which usually needs veterinary treatment."
+    },
+    {
+      "id": "bad_smell",
+      "when": { "signs": "bad_smell" },
+      "weight": 0.25,
+      "reason": "A bad smell often means infection or dead tissue."
+    },
+    {
+      "id": "bite",
+      "when": { "cause": "bite_fight" },
+      "weight": 0.35,
+      "reason": "Bite wounds often hide deep damage and become infected."
+    },
+    {
+      "id": "accident",
+      "when": { "cause": "accident" },
+      "weight": 0.3,
+      "reason": "Accidents can cause injuries that are not visible from the outside."
+    },
+    {
+      "id": "not_eating",
+      "when": { "appetite": "not_eating" },
+      "weight": 0.35,
+      "reason": "A pet that has stopped eating may be unwell overall."
+    },
+    {
+      "id": "eating_less",
+      "when": { "appetite": "less" },
+      "weight": 0.1,
+      "reason": "Eating less can be an early sign of pain or illness."
+    },
+    {
+      "id": "very_low_energy",
+      "when": { "energy": "very_low" },
+      "weight": 0.4,
+      "reason": "Weakness or hiding can mean the problem affects the whole body."
+    },
+    {
+      "id": "lower_energy",
+      "when": { "energy": "lower" },
+      "weight": 0.1,
+      "reason": "Being quieter than usual can be a sign of pain."
+    },
+    {
+      "id": "severe_pain",
+      "when": { "pain": "severe" },
+      "weight": 0.35,
+      "reason": "Severe pain needs veterinary pain relief and examination."
+    },
+    {
+      "id": "mild_pain",
+      "when": { "pain": "mild" },
+      "weight": 0.05,
+      "reason": "Mild pain on touch is common with small wounds."
+    },
+    {
+      "id": "eye_area",
+      "when": { "bodyLocation": "eye_area" },
+      "weight": 0.4,
+      "reason": "Problems near the eye can quickly affect sight."
+    },
+    {
+      "id": "genital_anal",
+      "when": { "bodyLocation": "genital_anal" },
+      "weight": 0.15,
+      "reason": "This area is sensitive and easily infected."
+    },
+    {
+      "id": "open_wound_body",
+      "when": { "signs": "open_wound", "bodyLocation": ["chest", "belly"] },
+      "weight": 0.35,
+      "reason": "Open wounds on the chest or belly can go deeper than they look."
+    },
+    {
+      "id": "open_wound",
+      "when": { "signs": "open_wound" },
+      "weight": 0.15,
+      "reason": "Open wounds can need cleaning or stitches."
+    },
+    {
+      "id": "bleeding",
+      "when": { "signs": "bleeding" },
+      "weight": 0.15,
+      "reason": "Bleeding wounds should be checked once bleeding has stopped."
+    },
+    {
+      "id": "swelling",
+      "when": { "signs": "swelling" },
+      "weight": 0.15,
+      "reason": "Swelling can mean infection, an abscess or a deeper injury."
+    },
+    {
+      "id": "red_hot",
+      "when": { "signs": "red_hot" },
+      "weight": 0.1,
+      "reason": "Red, hot skin is a sign of inflammation or infection."
+    },
+    {
+      "id": "limping",
+      "when": { "signs": "limping" },
+      "weight": 0.1,
+      "reason": "Limping can mean pain deeper than the skin."
+    },
+    {
+      "id": "lump",
+      "when": { "signs": "lump" },
+      "weight": 0.1,
+      "reason": "New lumps should be checked by a veterinarian."
+    },
+    {
+      "id": "not_healing",
+      "when": { "duration": "over_week" },
+      "weight": 0.25,
+      "reason": "A problem lasting more than a week is not healing on its own."
+    },
+    {
+      "id": "slow_healing",
+      "when": { "duration": "4_7_days" },
+      "weight": 0.1,
+      "reason": "Most small wounds improve within a few days."
+    },
+    {
+      "id": "skin_signs",
+      "when": { "signs": ["hair_loss", "itching", "scabs"] },
+      "weight": 0.1,
+      "reason": "Itching, hair loss or scabs often need tests to find the cause."
+    },
+    {
+      "id": "licking",
+      "when": { "signs": "licking" },
+      "weight": 0.05,
+      "reason": "Licking can delay healing and introduce infection."
+    }
+  ],
+  "levels": { "consult": 0.25, "urgent": 0.6 }
+}

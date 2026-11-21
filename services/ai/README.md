@@ -79,6 +79,8 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epoch
 | `train.py` | Two-phase training, class weighting, early stopping, calibration |
 | `evaluate.py` | Test metrics, confusion matrix, coverage and under-triage rate |
 | `assessment.py` | Safety rules and the `Assessor` used by the inference API |
+| `questionnaire.json` | Symptom questions, red flags, weighted rules and thresholds (vet-reviewable) |
+| `symptoms.py` | Validates answers and turns them into rule-weighted symptom evidence |
 | `chat/` | Pet-care assistant: knowledge loading, safety triage, TF-IDF retrieval, replies |
 | `service.py` | FastAPI inference service (`/health`, `/assess`) used by the Node API |
 | `synthetic.py` | Synthetic drawings for automated tests |

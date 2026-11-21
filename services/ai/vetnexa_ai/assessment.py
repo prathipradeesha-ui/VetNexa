@@ -32,6 +32,7 @@ from .config import (
 from .model import load_checkpoint
 from .preprocessing import eval_transform
 from .quality import check_quality, decode_image
+from .symptoms import Answers, evaluate_symptoms
 
 
 def apply_safety_rules(probabilities: dict[str, float], rules: SafetyRules = SAFETY) -> dict:
@@ -80,6 +81,66 @@ def apply_safety_rules(probabilities: dict[str, float], rules: SafetyRules = SAF
     }
 
 
+#: Severity suggested by the symptom evidence on its own.
+SYMPTOM_SEVERITY = {"routine": "MINOR", "consult": "MODERATE", "urgent": "SEVERE"}
+
+RED_FLAG_GUIDANCE = (
+    "You reported signs of an emergency. Contact or go to a veterinary clinic now; do not wait "
+    "for this assessment. Keep your pet calm and still, and apply gentle pressure to any "
+    "bleeding with a clean cloth on the way."
+)
+
+
+def combine_with_symptoms(result: dict, evidence: dict | None) -> dict:
+    """Adds the symptom evidence to an image result, always erring on the side of caution.
+
+    * Red flags override everything: the result is urgent (severe) and refers to a vet.
+    * Otherwise the more serious of the image severity and the symptom level is used, and the
+      owner is told when the symptoms raised it.
+    * An uncertain image stays "uncertain", but the symptoms can still raise its urgency.
+    """
+    if evidence is None:
+        return {**result, "symptoms": None}
+
+    combined = {**result, "symptoms": evidence}
+    if evidence["redFlags"]:
+        labels = "; ".join(flag["label"].lower() for flag in evidence["redFlags"])
+        return {
+            **combined,
+            "severity": "SEVERE",
+            "referToVet": True,
+            "escalated": True,
+            "summary": "Emergency signs were reported.",
+            "guidance": f"{RED_FLAG_GUIDANCE} Reported: {labels}.",
+        }
+
+    symptom_severity = SYMPTOM_SEVERITY[evidence["level"]]
+    current = result["severity"]
+    rank = SEVERITY_ORDER.index
+    if current == "UNCERTAIN":
+        if evidence["level"] == "routine":
+            return combined
+        return {
+            **combined,
+            "severity": symptom_severity,
+            "referToVet": True,
+            "escalated": True,
+            "guidance": result["guidance"]
+            + " Your answers about the symptoms also suggest a veterinarian should see your pet.",
+        }
+    if rank(symptom_severity) > rank(current):
+        return {
+            **combined,
+            "severity": symptom_severity,
+            "referToVet": True,
+            "escalated": True,
+            "guidance": result["guidance"]
+            + " Based on the symptoms you described, the urgency has been raised to be on the "
+            "safe side.",
+        }
+    return combined
+
+
 @dataclass
 class Assessor:
     """Loads the trained model once and assesses photos."""
@@ -107,8 +168,12 @@ class Assessor:
         probs = torch.softmax(logits / self.temperature, dim=0).numpy()
         return {name: float(p) for name, p in zip(self.classes, probs, strict=True)}
 
-    def assess(self, data: bytes) -> dict:
-        """Full pipeline for one uploaded photo. Raises InvalidImageError for non-images."""
+    def assess(self, data: bytes, answers: Answers | None = None) -> dict:
+        """Full pipeline for one photo and, optionally, the owner's questionnaire answers.
+
+        Raises InvalidImageError for non-images.
+        """
+        evidence = evaluate_symptoms(answers) if answers else None
         image = decode_image(data)
         quality = check_quality(image)
         base = {
@@ -118,7 +183,7 @@ class Assessor:
             "disclaimer": DISCLAIMER,
         }
         if not quality.ok:
-            return {
+            rejected = {
                 **base,
                 "status": "REJECTED_QUALITY",
                 "predictedClass": None,
@@ -130,9 +195,14 @@ class Assessor:
                 "escalated": False,
                 "probabilities": {},
             }
+            # A poor photo is normally retaken, but emergency signs must never wait for that.
+            if evidence and evidence["redFlags"]:
+                return combine_with_symptoms({**rejected, "status": "UNCERTAIN"}, evidence)
+            return {**rejected, "symptoms": evidence}
         probabilities = self.probabilities(image)
-        return {
+        result = {
             **base,
             **apply_safety_rules(probabilities),
             "probabilities": {k: round(v, 4) for k, v in probabilities.items()},
         }
+        return combine_with_symptoms(result, evidence)

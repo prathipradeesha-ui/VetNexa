@@ -4,7 +4,8 @@ It is an internal service: only the Node API calls it, never the browser. The AP
 the user is and stores the result; this service only turns a photo into a cautious assessment.
 
     GET  /health   whether a model is loaded, its version and whether it is a demo model
-    POST /assess   body = the image bytes (JPEG, PNG or WebP), returns the assessment JSON
+    POST /assess   multipart form: `image` (JPEG, PNG or WebP) and optional `answers` (JSON
+                   questionnaire answers, see symptoms.py); a raw image body also works
     POST /chat     body = { "message": "..." }, returns the pet-care assistant's reply
 
 Run it with:
@@ -25,6 +26,7 @@ If no checkpoint exists the service still starts, reports `modelLoaded: false` a
 from __future__ import annotations
 
 import hmac
+import json
 import logging
 import os
 from pathlib import Path
@@ -36,6 +38,7 @@ from fastapi.responses import JSONResponse
 from .assessment import Assessor
 from .chat import Assistant
 from .quality import InvalidImageError
+from .symptoms import Answers, InvalidAnswersError, parse_answers
 
 logger = logging.getLogger("vetnexa_ai.service")
 
@@ -107,16 +110,30 @@ def create_app(
                 503, "MODEL_UNAVAILABLE", "The wound assessment model is not available yet."
             )
         length = request.headers.get("content-length")
-        if length and length.isdigit() and int(length) > MAX_IMAGE_BYTES:
+        if length and length.isdigit() and int(length) > MAX_IMAGE_BYTES + 64 * 1024:
             return error(413, "TOO_LARGE", "The image is too large.")
-        data = await request.body()
+
+        answers: Answers | None = None
+        if request.headers.get("content-type", "").startswith("multipart/form-data"):
+            form = await request.form(max_files=1, max_fields=4, max_part_size=MAX_IMAGE_BYTES)
+            upload = form.get("image")
+            data = await upload.read() if upload is not None and hasattr(upload, "read") else b""
+            raw_answers = form.get("answers")
+            if isinstance(raw_answers, str) and raw_answers.strip():
+                try:
+                    answers = parse_answers(json.loads(raw_answers))
+                except (ValueError, InvalidAnswersError) as exc:
+                    return error(422, "INVALID_ANSWERS", f"Invalid questionnaire answers: {exc}")
+        else:
+            data = await request.body()
+
         if not data:
             return error(422, "INVALID_IMAGE", "No image was sent.")
         if len(data) > MAX_IMAGE_BYTES:
             return error(413, "TOO_LARGE", "The image is too large.")
         try:
             # Inference is CPU-bound, so it runs in a worker thread and does not block others.
-            return await run_in_threadpool(assessor.assess, data)
+            return await run_in_threadpool(assessor.assess, data, answers)
         except InvalidImageError:
             return error(422, "INVALID_IMAGE", "The file is not a valid image.")
 
