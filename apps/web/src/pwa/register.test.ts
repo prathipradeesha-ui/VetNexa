@@ -14,6 +14,13 @@ describe('registerServiceWorker', () => {
     expect(container.register).toHaveBeenCalledWith('/sw.js', { scope: '/' });
   });
 
+  it('runs follow-up work once the service worker is in place', async () => {
+    const container = fakeContainer();
+    const after = vi.fn();
+    registerServiceWorker(true, container, after);
+    await vi.waitFor(() => expect(after).toHaveBeenCalledOnce());
+  });
+
   it('does nothing in development', () => {
     const container = fakeContainer();
     registerServiceWorker(false, container);

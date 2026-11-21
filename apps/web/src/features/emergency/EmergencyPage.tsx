@@ -1,6 +1,8 @@
 import { HeartPulse, Megaphone, MessageCircleQuestion, ScanSearch, Siren } from 'lucide-react';
 import { Link } from 'react-router';
+import { useOnlineStatus } from '../../pwa/useOnlineStatus';
 import { useCurrentUser } from '../auth/useAuth';
+import { DangerSignCheck } from './DangerSignCheck';
 import { EmergencyClinics } from './EmergencyClinics';
 import { GuestRescueForm } from './GuestRescueForm';
 import { GuestWoundCheck } from './GuestWoundCheck';
@@ -19,6 +21,7 @@ const FIRST_STEPS = [
 /** Essential help for emergencies, without signing in. */
 export function EmergencyPage() {
   const { data: user } = useCurrentUser();
+  const online = useOnlineStatus();
 
   return (
     <>
@@ -55,11 +58,23 @@ export function EmergencyPage() {
               <h2 id="wound-check-title" className="card-title">
                 <ScanSearch size={20} aria-hidden="true" /> Check a wound with your camera
               </h2>
-              <p className="field__hint">
-                A quick, cautious first look at a wound or skin problem, combining your photo with
-                what you tell us. It is not a diagnosis.
-              </p>
-              <GuestWoundCheck />
+              {online ? (
+                <>
+                  <p className="field__hint">
+                    A quick, cautious first look at a wound or skin problem, combining your photo
+                    with what you tell us. It is not a diagnosis.
+                  </p>
+                  <GuestWoundCheck />
+                </>
+              ) : (
+                <>
+                  <p className="field__hint">
+                    The photo check needs an internet connection. You can still check for danger
+                    signs, which works on this phone.
+                  </p>
+                  <DangerSignCheck />
+                </>
+              )}
             </section>
 
             <section className="card emergency-section" aria-labelledby="report-title">
