@@ -20,14 +20,14 @@
   --color-surface-raised: #ffffff;
   --color-text: #1c2b3a;
   --color-text-muted: #4a5b73;
-  --color-text-subtle: #6b7a8f;
+  --color-text-subtle: #5e6d82; /* 4.5:1 or more on white, Mist and Soft Mint */
   --color-border: #dce5e8;
   --color-border-strong: #c3d1d6;
 
   /* Status */
   --color-success: #1e8e5a;
   --color-success-bg: #e6f5ee;
-  --color-warning: #b7791f;
+  --color-warning: #946116; /* dark amber: 4.8:1 even on the warning background */
   --color-warning-bg: #fdf4e3;
   --color-danger: #c2412d;
   --color-danger-bg: #fcebe8;

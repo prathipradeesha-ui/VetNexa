@@ -161,6 +161,6 @@
 .not-found__code {
   font-size: 4rem;
   font-weight: 800;
-  color: var(--color-mint-strong);
+  color: var(--color-primary);
   line-height: 1;
 }

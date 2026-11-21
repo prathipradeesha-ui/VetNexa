@@ -57,7 +57,8 @@ export function ChatLauncher() {
           aria-labelledby="chat-launcher-title"
           tabIndex={-1}
         >
-          <header className="chat-launcher__header">
+          {/* A div, not <header>: a second page-wide header would confuse screen readers. */}
+          <div className="chat-launcher__header">
             <h2 id="chat-launcher-title">
               <MessageCircleQuestion size={20} aria-hidden="true" /> Ask VetNexa
             </h2>
@@ -72,7 +73,7 @@ export function ChatLauncher() {
             >
               <X size={20} />
             </button>
-          </header>
+          </div>
           <div className="chat-launcher__body">
             <Suspense fallback={<p className="chat-launcher__loading">Loading the assistant…</p>}>
               <AssistantChat compact />

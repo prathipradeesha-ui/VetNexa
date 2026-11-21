@@ -49,6 +49,7 @@ The mark is a paw print whose main pad carries a medical cross, set inside a rou
 | `--color-surface`      | Mist              | `#F4F8F8` | App background behind cards.                                              |
 | `--color-text`         | Ink               | `#1C2B3A` | Body text.                                                                |
 | `--color-text-muted`   | Slate             | `#4A5B73` | Secondary text and labels.                                                |
+| `--color-text-subtle`  | Light Slate       | `#5E6D82` | Hints, dates and table headings (the lightest text that still passes AA). |
 | `--color-border`       | Line              | `#DCE5E8` | Borders and dividers.                                                     |
 
 **Status colours** (used sparingly, always with an icon or text, never colour alone):
@@ -56,11 +57,11 @@ The mark is a paw print whose main pad carries a medical cross, set inside a rou
 | Status          | Hex       |
 | --------------- | --------- |
 | Success         | `#1E8E5A` |
-| Warning         | `#B7791F` |
+| Warning         | `#946116` |
 | Danger / urgent | `#C2412D` |
 | Info            | `#2B6CB0` |
 
-Contrast checks: white text on Deep Teal is about 6.1 : 1 and Navy on white about 14 : 1, both above the WCAG AA requirement of 4.5 : 1.
+Contrast checks: white text on Deep Teal is about 6.1 : 1 and Navy on white about 14 : 1, both above the WCAG AA requirement of 4.5 : 1. The Mint accent is only for icons and large shapes on dark backgrounds; small text on Deep Teal uses Soft Mint (about 5 : 1). Light Slate and Warning were darkened in the accessibility review (Stage 25) so every text colour reaches 4.5 : 1.
 
 ## 4. Typography
 

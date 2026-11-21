@@ -101,7 +101,6 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-primary);
-  opacity: 0.75;
 }
 .listing-photo--large {
   border-radius: var(--radius-lg);

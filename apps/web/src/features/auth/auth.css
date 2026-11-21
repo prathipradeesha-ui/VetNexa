@@ -69,7 +69,8 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-mint-strong);
+  /* Soft Mint: the brighter mint accent is too faint for small text on Deep Teal. */
+  color: var(--color-mint);
 }
 
 /* Form side */

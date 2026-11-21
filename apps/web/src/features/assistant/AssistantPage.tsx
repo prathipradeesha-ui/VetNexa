@@ -63,6 +63,8 @@ export function AssistantChat({ compact = false }: { compact?: boolean }) {
       {!compact && <EmergencyNotice />}
 
       <div className="card chat-window">
+        {/* Screen readers: answers use level-3 headings, so give the conversation a level 2. */}
+        {!compact && <h2 className="sr-only">Conversation</h2>}
         <div
           ref={logRef}
           className="chat-log"
