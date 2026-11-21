@@ -1,25 +1,53 @@
 # Dog and cat image collection – evidence
 
-This folder documents where every training image came from. The images themselves stay out of
-Git (`services/ai/data/`), but these files let anyone trace and re-create the collection.
+This folder documents where every image came from and why each source was used or rejected.
+The images themselves stay out of Git (`services/ai/data/`); these files let anyone trace and
+re-create the collection.
+
+## Policy: verified original data only
+
+Decided on 21 November 2026. The collection contains **only images published by the people who
+took them** (for example a research institute with a DOI and an owner-consent statement), or
+data supplied directly by a veterinary clinic.
+
+Community datasets on Kaggle and Roboflow were researched, downloaded and inspected, but are
+**not used**. Inspection found that they re-publish photos their uploaders do not own:
+
+- stock photos with Shutterstock, Alamy, Getty Images and CanStockPhoto watermarks;
+- photos from veterinary websites (e.g. marked "© SeniorTailWaggers.com");
+- a Kaggle "CC0" set that re-uploads the Mendeley CC BY 4.0 dataset under a different licence;
+- collages, photos with drawings on them, and rotated or cropped augmented copies;
+- cows, buffalo and people in sets described as dog or cat data.
+
+An uploader's licence cannot cover photos they did not take, so these sets cannot serve as
+evidence of real, lawfully used data. The full inspection record is kept below.
+
+## Files
 
 | File | Contents |
 | --- | --- |
-| `sources.json` | Every source considered, with its link, licence, labels, the date it was checked, and whether it was included or excluded (and why). |
-| `manifest.csv` | One row per image kept: file path, category, species, original label, source, licence, original path inside the download, size and SHA-256 fingerprint. |
-| `excluded.csv` | Every image left out and the reason (unlabelled, not a dog or cat, duplicate, augmented copy, too small, unreadable). |
+| `sources.json` | Every source considered: link, licence, labels, date checked, provenance level, inspection notes and the include/exclude decision with its reason. |
+| `manifest.csv` | One row per image kept: file path, category, species, original label, source, licence, path inside the download, size and SHA-256 fingerprint. |
+| `excluded.csv` | Every image from a used source that was left out, and why. |
 | `summary.json` | Image counts per category, species and source. |
+| `species_review.csv` | Record of the manual inspection of community data (87 images): species seen, stock-photo watermarks, cropped copies. Kept as evidence for the policy above. |
 
-## Rules
+## Current collection
 
-1. **Dogs and cats only.** Images of people or other animals are removed.
-2. **Real photographs only.** Augmented copies (flipped, rotated or re-coloured versions some
-   datasets add) and the same photo appearing in several datasets are removed, using a SHA-256
-   file hash, Roboflow's original-file name and a 256-bit perceptual hash that also checks
-   flipped and rotated versions.
-3. **Reusable licences only** (CC0, Public Domain, CC BY 4.0, Apache 2.0). Sources with an
-   unknown or missing licence are excluded. Nothing is scraped from general websites.
-4. Files are copied byte for byte, never edited, so each one can be matched to its source.
+| Category | Dogs | Source |
+| --- | --- | --- |
+| Healthy skin | 26 | Mendeley 10.17632/5dbht54kw7.1 |
+| Allergic dermatitis | 13 | Mendeley |
+| Bacterial dermatosis | 12 | Mendeley |
+| Fungal infection | 11 | Mendeley |
+
+Each image is the white-light photo of one dog. The other nine frames per dog in that dataset
+are narrow-band multispectral images and are not used; 33 dogs without a label in the source's
+label file are excluded.
+
+**Requested:** PetWound (290 photos of real wounds on 208 dogs and 82 cats, *Animals* 2023,
+13(6), 956) from its authors, and clinical photos from a partner veterinary clinic. Both would
+be verified original data.
 
 ## Re-creating the collection
 
@@ -29,10 +57,13 @@ cd services/ai
 python -m vetnexa_ai.curation
 ```
 
-The organised images appear in `data/dogs-cats/<category>/<species>/`, with contact sheets
-in `data/dogs-cats/_previews/`.
+Images appear in `data/dogs-cats/<category>/<species>/`, with contact sheets in
+`data/dogs-cats/_previews/`. The tool also supports a second, clearly labelled tier of
+community data by adding `"uploader-asserted"` to `ACCEPTED_PROVENANCE` in `curation.py`.
 
 ## Attribution
 
-Images are used under the licences listed in `sources.json`. When showing or publishing them,
-credit the dataset authors and link to the source, as CC BY 4.0 requires.
+Mendeley images: Korea Institute of Toxicology, *Classification of pet dog skin diseases using
+deep learning with images captured from multispectral imaging device*, Mendeley Data, V1,
+doi:10.17632/5dbht54kw7.1, licensed CC BY 4.0. Credit the authors and link to the source when
+showing these images.

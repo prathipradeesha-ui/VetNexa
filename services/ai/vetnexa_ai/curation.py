@@ -213,6 +213,12 @@ def read_coco(source_dir: Path, source_id: str, species: str | None) -> Iterator
             )
 
 
+#: Only sources with these provenance levels (see sources.json) are used. Decision recorded on
+#: 2026-11-21: the collection contains verified original data only, because inspection showed
+#: that community "open" pet datasets re-publish stock and website photos their uploaders do
+#: not own. Add "uploader-asserted" here to build a second, clearly labelled tier.
+ACCEPTED_PROVENANCE = {"verified"}
+
 #: Mixed-animal sources whose images get the automatic dog/cat check.
 SPECIES_CHECKED_SOURCES = {
     "roboflow-resqpetai-injury-classifier",
@@ -382,6 +388,7 @@ def build(near_duplicate_bits: int = 12, min_side: int = 128) -> dict:
     species_checker: SpeciesChecker | None = None
     reviews = load_species_reviews()
     review_queue: list[dict] = []
+    skipped_sources: list[str] = []
 
     def exclude(item: Item, reason: str, duplicate_of: str = "") -> None:
         excluded.append(
@@ -399,6 +406,9 @@ def build(near_duplicate_bits: int = 12, min_side: int = 128) -> dict:
         if not source_dir.exists():
             continue
         source = sources[source_id]
+        if source.get("provenance") not in ACCEPTED_PROVENANCE:
+            skipped_sources.append(source_id)
+            continue
         for item in reader(source_dir, source_id):
             label = normalise(item.original_label)
             if label in NON_TARGET_LABELS or label not in LABEL_MAP:
@@ -512,6 +522,8 @@ def build(near_duplicate_bits: int = 12, min_side: int = 128) -> dict:
                 }
             )
 
+    if skipped_sources:
+        print(f"Not used (provenance not verified): {', '.join(skipped_sources)}")
     write_outputs(kept, excluded)
     make_previews(kept)
     write_review_queue(review_queue)
@@ -560,6 +572,8 @@ def make_previews(kept: list[dict], per_sheet: int = 40, tile: int = 160) -> Non
 
 def write_review_queue(queue: list[dict], per_sheet: int = 30, tile: int = 220) -> None:
     """Numbered contact sheets of images whose species needs a person to decide."""
+    if not queue:
+        return
     folder = OUT / "_review"
     folder.mkdir(exist_ok=True)
     with (folder / "queue.csv").open("w", newline="", encoding="utf-8") as f:

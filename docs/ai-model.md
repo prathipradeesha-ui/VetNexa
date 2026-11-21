@@ -65,8 +65,23 @@ a veterinarian before any real-world use.
   inflated by near-duplicates. Exact duplicate files are removed.
 - The split is saved to `models/split.json` and evaluation always uses the same test images.
 
-Dataset: _to be completed once the training data is chosen_ (sources, licences, number of images
-per class, how labels were checked). See `services/ai/data/README.md`.
+**Data policy: verified original data only** (decided 21 November 2026). Only images published
+by the people who took them, or supplied directly by a clinic with owner consent, are used.
+About 25 public sources were researched; community uploads on Kaggle and Roboflow were inspected
+and rejected because they contain stock-watermarked and website photos, re-licensed copies of
+other datasets and augmented images. The full record, with a manifest and SHA-256 fingerprint
+for every image, is in `services/ai/datasets/`.
+
+| Source                                     | Content                                                                                      | Status                     |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------- | -------------------------- |
+| Mendeley 10.17632/5dbht54kw7.1 (CC BY 4.0) | Clinical skin photos of 62 dogs: 26 healthy, 13 allergic dermatitis, 12 bacterial, 11 fungal | In use                     |
+| PetWound (Animals 2023, 13(6), 956)        | 290 photos of real wounds: 208 dogs, 82 cats                                                 | Requested from the authors |
+| Partner veterinary clinic                  | Wound photos with owner consent                                                              | Requested                  |
+
+**Status of the wound model:** none of the verified data yet contains labelled wound types, so
+the wound classifier has not been trained on real data. The pipeline is complete and tested,
+and training will run as soon as PetWound or clinic images are received and labelled by a
+veterinarian.
 
 ## Evaluation
 
@@ -85,8 +100,8 @@ not reported because they say nothing about real wounds.
 
 ## Known limitations and risks
 
-- **Small data.** Openly licensed dog and cat wound datasets contain only a few hundred images,
-  so performance estimates will have wide uncertainty and may not generalise.
+- **Small data.** Verified dog and cat wound data is scarce (a few hundred images at best), so
+  performance estimates will have wide uncertainty and may not generalise.
 - **Bias.** Coat colour, breed, hair length, lighting and phone camera can all affect results.
   Dark-coated animals and dark skin are likely under-represented.
 - **Single photo.** Depth, smell, heat, pain and the animal's behaviour are invisible in a photo

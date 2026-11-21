@@ -30,14 +30,16 @@ data/wounds/
 
 ## Sources, licences and consent
 
-Use only images you are allowed to use, and record where each one came from.
+**Policy: verified original data only.** Use only images published by the people who took them
+(a research group with a DOI and consent statement) or supplied directly by a veterinary clinic
+with owner consent. Community uploads on Kaggle and Roboflow are not used: inspection found
+they contain stock and website photos their uploaders do not own. The full record is in
+`../datasets/` (see `datasets/README.md`).
 
-| Source | Notes |
+| Source | Status |
 | --- | --- |
-| Photos collected with clinics or rescuers | Best quality. Get written owner consent, remove faces, people and house numbers, and get your university's ethics approval first. |
-| PetWound dataset (dog and cat wounds, CC BY 4.0) | About 290 images, labelled for segmentation; needs re-labelling into the classes above. Credit the authors. |
-| Roboflow "injured dog detector" sets (CC BY 4.0) | Small; labels are only injured / not injured. Credit the uploaders. |
-| Human wound datasets on Roboflow (CC BY 4.0) | Right wound types, wrong species: use only for the first stage of two-stage training, never for evaluation. |
+| Mendeley 10.17632/5dbht54kw7.1 (dog skin, CC BY 4.0) | In use: 62 dogs, 4 skin conditions |
+| PetWound (208 dogs and 82 cats with real wounds) | Requested from the authors |
+| Partner veterinary clinic | Requested. Needs written owner consent, removal of faces, people and house numbers, and university ethics approval |
 
-Check the licence on each dataset's own page before downloading, as uploader labels can be wrong.
 Results must always be **evaluated on dog and cat photos only**.

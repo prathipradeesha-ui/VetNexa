@@ -47,7 +47,7 @@
         "Hypersensitivity_dermatitis"
       ],
       "access": "Kaggle sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, contradicted",
       "inspection_notes": "Inspection on 2026-11-21 found this is a compilation: it re-uploads the Mendeley CC BY 4.0 images (including multispectral band frames) under CC0, contains photos from veterinary websites (e.g. \"© SeniorTailWaggers.com\"), collages, annotated images and rotated augmented copies. The CC0 claim cannot cover third-party photos."
     },
@@ -70,7 +70,7 @@
         "ringworm"
       ],
       "access": "Kaggle sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -91,7 +91,7 @@
         "hypersensitivity dermatitis"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -112,7 +112,7 @@
         "ringworm"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -133,7 +133,7 @@
         "hypersensitivity-allergic-dermatosis"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -154,7 +154,7 @@
         "Scabies"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -174,7 +174,7 @@
         "scabbies"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -195,7 +195,7 @@
         "scabies"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -215,7 +215,7 @@
         "injured"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included – each image is checked and anything that is not a dog or cat is removed",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, contradicted",
       "inspection_notes": "Inspection on 2026-11-21 found web-collected photos including stock images with Shutterstock, Alamy, Getty Images and CanStockPhoto watermarks, and many cows and buffalo. The CC BY 4.0 claim cannot cover stock photos."
     },
@@ -242,7 +242,7 @@
         "(others excluded)"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included – only images whose boxes are dogs or cats are kept",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -267,7 +267,7 @@
         "(others excluded)"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included – only images containing a dog or cat are kept",
+      "decision": "excluded – provenance not verifiable (community upload); see policy",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {
@@ -295,7 +295,7 @@
       "id": "petwound",
       "name": "PetWound (Animals 2023, 13(6), 956)",
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10044392/",
-      "decision": "not available – images only on request from the authors (worth requesting)"
+      "decision": "requested – images available from the authors on reasonable request; verified original clinical data (dogs and cats) if granted"
     },
     {
       "id": "ieee-medipaw",
@@ -318,5 +318,10 @@
     "verified": "Original data published by the people who took the photos (institution, DOI, consent statement).",
     "uploader-asserted": "Community upload; the licence is the uploader's claim and the original photographers are unknown.",
     "uploader-asserted, contradicted": "Inspection found images the uploader cannot have licensed (stock watermarks, copies of other datasets)."
+  },
+  "policy": {
+    "decided_on": "2026-11-21",
+    "standard": "Verified original data only",
+    "reason": "Inspection of community datasets on Kaggle and Roboflow found stock photos (Shutterstock, Alamy, Getty Images, CanStockPhoto), photos from veterinary websites, re-uploads of other datasets under a different licence, collages, annotated and augmented images. Their uploaders cannot license photos they did not take, so they cannot serve as evidence of lawful, real data."
   }
 }
