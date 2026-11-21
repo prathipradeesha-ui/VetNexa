@@ -24,6 +24,16 @@ export const RESCUE_STATUS_LABELS: Record<RescueStatus, string> = {
 
 const optionalPhone = phoneSchema.optional().or(z.literal('').transform(() => undefined));
 
+/** Optional GPS position from "Use my current location"; must be inside Sri Lanka. */
+const optionalCoordinate = (min: number, max: number) =>
+  z
+    .number()
+    .min(min, 'This location is outside Sri Lanka')
+    .max(max, 'This location is outside Sri Lanka')
+    .optional()
+    .nullable()
+    .transform((value) => value ?? undefined);
+
 /** Anyone signed in can report an animal that needs help. */
 export const rescueReportSchema = z.object({
   species: z.enum(SPECIES, { error: SPECIES_ERROR }),
@@ -45,9 +55,22 @@ export const rescueReportSchema = z.object({
   city: z.string().trim().min(2, 'Please enter the town or city').max(80),
   urgency: z.enum(RESCUE_URGENCIES).default('MEDIUM'),
   contactPhone: optionalPhone,
+  latitude: optionalCoordinate(5.5, 10),
+  longitude: optionalCoordinate(79.4, 82),
 });
 export type RescueReportInput = z.input<typeof rescueReportSchema>;
 export type RescueReportData = z.output<typeof rescueReportSchema>;
+
+/**
+ * Emergency report without an account. A name and a phone number are required so rescuers
+ * can reach the person who saw the animal.
+ */
+export const guestRescueReportSchema = rescueReportSchema.extend({
+  reporterName: z.string().trim().min(2, 'Please enter your name').max(80),
+  contactPhone: phoneSchema,
+});
+export type GuestRescueReportInput = z.input<typeof guestRescueReportSchema>;
+export type GuestRescueReportData = z.output<typeof guestRescueReportSchema>;
 
 export const rescueStatusSchema = z.object({
   status: z.enum(['RESCUED', 'CLOSED']),

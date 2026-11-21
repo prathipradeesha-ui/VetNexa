@@ -29,6 +29,17 @@ export const assessmentRequestSchema = z.object({
 
 export type AssessmentRequest = z.infer<typeof assessmentRequestSchema>;
 
+/**
+ * Emergency wound check without an account: the species is chosen on the form instead of
+ * coming from a pet profile. Nothing is stored.
+ */
+export const guestAssessmentRequestSchema = z.object({
+  species: z.enum(SPECIES, { error: 'Please choose dog or cat' }),
+  answers: assessmentRequestSchema.shape.answers,
+});
+
+export type GuestAssessmentRequest = z.infer<typeof guestAssessmentRequestSchema>;
+
 /** Wound classes in the order the model outputs them, with the wording shown to owners. */
 export const WOUND_CLASS_LABELS: Record<string, string> = {
   abrasion: 'Graze or abrasion',
@@ -73,6 +84,12 @@ export interface WoundAssessmentResult {
   disclaimer: string;
   createdAt: string;
 }
+
+/** Result of an emergency check made without an account (never stored). */
+export type GuestAssessmentResult = Omit<
+  WoundAssessmentResult,
+  'id' | 'pet' | 'imageUrl' | 'ownerNotes' | 'createdAt'
+> & { species: (typeof SPECIES)[number] };
 
 /** Whether the assessment service can be used right now. */
 export interface AssessmentServiceStatus {

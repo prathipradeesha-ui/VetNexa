@@ -17,6 +17,7 @@ import { chatRouter } from './modules/chat/chat.routes';
 import { adoptionRouter } from './modules/adoption/adoption.routes';
 import { clinicsRouter } from './modules/clinics/clinics.routes';
 import { contactRouter } from './modules/contact/contact.routes';
+import { emergencyRouter } from './modules/emergency/emergency.routes';
 import {
   consultationsRouter,
   vetPortalRouter,
@@ -170,6 +171,29 @@ export function createApp({
       next(HttpError.tooManyRequests('You have asked a lot of questions. Please wait a moment.')),
   });
 
+  // Emergency help without an account: 10 wound checks and 5 rescue reports per hour per IP.
+  const guestAssessLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) =>
+      next(
+        HttpError.tooManyRequests(
+          'Too many checks from this connection. If your pet is in danger, contact a clinic now.',
+        ),
+      ),
+  });
+  const guestRescueLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 5,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => !rateLimits,
+    handler: (_req, _res, next) => next(HttpError.tooManyRequests()),
+  });
+
   // ── Routes ──
   app.use('/api/health', healthRouter(prisma));
   app.use('/api/auth', authRouter(prisma, loginLimiter));
@@ -180,6 +204,10 @@ export function createApp({
   app.use('/api/reminders', remindersRouter(prisma));
   app.use('/api/assessments', assessmentsRouter(prisma, aiClient, assessmentLimiter));
   app.use('/api/chat', chatRouter(prisma, aiClient, chatLimiter));
+  app.use(
+    '/api/emergency',
+    emergencyRouter(prisma, aiClient, guestAssessLimiter, guestRescueLimiter),
+  );
   app.use('/api/clinics', clinicsRouter(prisma, reviewLimiter));
   app.use('/api/consultations', consultationsRouter(prisma));
   app.use('/api/vet', vetPortalRouter(prisma));

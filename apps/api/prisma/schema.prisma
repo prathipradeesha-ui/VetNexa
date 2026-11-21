@@ -316,7 +316,10 @@ enum RescueStatus {
 /// Anyone signed in can report; rescuers pick reports up and update their status.
 model RescueReport {
   id           String        @id @default(cuid())
-  reporterId   String
+  /// Null for reports made without an account (emergency mode); see reporterName.
+  reporterId   String?
+  /// Name given by a guest reporter. Guests must also give a contact phone.
+  reporterName String?       @db.VarChar(80)
   assignedToId String?
   species      Species
   title        String        @db.VarChar(120)
@@ -332,7 +335,7 @@ model RescueReport {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  reporter   User  @relation("RescueReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporter   User? @relation("RescueReporter", fields: [reporterId], references: [id], onDelete: Cascade)
   assignedTo User? @relation("RescueAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([status, urgency])

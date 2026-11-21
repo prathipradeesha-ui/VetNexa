@@ -1,4 +1,4 @@
-import type { RescueReportData } from '@vetnexa/shared';
+import type { GuestRescueReportData, RescueReportData } from '@vetnexa/shared';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import { HttpError } from '../../lib/http-error';
 import { deleteUpload, saveImage } from '../../lib/uploads';
@@ -14,6 +14,11 @@ type ReportRow = Prisma.RescueReportGetPayload<{ include: typeof include }>;
 const isResponder = (user: AuthUser) => user.role === 'RESCUER' || user.role === 'ADMIN';
 const URGENCY_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 } as const;
 
+/** About 1.1 km: shown to rescuers who have not taken the report on yet. */
+export const APPROXIMATE_DECIMALS = 2;
+const roundTo = (value: number, decimals: number) =>
+  Math.round(value * 10 ** decimals) / 10 ** decimals;
+
 /**
  * Phone numbers are personal: responders see the reporter's contact details so they can find
  * the animal, and the reporter sees who is handling their report.
@@ -21,6 +26,12 @@ const URGENCY_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 } as const;
 export function toReportResponse(row: ReportRow, viewer: AuthUser) {
   const responder = isResponder(viewer);
   const isAssignee = row.assignedToId === viewer.id;
+  const isReporter = row.reporterId !== null && row.reporterId === viewer.id;
+  // "Location shared safely": the exact spot only for the reporter, the rescuer handling the
+  // report and administrators. Other rescuers see the area (about 1 km) until they take it on.
+  const exact = isReporter || isAssignee || viewer.role === 'ADMIN';
+  const coordinate = (value: unknown) =>
+    value === null ? null : exact ? Number(value) : roundTo(Number(value), APPROXIMATE_DECIMALS);
   return {
     id: row.id,
     species: row.species,
@@ -28,17 +39,21 @@ export function toReportResponse(row: ReportRow, viewer: AuthUser) {
     description: row.description,
     locationText: row.locationText,
     city: row.city,
-    latitude: row.latitude === null ? null : Number(row.latitude),
-    longitude: row.longitude === null ? null : Number(row.longitude),
+    latitude: coordinate(row.latitude),
+    longitude: coordinate(row.longitude),
+    locationApproximate: !exact && row.latitude !== null,
     urgency: row.urgency,
     status: row.status,
     photoUrl: row.photoUrl,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     reporter: {
-      name: `${row.reporter.firstName} ${row.reporter.lastName.charAt(0)}.`,
-      phone: responder ? (row.contactPhone ?? row.reporter.phone) : null,
-      isMe: row.reporterId === viewer.id,
+      name: row.reporter
+        ? `${row.reporter.firstName} ${row.reporter.lastName.charAt(0)}.`
+        : `${row.reporterName ?? 'Guest'} (no account)`,
+      phone: responder ? (row.contactPhone ?? row.reporter?.phone ?? null) : null,
+      isMe: isReporter,
+      isGuest: row.reporterId === null,
     },
     assignedTo: row.assignedTo
       ? {
@@ -50,8 +65,8 @@ export function toReportResponse(row: ReportRow, viewer: AuthUser) {
     actions: {
       canTakeOn: viewer.role === 'RESCUER' && row.status === 'OPEN',
       canResolve: row.status === 'IN_PROGRESS' && (isAssignee || viewer.role === 'ADMIN'),
-      canClose: row.status === 'OPEN' && (viewer.role === 'ADMIN' || row.reporterId === viewer.id),
-      canChangePhoto: row.reporterId === viewer.id && ['OPEN', 'IN_PROGRESS'].includes(row.status),
+      canClose: row.status === 'OPEN' && (viewer.role === 'ADMIN' || isReporter),
+      canChangePhoto: isReporter && ['OPEN', 'IN_PROGRESS'].includes(row.status),
     },
   };
 }
@@ -112,10 +127,35 @@ export function rescueService(prisma: PrismaClient) {
           city: data.city,
           urgency: data.urgency,
           contactPhone: data.contactPhone ?? null,
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
         },
         include,
       });
       return toReportResponse(row, viewer);
+    },
+
+    /**
+     * Emergency report from someone without an account. Nothing about the report is shown back
+     * except a reference number; rescuers contact the reporter by phone.
+     */
+    async createAsGuest(data: GuestRescueReportData) {
+      const row = await prisma.rescueReport.create({
+        data: {
+          reporterName: data.reporterName,
+          species: data.species,
+          title: data.title,
+          description: data.description,
+          locationText: data.locationText,
+          city: data.city,
+          urgency: data.urgency,
+          contactPhone: data.contactPhone,
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
+        },
+        select: { id: true, createdAt: true },
+      });
+      return { reference: row.id.slice(-8).toUpperCase(), createdAt: row.createdAt.toISOString() };
     },
 
     /** A rescuer takes on an open report. The update only succeeds if nobody else got there first. */

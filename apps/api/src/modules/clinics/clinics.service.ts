@@ -22,6 +22,9 @@ export function toClinicSummary(clinic: Clinic, now = new Date()) {
     addressLine: clinic.addressLine,
     city: clinic.city,
     district: clinic.district,
+    // Map pins and "near me" sorting; clinics are public places, so exact positions are fine.
+    latitude: clinic.latitude === null ? null : Number(clinic.latitude),
+    longitude: clinic.longitude === null ? null : Number(clinic.longitude),
     phone: clinic.phone,
     services: asStringArray(clinic.services),
     hasEmergency: clinic.hasEmergency,
