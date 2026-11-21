@@ -57,6 +57,7 @@ Dependabot keeps watching npm, pip, Docker and GitHub Actions every week.
 | `3af7d87` | The API only reads JSON, so a form on another website cannot post data with a visitor's session; a wildcard `CORS_ORIGIN` stops start-up |
 | `7e8d60a` | bcrypt only checks the first 72 bytes. Sinhala, Tamil and emoji characters take 3–4 bytes, so such long passwords are now refused        |
 | `cc5cb04` | New tests: wound checks, pet and rescue photos and adoption applications cannot be reached by other users; errors never show internals   |
+| Stage 26  | Found while writing the setup guide: MySQL was published on every network interface; it now listens on this computer only (`127.0.0.1`)  |
 
 ### 1.4 Remaining risks and advice for deployment
 
