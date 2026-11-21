@@ -29,6 +29,11 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser } },
     rules: { ...reactHooks.configs.recommended.rules },
   },
+  // The service worker runs in its own worker scope.
+  {
+    files: ['apps/web/public/sw.js'],
+    languageOptions: { globals: { ...globals.serviceworker } },
+  },
   // Prettier last, so formatting rules never conflict with lint rules.
   prettier,
 );
