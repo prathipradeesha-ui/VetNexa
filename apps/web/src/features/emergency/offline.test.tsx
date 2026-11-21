@@ -152,6 +152,28 @@ describe('emergency page offline', () => {
     ).toBeInTheDocument();
   });
 
+  it('offers the danger-sign check when VetNexa cannot be reached, even with Wi-Fi on', async () => {
+    saveClinics([clinic]);
+    mockApi({}); // the phone says it is online, but no request gets through
+    renderRoute('/emergency');
+    expect(await screen.findByRole('button', { name: 'Check danger signs' })).toBeInTheDocument();
+    expect(
+      await screen.findByText(/This is the clinic list saved on this phone/),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText('Map of emergency clinics')).not.toBeInTheDocument();
+  });
+
+  it('still shows the first-aid guides', async () => {
+    mockApi({});
+    goOffline();
+    renderRoute('/emergency');
+    const guides = (await screen.findByRole('heading', { name: 'First-aid guides' })).closest(
+      'section',
+    )!;
+    expect(within(guides).getByText('First aid for cuts and wounds')).toBeInTheDocument();
+    expect(within(guides).getByText('Heatstroke')).toBeInTheDocument();
+  });
+
   it('explains when no clinic list has been saved yet', async () => {
     mockApi({});
     goOffline();

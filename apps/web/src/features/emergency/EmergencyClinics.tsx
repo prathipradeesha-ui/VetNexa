@@ -49,20 +49,21 @@ export function EmergencyClinics() {
   }, [live, saved, me]);
 
   // The map needs internet, so offline it is left out and the list does the work.
-  const places: MapPlace[] = !online
-    ? []
-    : clinics
-        .filter(({ clinic }) => clinic.latitude !== null && clinic.longitude !== null)
-        .map(({ clinic, distance }) => ({
-          id: clinic.id,
-          position: { lat: clinic.latitude!, lng: clinic.longitude! },
-          title: clinic.name,
-          subtitle: [clinic.phone, distance !== null ? formatDistance(distance) : null]
-            .filter(Boolean)
-            .join(' · '),
-          href: `/clinics/${clinic.slug}`,
-          highlight: true,
-        }));
+  const places: MapPlace[] =
+    !online || saved
+      ? []
+      : clinics
+          .filter(({ clinic }) => clinic.latitude !== null && clinic.longitude !== null)
+          .map(({ clinic, distance }) => ({
+            id: clinic.id,
+            position: { lat: clinic.latitude!, lng: clinic.longitude! },
+            title: clinic.name,
+            subtitle: [clinic.phone, distance !== null ? formatDistance(distance) : null]
+              .filter(Boolean)
+              .join(' · '),
+            href: `/clinics/${clinic.slug}`,
+            highlight: true,
+          }));
   const nearest = clinics[0]?.clinic;
 
   return (

@@ -13,6 +13,8 @@ COPY packages/shared/package.json packages/shared/
 RUN npm ci --no-audit --no-fund
 COPY packages/shared packages/shared
 COPY apps/web apps/web
+# First-aid guides on the emergency page come from the assistant's knowledge base.
+COPY services/ai/knowledge services/ai/knowledge
 # Optional Google Maps browser key (restrict it to your domain in Google Cloud). Without it the
 # app uses Google's keyless embed for one place at a time.
 ARG VITE_GOOGLE_MAPS_API_KEY=

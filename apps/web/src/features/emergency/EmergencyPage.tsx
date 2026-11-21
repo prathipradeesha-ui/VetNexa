@@ -1,8 +1,17 @@
-import { HeartPulse, Megaphone, MessageCircleQuestion, ScanSearch, Siren } from 'lucide-react';
+import {
+  BookOpen,
+  HeartPulse,
+  Megaphone,
+  MessageCircleQuestion,
+  ScanSearch,
+  Siren,
+} from 'lucide-react';
 import { Link } from 'react-router';
 import { useOnlineStatus } from '../../pwa/useOnlineStatus';
 import { useCurrentUser } from '../auth/useAuth';
 import { DangerSignCheck } from './DangerSignCheck';
+import { FirstAidGuides } from './FirstAidGuides';
+import { useEmergencyStatus } from './useEmergency';
 import { EmergencyClinics } from './EmergencyClinics';
 import { GuestRescueForm } from './GuestRescueForm';
 import { GuestWoundCheck } from './GuestWoundCheck';
@@ -22,6 +31,9 @@ const FIRST_STEPS = [
 export function EmergencyPage() {
   const { data: user } = useCurrentUser();
   const online = useOnlineStatus();
+  // The photo check needs the server; if it cannot be reached, offer the offline check instead.
+  const status = useEmergencyStatus();
+  const canCheckPhoto = online && !status.isError;
 
   return (
     <>
@@ -45,6 +57,9 @@ export function EmergencyPage() {
             <a href="#report-title" className="btn btn--secondary">
               <Megaphone size={18} aria-hidden="true" /> Report an animal
             </a>
+            <a href="#first-aid-guides-title" className="btn btn--secondary">
+              <BookOpen size={18} aria-hidden="true" /> First aid
+            </a>
           </nav>
         </div>
       </section>
@@ -58,7 +73,7 @@ export function EmergencyPage() {
               <h2 id="wound-check-title" className="card-title">
                 <ScanSearch size={20} aria-hidden="true" /> Check a wound with your camera
               </h2>
-              {online ? (
+              {canCheckPhoto ? (
                 <>
                   <p className="field__hint">
                     A quick, cautious first look at a wound or skin problem, combining your photo
@@ -87,6 +102,8 @@ export function EmergencyPage() {
               </p>
               <GuestRescueForm />
             </section>
+
+            <FirstAidGuides />
           </div>
 
           <aside className="emergency-layout__side">

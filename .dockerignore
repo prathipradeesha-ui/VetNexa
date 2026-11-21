@@ -10,7 +10,11 @@
 !**/.env.example
 apps/api/uploads
 apps/api/src/generated
-services
+services/*
+!services/ai
+services/ai/*
+# The web app builds its offline first-aid guides from the knowledge base.
+!services/ai/knowledge
 brand
 docs
 infra/mysql
