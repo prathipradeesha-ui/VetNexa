@@ -1,0 +1,45 @@
+{
+  "id": "/",
+  "name": "VetNexa – Dog and cat healthcare",
+  "short_name": "VetNexa",
+  "description": "Health records, nearby clinics, emergency help and AI-supported wound checks for dogs and cats.",
+  "lang": "en-GB",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0A6C6C",
+  "background_color": "#F4F8F8",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Emergency help",
+      "short_name": "Emergency",
+      "description": "Nearest clinics, a quick wound check and rescue reports – no account needed",
+      "url": "/emergency",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Find a clinic",
+      "short_name": "Clinics",
+      "url": "/clinics",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "New wound check",
+      "short_name": "Wound check",
+      "url": "/dashboard/assessments/new",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
