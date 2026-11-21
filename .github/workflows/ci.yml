@@ -126,6 +126,14 @@ jobs:
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
 
+      - name: Build MinIO image (from source)
+        uses: docker/build-push-action@v6
+        with:
+          context: infra/minio
+          push: false
+          cache-from: type=gha,scope=minio
+          cache-to: type=gha,mode=max,scope=minio
+
       - name: Build AI image
         uses: docker/build-push-action@v6
         with:

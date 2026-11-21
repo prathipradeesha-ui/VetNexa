@@ -53,6 +53,22 @@ services:
     networks: [backend]
     restart: 'no'
 
+  # Object storage for uploaded photos (S3-compatible), built from MinIO's open-source code.
+  minio:
+    build: ./infra/minio
+    image: vetnexa-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-vetnexa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-change-me-minio-password}
+    volumes:
+      - minio-data:/data
+    # Published on the loopback interface only, for local tools (console on 9001).
+    ports:
+      - '127.0.0.1:${MINIO_PORT:-9000}:9000'
+      - '127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001'
+    networks: [backend]
+
   ai:
     build: ./services/ai
     image: vetnexa-ai
@@ -82,6 +98,13 @@ services:
       DATABASE_URL: *database-url
       AI_SERVICE_URL: http://ai:8000
       CORS_ORIGIN: ${PUBLIC_URL:-http://localhost:8080}
+      # Photos are stored in MinIO; the API creates the bucket on start-up.
+      STORAGE_DRIVER: s3
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: ${S3_BUCKET:-vetnexa-uploads}
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-vetnexa}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-change-me-minio-password}
+      # Earlier local photos (before MinIO) stay readable for `node dist/migrate-uploads.js`.
       UPLOAD_DIR: /data/uploads
     volumes:
       - uploads:/data/uploads
@@ -90,6 +113,8 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+      minio:
+        condition: service_healthy
       ai:
         condition: service_started
     networks: [backend]
@@ -116,3 +141,4 @@ networks:
 volumes:
   db-data:
   uploads:
+  minio-data:
