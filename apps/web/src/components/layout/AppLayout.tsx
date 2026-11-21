@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   PawPrint,
+  ScanSearch,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -31,6 +32,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/dashboard/pets', label: 'My pets', icon: PawPrint, roles: ['OWNER'] },
+  { to: '/dashboard/assessments', label: 'Wound check', icon: ScanSearch, roles: ['OWNER'] },
   {
     to: '/dashboard/consultations',
     label: 'Consultations',

@@ -175,6 +175,27 @@ export const routes: RouteObject[] = [
                     lazy: lazyPage(() => import('./features/pets/PetFormPage'), 'PetFormPage'),
                   },
                   {
+                    path: '/dashboard/assessments',
+                    lazy: lazyPage(
+                      () => import('./features/assessments/AssessmentsPage'),
+                      'AssessmentsPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/assessments/new',
+                    lazy: lazyPage(
+                      () => import('./features/assessments/NewAssessmentPage'),
+                      'NewAssessmentPage',
+                    ),
+                  },
+                  {
+                    path: '/dashboard/assessments/:id',
+                    lazy: lazyPage(
+                      () => import('./features/assessments/AssessmentResultPage'),
+                      'AssessmentResultPage',
+                    ),
+                  },
+                  {
                     path: '/dashboard/applications',
                     lazy: lazyPage(
                       () => import('./features/adoption/MyApplicationsPage'),

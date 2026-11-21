@@ -49,6 +49,15 @@ a veterinarian before any real-world use.
    - Cuts, punctures and infections always recommend a vet.
    - Every result carries a disclaimer and the word "diagnosis" is never used for AI output.
 
+## How it is used in VetNexa
+
+The model runs in a separate Python service (`python -m vetnexa_ai.service`). Owners upload a
+photo of their dog or cat in **Wound check**; the API forwards it, stores the result with the
+model version, and the web app shows the severity, calibrated confidence (hidden for uncertain
+results), guidance, a vet referral with links to clinics and consultations, the probability of
+each class, an emergency notice and the disclaimer. Results from a model trained with `--demo`
+(synthetic images) are labelled as demonstration results on every screen.
+
 ## Training method
 
 - Transfer learning: frozen backbone for the first epochs, then full fine-tuning at a lower

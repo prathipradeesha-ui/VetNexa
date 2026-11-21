@@ -224,6 +224,35 @@ data from phone photos. Files get random names and are served from `/uploads/...
   (case-insensitive) only the latest entry counts. Recording this year's vaccine therefore
   clears last year's overdue reminder.
 
+## AI wound assessment
+
+`OWNER` role, own dogs and cats only. The API forwards the photo to the internal AI service
+(`services/ai`, see `AI_SERVICE_URL`), stores the result and returns it. The browser never talks
+to the AI service directly.
+
+| Method | Path                  | Description                                                                 |
+| ------ | --------------------- | --------------------------------------------------------------------------- |
+| GET    | `/assessments/status` | `{ available, demoModel, modelVersion }` – whether a model is loaded.       |
+| GET    | `/assessments`        | My assessments, newest first. Optional `?petId=`.                           |
+| POST   | `/assessments`        | Assess a photo: `multipart/form-data` with `photo`, `petId`, `ownerNotes?`. |
+| GET    | `/assessments/:id`    | One assessment.                                                             |
+| DELETE | `/assessments/:id`    | Delete an assessment and its stored photo.                                  |
+
+**Result:** `status` (`ASSESSED` or `UNCERTAIN`), `predictedClass`, calibrated `confidence`,
+`severity` (`MINOR`, `MODERATE`, `SEVERE`, `UNCERTAIN`), `referToVet`, `escalated`,
+per-class `probabilities`, `summary`, `guidance`, `modelVersion`, `demoModel` and `disclaimer`.
+
+**Rules**
+
+- Pets that are not dogs or cats receive `422` (field `petId`); the model was not built for them.
+- A blurry, dark or washed-out photo receives `422` with code `PHOTO_QUALITY` and
+  `details.problems` (advice for retaking it). Nothing is stored.
+- If the AI service is down or has no model, `POST` returns `503` and `/status` reports
+  `available: false`; the rest of the platform keeps working.
+- `demoModel: true` means the result came from a model trained on synthetic images; the
+  interface then shows a clear warning that the result says nothing about the pet.
+- At most 20 assessments per hour per IP address.
+
 ## Administration
 
 All routes require the `ADMIN` role.

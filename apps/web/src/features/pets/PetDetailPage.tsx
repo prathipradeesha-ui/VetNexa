@@ -1,5 +1,5 @@
 import { formatPetAge, PET_SEX_LABELS, SPECIES_LABELS } from '@vetnexa/shared';
-import { ArrowLeft, Camera, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Camera, Pencil, ScanSearch, Trash2 } from 'lucide-react';
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
@@ -135,9 +135,19 @@ function PetDetail({ pet }: { pet: Pet }) {
         <div className="pet-profile__body">
           <div className="pet-profile__header">
             <h1>{pet.name}</h1>
-            <Link to={`/dashboard/pets/${pet.id}/edit`} className="btn btn--secondary btn--sm">
-              <Pencil size={16} aria-hidden="true" /> Edit details
-            </Link>
+            <div className="pet-profile__actions">
+              {(pet.species === 'DOG' || pet.species === 'CAT') && (
+                <Link
+                  to={`/dashboard/assessments/new?petId=${pet.id}`}
+                  className="btn btn--secondary btn--sm"
+                >
+                  <ScanSearch size={16} aria-hidden="true" /> Check a wound
+                </Link>
+              )}
+              <Link to={`/dashboard/pets/${pet.id}/edit`} className="btn btn--secondary btn--sm">
+                <Pencil size={16} aria-hidden="true" /> Edit details
+              </Link>
+            </div>
           </div>
           {photoError && <Alert tone="error">{photoError}</Alert>}
 

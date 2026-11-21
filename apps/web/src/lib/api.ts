@@ -15,6 +15,8 @@ export class ApiError extends Error {
     public readonly code: string,
     message: string,
     public readonly details?: FieldError[],
+    /** Extra data some errors carry, e.g. { problems: [...] } for a rejected photo. */
+    public readonly data?: unknown,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -48,6 +50,11 @@ export async function apiUpload<T>(
   return request<T>(path, { method, body: form });
 }
 
+/** Sends a prepared multipart form, e.g. a photo together with text fields. */
+export async function apiForm<T>(path: string, form: FormData, method: Method = 'POST') {
+  return request<T>(path, { method, body: form });
+}
+
 async function request<T>(path: string, init: RequestInit): Promise<T> {
   let response: Response;
   try {
@@ -72,6 +79,7 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
       error?.code ?? 'UNKNOWN_ERROR',
       error?.message ?? 'Something went wrong. Please try again.',
       Array.isArray(error?.details) ? (error.details as FieldError[]) : undefined,
+      error?.details,
     );
   }
 
