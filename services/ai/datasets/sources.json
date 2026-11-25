@@ -1,6 +1,6 @@
 {
   "description": "Every image source considered for the VetNexa dog and cat wound / skin-condition dataset. Licence, image count and labels were read from each source's own page on the date given. Only sources marked \"included\" are used.",
-  "checked_on": "2026-11-21",
+  "checked_on": "2026-11-25",
   "rules": [
     "Dogs and cats only: images of humans or other animals are excluded.",
     "Real photographs only: no synthetic, AI-generated or augmented copies.",
@@ -91,7 +91,7 @@
         "hypersensitivity dermatitis"
       ],
       "access": "Roboflow sign-in required to download",
-      "decision": "included in the community tier (open licence, uploader-asserted); kept separate from verified data",
+      "decision": "not downloaded – every browser download stalled part-way (21–25 Nov 2026); included automatically once its zip is in data/raw",
       "provenance": "uploader-asserted, not yet inspected"
     },
     {

@@ -51,7 +51,7 @@ be verified original data.
 
 ## Community collection (second tier)
 
-At the project owner's request (21–22 November 2026) the real dog and cat photos from open-licence
+At the project owner's request (21–25 November 2026) the real dog and cat photos from open-licence
 community datasets were also collected. They are kept **separate** from the verified collection
 above and are never mixed with it:
 
@@ -68,17 +68,19 @@ fingerprint, and `excluded.csv` records every image left out and why.
 
 ### What was removed
 
-From 6,012 downloaded files, **616 distinct, clear, real dog and cat photos** were kept.
+From 10,621 downloaded files, **744 distinct, clear, real dog and cat photos** were kept. The
+owner asked for clear photos only, so anything doubtful was left out.
 
 | Removed | Images | How |
 | --- | ---: | --- |
-| Duplicates: augmented, flipped, rotated, cropped or noisy copies; video frames of the same case; copies of verified photos | 4,433 | Exact and difference hashes, rotation-corner check, artificial speckle-noise check, and EfficientNet-B0 image features: a photo at least 0.70 similar to one already kept counts as the same case |
-| Not clear: blurry, too small, too dark, washed out, pixelated enlargements, unrecognisable close-ups | 223 | Sharpness, size and exposure checks (sharpness at least 35), then by eye |
-| Not a real photo: drawings on the image, collages, cut-outs, colour-altered or upside-down copies, multispectral frames, graphics | 196 | Automatic checks, then by eye |
-| No usable label | 167 | Images without a label, or labelled only "Unlabeled" |
-| Not a dog or cat (cows, buffalo, goats, people, an African wild dog) | 158 | Labels, an image check, then by eye |
-| Watermarks, captions, logos and image credits (Shutterstock, Alamy, iStock, Depositphotos, 123RF, Bigstock, CanStockPhoto, SeniorTailWaggers, KineMaster, news and university marks) | 144 | By eye; copies of rejected photos are removed automatically |
+| Duplicates: augmented, flipped, rotated, stretched, cropped or noisy copies; video frames of the same case; copies of verified photos | 7,256 | Exact and difference hashes, rotation-corner and speckle-noise checks, and EfficientNet-B0 image features: a photo at least 0.70 similar to one already kept counts as the same case |
+| Not clear: blurry, soft, pixelated, too small, too dark, washed out, or the animal too far away to see the skin | 1,081 | Sharpness, size and exposure checks, then every remaining photo by eye at a large size |
+| Not a dog or cat (cows, buffalo, goats, a bird, people, an African wild dog, a dog in a cat set) | 569 | Labels, an image check, then by eye |
+| Not a real case photo: drawings, collages, stickers, borders, colour or black-and-white edits, light effects, costumes, studio or stock-style shots, screens or signs in front of the animal, upside-down copies, multispectral frames | 421 | Automatic checks, then by eye |
+| Watermarks, captions, date stamps, video-player bars, logos and credits (Shutterstock, Alamy, iStock, Depositphotos, 123RF, Bigstock, CanStockPhoto, SeniorTailWaggers, KineMaster, SPCA, websites, news and university marks) | 277 | By eye; copies of rejected photos are removed automatically |
+| No usable label | 187 | Images without a label, or labelled only "Unlabeled" |
 | Figures scanned from a published veterinary textbook (ISBN in the file name) | 74 | File name; the publisher holds the copyright |
+| Species unclear | 12 | Left out rather than guessed |
 
 Every kept image was looked at on numbered contact sheets (`_check/sheet_*.jpg`, made with
 `python -m vetnexa_ai.review_sheets --tier community`). Each decision is recorded in
@@ -89,33 +91,40 @@ rebuild applies them, including to any near-copy of a rejected photo.
 
 | Category | Dog | Cat | Use |
 | --- | ---: | ---: | --- |
-| `wound_injury` | 17 | 15 | Real injured animals: test the wound check and its unfamiliar-photo detector on real photos |
-| `uninjured` | 18 | 26 | Whole animals without injuries: real "healthy" examples |
-| `healthy_skin` | 114 | – | Healthy skin and coat |
-| `ringworm` | 94 | – | Skin conditions: for the planned skin-condition classes and to check the symptom questions |
-| `mange_scabies` | 112 | – | 〃 |
-| `fungal_infection` | 94 | – | 〃 |
-| `dermatitis` | 80 | – | 〃 |
-| `allergic_dermatitis` | 25 | – | 〃 |
-| `bacterial_dermatosis` | 20 | – | 〃 |
+| `wound_injury` | 8 | 3 | Real injured animals: test the wound check and its unfamiliar-photo detector on real photos |
+| `uninjured` | 9 | 16 | Whole animals without injuries: real "healthy" examples |
+| `healthy_skin` | 93 | 113 | Healthy skin and coat |
+| `ringworm` | 82 | 54 | Skin conditions: for the planned skin-condition classes and to check the symptom questions |
+| `mange_scabies` | 85 | 47 | 〃 |
+| `fungal_infection` | 59 | 31 | 〃 |
+| `dermatitis` | 70 | – | 〃 |
+| `flea_allergy` | 11 | 16 | 〃 |
+| `allergic_dermatitis` | 15 | – | 〃 |
+| `bacterial_dermatosis` | 16 | – | 〃 |
+| `dandruff_scaling` | – | 13 | 〃 |
+| `hot_spot` | 2 | – | 〃 |
 | `alopecia` | – | 1 | 〃 |
+| **Total** | **450** | **294** | |
 
-Sources kept: Kaggle *Dog's skin diseases* (youssefmohmmed, Apache 2.0) 469; Kaggle *Dogs skin
-disease* (yashmotiani, CC0) 70; Roboflow *Injury Classifier* (RESQPETAI, CC BY 4.0) 62; Roboflow
-*injured dog detector* (AnimalWounded, CC BY 4.0) 7; Roboflow *injured animal detector2* (school,
-CC BY 4.0) 7; Roboflow *Cat skin disease* (FYP, CC BY 4.0) 1. Credit each source as its licence
-requires (links in `sources.json`).
+Sources kept: Kaggle *Dog's skin diseases* (youssefmohmmed, Apache 2.0) 342; Roboflow *Cat Skin
+Disease* (kat, CC BY 4.0) 181; Roboflow *Cat Skin Disease* (bios, public domain) 71; Kaggle *Dogs
+skin disease* (yashmotiani, CC0) 62; Roboflow *Dog Skin Disease Prediction* (CC BY 4.0) 29;
+Roboflow *Cat Infections* (CC BY 4.0) 22; Roboflow *Injury Classifier* (RESQPETAI, CC BY 4.0) 21;
+Roboflow *injured animal detector* (sunny, public domain) 8; Roboflow *injured dog detector*
+(AnimalWounded, CC BY 4.0) 6; Roboflow *injured animal detector new* (CC BY 4.0) 1; Roboflow *Cat
+skin disease* (FYP, CC BY 4.0) 1. Credit each source as its licence requires (links in
+`sources.json`). The Roboflow *Dog Skin Diseases* (litespy) and *injured dog detector* (school)
+sets were downloaded and checked, but none of their photos passed: all were copies, unclear or
+watermarked.
 
-**Limits.** The wound photos show injuries but are not typed (cut, puncture, abscess), so they
-cannot train the five wound classes directly; a veterinarian would need to label them. The skin
-labels come from uploaders and may be wrong. Cats are under-represented. Results from this tier
-must be reported as community data, never as verified clinical data.
+**Limits.** Real, clear wound photos are rare in open data: only 11 passed. They show injuries but
+are not typed (cut, puncture, abscess), so a veterinarian would need to label them before they can
+train the five wound classes. The skin labels come from uploaders and may be wrong. Results from
+this tier must be reported as community data, never as verified clinical data.
 
-**Still to add.** Several open sets were found and checked but could not be downloaded through the
-browser (downloads stalled): Roboflow *Dog Skin Disease Dataset* (1,418 images), *Dog Skin Disease
-Prediction* (361), *Dog Skin Diseases* (618), *Cat Skin Disease* (kat, 983; bios, 348), *Cat
-Infections* (96) and three more injured-animal sets. They are recorded in `sources.json`; once a
-zip is placed in `data/raw/<source id>/`, a rebuild includes it with the same checks.
+**Not collected.** The Roboflow *Dog Skin Disease Dataset* (1,418 images) could not be downloaded:
+every attempt stalled part-way. It is recorded in `sources.json`; once its zip is placed in
+`data/raw/roboflow-dog-skin-disease-dermatosis/`, a rebuild includes it with the same checks.
 
 ## Re-creating the collection
 
