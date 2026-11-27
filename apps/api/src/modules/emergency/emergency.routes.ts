@@ -84,6 +84,7 @@ export function emergencyRouter(
         symptoms: result.symptoms ?? null,
         triage: result.triage?.outcome ?? SEVERITY_TO_TRIAGE[result.severity],
         triageDetails: result.triage ?? null,
+        skinCheck: result.skinCheck ?? null,
         disclaimer: ASSESSMENT_DISCLAIMER,
       };
       res.json({ assessment, stored: false });

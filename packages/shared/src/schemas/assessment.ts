@@ -106,6 +106,19 @@ export interface TriageDetails {
 }
 
 /** One stored assessment as returned by the API. */
+/** Advisory skin-condition suggestion from the second AI model. It never changes the triage. */
+export interface SkinCheck {
+  /** SUGGESTED: one condition is clearly ahead. UNSURE: no clear answer. UNFAMILIAR: unlike the training photos. */
+  status: 'SUGGESTED' | 'UNSURE' | 'UNFAMILIAR';
+  /** healthy, ringworm, mange, fungal_infection or dermatitis; null unless SUGGESTED. */
+  condition: string | null;
+  label: string | null;
+  confidence: number | null;
+  advice: string;
+  probabilities: Record<string, number>;
+  modelVersion: string;
+}
+
 export interface WoundAssessmentResult {
   id: string;
   pet: { id: string; name: string; species: string };
@@ -128,6 +141,8 @@ export interface WoundAssessmentResult {
   triage: TriageOutcome;
   /** Null for results stored before reliability-weighted triage existed. */
   triageDetails: TriageDetails | null;
+  /** Null when no skin model is loaded, the photo failed the quality checks, or for older results. */
+  skinCheck: SkinCheck | null;
   disclaimer: string;
   createdAt: string;
 }

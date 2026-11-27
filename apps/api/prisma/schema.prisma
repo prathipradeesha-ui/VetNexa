@@ -193,6 +193,8 @@ model WoundAssessment {
   answers         Json?
   /// Symptom evidence from the AI service: red flags, triggered rules, risk and completeness.
   symptomEvidence Json?
+  /// Advisory skin-condition suggestion from the second model. Never changes the triage.
+  skinCheck       Json?
   summary         String           @db.VarChar(200)
   guidance        String           @db.Text
   modelVersion    String           @db.VarChar(40)

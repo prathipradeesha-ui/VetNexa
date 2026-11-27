@@ -1,4 +1,4 @@
-import type { ChatReply, SymptomEvidence, TriageDetails } from '@vetnexa/shared';
+import type { ChatReply, SkinCheck, SymptomEvidence, TriageDetails } from '@vetnexa/shared';
 import { env } from '../config/env';
 import { HttpError } from './http-error';
 import { logger } from './logger';
@@ -22,6 +22,8 @@ export interface AiAssessment {
   /** Null only when the photo was rejected for quality without red flags. */
   triage: TriageDetails | null;
   ood: { familiarity: number; outOfDistribution: boolean } | null;
+  /** Advisory only; missing from older AI service versions. */
+  skinCheck?: SkinCheck | null;
 }
 
 export interface AiHealth {

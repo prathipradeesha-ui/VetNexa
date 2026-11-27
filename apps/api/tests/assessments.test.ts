@@ -55,6 +55,21 @@ const assessed: AiAssessment = {
     fusion: 'reliability',
   },
   ood: { familiarity: 0.9, outOfDistribution: false },
+  skinCheck: {
+    status: 'SUGGESTED',
+    condition: 'dermatitis',
+    label: 'Inflamed or allergic skin (dermatitis, allergy, bacterial, hot spot)',
+    confidence: 0.71,
+    advice: 'Ask a vet for advice.',
+    probabilities: {
+      healthy: 0.1,
+      ringworm: 0.05,
+      mange: 0.08,
+      fungal_infection: 0.06,
+      dermatitis: 0.71,
+    },
+    modelVersion: 'skin-efficientnetb0-test',
+  },
 };
 
 /** A fake AI service that returns the given answer and records what it was sent. */
@@ -170,13 +185,18 @@ describe('AI wound assessments', () => {
     });
     expect(res.body.assessment.triage).toBe('CONSULT');
     expect(res.body.assessment.triageDetails.inputs[0].source).toBe('image');
+    expect(res.body.assessment.skinCheck).toMatchObject({
+      status: 'SUGGESTED',
+      condition: 'dermatitis',
+    });
     expect(res.body.assessment.disclaimer).toMatch(/not a diagnosis/i);
     expect(res.body.assessment.imageUrl).toMatch(/^\/uploads\/wounds\/[a-f0-9]{32}\.webp$/);
     expect(existsSync(uploadPath(res.body.assessment.imageUrl))).toBe(true);
 
     const list = await agent.get(`/api/assessments?petId=${pet.id}`).expect(200);
     expect(list.body.assessments).toHaveLength(1);
-    await agent.get(`/api/assessments/${res.body.assessment.id}`).expect(200);
+    const saved = await agent.get(`/api/assessments/${res.body.assessment.id}`).expect(200);
+    expect(saved.body.assessment.skinCheck.condition).toBe('dermatitis');
   });
 
   it('stores uncertain results, which always refer to a vet', async () => {

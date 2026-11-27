@@ -75,7 +75,11 @@ describe('emergency wound check without an account', () => {
       answers: expect.objectContaining({ cause: 'bite_fight' }),
     });
     // Without triage details from the AI service, the outcome follows the severity.
-    expect(res.body.assessment).toMatchObject({ triage: 'CONSULT', triageDetails: null });
+    expect(res.body.assessment).toMatchObject({
+      triage: 'CONSULT',
+      triageDetails: null,
+      skinCheck: null,
+    });
     expect(res.body.assessment).not.toHaveProperty('imageUrl');
     expect(await testPrisma.woundAssessment.count()).toBe(0);
   });
