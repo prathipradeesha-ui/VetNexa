@@ -76,8 +76,8 @@ def set_backbone_trainable(model: WoundClassifier, trainable: bool) -> None:
         parameter.requires_grad = trainable
 
 
-def model_name(arch: str) -> str:
-    return f"wound-{arch.replace('_', '')}"
+def model_name(arch: str, task: str = "wound") -> str:
+    return f"{task}-{arch.replace('_', '')}"
 
 
 def save_checkpoint(
@@ -91,9 +91,10 @@ def save_checkpoint(
     demo: bool = False,
     arch: str = DEFAULT_ARCH,
     ood: dict | None = None,
+    task: str = "wound",
 ) -> str:
     """Saves the weights with everything needed to use and audit them later."""
-    name = model_name(arch)
+    name = model_name(arch, task)
     version = f"{name}-{datetime.now(UTC):%Y%m%d-%H%M}"
     path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(

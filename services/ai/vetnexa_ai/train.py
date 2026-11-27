@@ -89,10 +89,11 @@ def train(args: argparse.Namespace) -> dict:
     device = "cuda" if torch.cuda.is_available() and not args.cpu else "cpu"
     data_dir, out_dir = Path(args.data_dir), Path(args.output_dir)
 
-    samples = scan_dataset(data_dir, CLASSES)
+    classes = tuple(args.classes.split(",")) if args.classes else CLASSES
+    samples = scan_dataset(data_dir, classes)
     split = split_dataset(samples, seed=args.seed)
     split.save(out_dir / "split.json")
-    print(f"Images: {len(samples)} | split: {json.dumps(split.summary())}")
+    print(f"Images: {len(samples)} | split: {json.dumps(split.summary(classes))}")
 
     loaders = {
         "train": DataLoader(
@@ -108,11 +109,11 @@ def train(args: argparse.Namespace) -> dict:
         ),
     }
 
-    model = build_model(len(CLASSES), pretrained=not args.no_pretrained, arch=args.arch).to(device)
+    model = build_model(len(classes), pretrained=not args.no_pretrained, arch=args.arch).to(device)
     if args.init_from:
         load_initial_weights(model, Path(args.init_from))
     loss_fn = nn.CrossEntropyLoss(
-        weight=class_weights(split.train, len(CLASSES)).to(device), label_smoothing=0.05
+        weight=class_weights(split.train, len(classes)).to(device), label_smoothing=0.05
     )
 
     best = {"f1": -1.0, "epoch": 0, "state": None}
@@ -171,16 +172,17 @@ def train(args: argparse.Namespace) -> dict:
         "history": history,
     }
     version = save_checkpoint(
-        out_dir / "wound-classifier.pt",
+        out_dir / args.model_file,
         model,
-        CLASSES,
+        classes,
         temperature,
         metrics,
-        split.summary(),
+        split.summary(classes),
         IMAGE_SIZE,
         demo=args.demo,
         arch=args.arch,
         ood=ood.to_dict(),
+        task=args.task,
     )
     print(
         f"Saved {version} (best epoch {best['epoch']}, val macro-F1 {best['f1']:.3f}, "
@@ -199,6 +201,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="backbone: efficientnet_b0 (default) or the resnet18 baseline",
     )
     parser.add_argument("--output-dir", default="models")
+    parser.add_argument(
+        "--classes",
+        help="comma-separated class folders (default: the wound classes in config.CLASSES)",
+    )
+    parser.add_argument("--model-file", default="wound-classifier.pt")
+    parser.add_argument("--task", default="wound", help="name used in the model version")
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--frozen-epochs", type=int, default=3)
     parser.add_argument("--patience", type=int, default=5)
