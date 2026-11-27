@@ -102,6 +102,7 @@ LABEL_MAP: dict[str, str] = {
     "demodicosis": "mange_scabies",
     "mites": "mange_scabies",
     "hotspot": "hot_spot",
+    "hot spot": "hot_spot",
     # feline skin conditions
     "alopecia": "alopecia",
     "eosinophilic plague": "eosinophilic_plaque",  # spelling used by the source
@@ -109,6 +110,19 @@ LABEL_MAP: dict[str, str] = {
     "miliary dermatitis": "miliary_dermatitis",
     "dandruff": "dandruff_scaling",
     "hot_spot": "hot_spot",
+    # Wikimedia Commons labels (from each file's description)
+    "dog bite wound (stapled)": "wound_injury",
+    "surgical wound after amputation": "wound_injury",
+    "injured dog": "wound_injury",
+    "anal gland abscess": "wound_injury",
+    "cat fight wound": "wound_injury",
+    "shoulder injury": "wound_injury",
+    "wound": "wound_injury",
+    "wound with myiasis": "wound_injury",
+    "demodectic mange": "mange_scabies",
+    "notoedres mange": "mange_scabies",
+    "lick granuloma": "dermatitis",
+    "ringworm (pseudomycetoma)": "ringworm",
     # injuries
     "injured": "wound_injury",
     "injury": "wound_injury",
@@ -205,6 +219,17 @@ def read_mendeley(source_dir: Path, source_id: str) -> Iterator[Item]:
             "dog",
             f"{source_id}/{folder}",
         )
+
+
+def read_listed_files(source_dir: Path, source_id: str) -> Iterator[Item]:
+    """Photos chosen one by one (e.g. from Wikimedia Commons), listed in files.csv with their
+    species, label, licence and author. Each label comes from the file's own description."""
+    with (source_dir / "files.csv").open(encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            path = source_dir / row["file"]
+            if path.exists():
+                group = f"{source_id}/{path.stem}"
+                yield Item(source_id, path, row["label"], row["species"], group)
 
 
 def read_class_folders(source_dir: Path, source_id: str, species: str) -> Iterator[Item]:
@@ -336,6 +361,7 @@ READERS = [
     ("roboflow-school-injured-animal-detector2", lambda d, s: read_coco(d, s, None)),
     ("roboflow-imtired-injured-animal-detector-new", lambda d, s: read_coco(d, s, None)),
     ("roboflow-fyp-cat-skin-disease", lambda d, s: read_coco(d, s, "cat")),
+    ("wikimedia-commons", lambda d, s: read_listed_files(d, s)),
     ("roboflow-commission-cat-infections", lambda d, s: read_coco(d, s, "cat")),
 ]
 
@@ -485,6 +511,10 @@ def load_sources() -> dict[str, dict]:
 CURATION_MIN_SHARPNESS = 35.0
 
 
+#: Single photos chosen and checked one by one from their original pages. They are originals,
+#: never augmented copies, so the speckle-noise rule (aimed at augmented datasets) is not used.
+HAND_PICKED_SOURCES = {"wikimedia-commons"}
+
 #: Share of pixels that differ sharply from their 3x3 median. Augmented copies with added
 #: "salt and pepper" speckles score 0.24 % or more; real photos checked on contact sheets scored
 #: at most 0.16 % (2026-11-21).
@@ -493,6 +523,11 @@ SPECKLE_LIMIT = 0.0018
 
 def has_speckle_noise(image: np.ndarray) -> bool:
     """True for copies with artificial salt-and-pepper noise added by data augmentation."""
+    # Measured at 640 px (the size it was calibrated on): at full camera resolution, fine fur
+    # and skin texture of genuine photos would look like speckles.
+    scale = 640 / max(image.shape[:2])
+    if scale < 1:
+        image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     difference = np.abs(gray.astype(np.int16) - cv2.medianBlur(gray, 3).astype(np.int16))
     return float((difference > 70).mean()) > SPECKLE_LIMIT
@@ -686,7 +721,11 @@ def build(tier: str = "verified", near_duplicate_bits: int = 12, min_side: int =
             if settings.clarity_check and (reason := unclear_reason(image)):
                 exclude(item, reason)
                 continue
-            if settings.clarity_check and has_speckle_noise(image):
+            if (
+                settings.clarity_check
+                and source_id not in HAND_PICKED_SOURCES
+                and has_speckle_noise(image)
+            ):
                 exclude(item, "augmented copy: artificial speckle noise (not a real photo)")
                 continue
             if settings.clarity_check and (isbn := ISBN.search(item.path.name)):
