@@ -462,6 +462,25 @@
       ],
       "decision": "not used – three images labelled 'watch' and 'gpu'; not a dog or cat dataset",
       "provenance": "uploader-asserted, not yet inspected"
+    },
+    {
+      "id": "wikimedia-commons",
+      "name": "Wikimedia Commons (selected files)",
+      "provider": "Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/",
+      "licence": "per file: CC0, CC BY or CC BY-SA, or public domain (see data/raw/wikimedia-commons/files.csv)",
+      "species": [
+        "dog",
+        "cat"
+      ],
+      "task": "Single photos chosen by search and visual check",
+      "labels": [
+        "from each file's description"
+      ],
+      "access": "free download",
+      "decision": "included in the community tier; each file's licence and author recorded",
+      "provenance": "uploader-asserted",
+      "inspection_notes": "Searched 31 terms on 2026-11-25; 764 results, 576 with a free licence, 93 likely relevant by title and categories, 18 chosen after viewing each photo."
     }
   ],
   "provenance_levels": {

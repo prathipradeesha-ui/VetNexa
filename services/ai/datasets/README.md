@@ -68,7 +68,7 @@ fingerprint, and `excluded.csv` records every image left out and why.
 
 ### What was removed
 
-From 10,621 downloaded files, **744 distinct, clear, real dog and cat photos** were kept. The
+From 10,637 downloaded files, **760 distinct, clear, real dog and cat photos** were kept. The
 owner asked for clear photos only, so anything doubtful was left out.
 
 | Removed | Images | How |
@@ -91,20 +91,20 @@ rebuild applies them, including to any near-copy of a rejected photo.
 
 | Category | Dog | Cat | Use |
 | --- | ---: | ---: | --- |
-| `wound_injury` | 8 | 3 | Real injured animals: test the wound check and its unfamiliar-photo detector on real photos |
+| `wound_injury` | 11 | 7 | Real injured animals: test the wound check and its unfamiliar-photo detector on real photos |
 | `uninjured` | 9 | 16 | Whole animals without injuries: real "healthy" examples |
 | `healthy_skin` | 93 | 113 | Healthy skin and coat |
-| `ringworm` | 82 | 54 | Skin conditions: for the planned skin-condition classes and to check the symptom questions |
-| `mange_scabies` | 85 | 47 | 〃 |
+| `ringworm` | 82 | 56 | Skin conditions: for the planned skin-condition classes and to check the symptom questions |
+| `mange_scabies` | 89 | 48 | 〃 |
 | `fungal_infection` | 59 | 31 | 〃 |
 | `dermatitis` | 70 | – | 〃 |
-| `flea_allergy` | 11 | 16 | 〃 |
+| `flea_allergy` | 12 | 16 | 〃 |
 | `allergic_dermatitis` | 15 | – | 〃 |
 | `bacterial_dermatosis` | 16 | – | 〃 |
 | `dandruff_scaling` | – | 13 | 〃 |
-| `hot_spot` | 2 | – | 〃 |
+| `hot_spot` | 3 | – | 〃 |
 | `alopecia` | – | 1 | 〃 |
-| **Total** | **450** | **294** | |
+| **Total** | **459** | **301** | |
 
 Sources kept: Kaggle *Dog's skin diseases* (youssefmohmmed, Apache 2.0) 342; Roboflow *Cat Skin
 Disease* (kat, CC BY 4.0) 181; Roboflow *Cat Skin Disease* (bios, public domain) 71; Kaggle *Dogs
@@ -112,12 +112,13 @@ skin disease* (yashmotiani, CC0) 62; Roboflow *Dog Skin Disease Prediction* (CC 
 Roboflow *Cat Infections* (CC BY 4.0) 22; Roboflow *Injury Classifier* (RESQPETAI, CC BY 4.0) 21;
 Roboflow *injured animal detector* (sunny, public domain) 8; Roboflow *injured dog detector*
 (AnimalWounded, CC BY 4.0) 6; Roboflow *injured animal detector new* (CC BY 4.0) 1; Roboflow *Cat
-skin disease* (FYP, CC BY 4.0) 1. Credit each source as its licence requires (links in
+skin disease* (FYP, CC BY 4.0) 1. Wikimedia Commons (single photos picked by hand; licence and author of each in
+`datasets/community/wikimedia_credits.csv`) 15. Credit each source as its licence requires (links in
 `sources.json`). The Roboflow *Dog Skin Diseases* (litespy) and *injured dog detector* (school)
 sets were downloaded and checked, but none of their photos passed: all were copies, unclear or
 watermarked.
 
-**Limits.** Real, clear wound photos are rare in open data: only 11 passed. They show injuries but
+**Limits.** Real, clear wound photos are rare in open data: only 18 passed. They show injuries but
 are not typed (cut, puncture, abscess), so a veterinarian would need to label them before they can
 train the five wound classes. The skin labels come from uploaders and may be wrong. Results from
 this tier must be reported as community data, never as verified clinical data.
