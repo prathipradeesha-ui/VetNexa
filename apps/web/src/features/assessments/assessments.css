@@ -562,3 +562,31 @@ li:last-child > .assessment-row {
   padding-left: 1.2em;
   font-size: var(--text-sm);
 }
+
+/* ── Advisory skin check ── */
+.skin-check {
+  margin-bottom: var(--space-5);
+}
+.skin-check .card-title {
+  flex-wrap: wrap;
+}
+.skin-check__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+}
+.skin-check__status > span {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.skin-check__details summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+}

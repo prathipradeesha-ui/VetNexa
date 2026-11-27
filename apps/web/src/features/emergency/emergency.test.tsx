@@ -43,6 +43,7 @@ const assessment = {
   symptoms: null,
   triage: 'CONSULT',
   triageDetails: null,
+  skinCheck: null,
   disclaimer: 'This is a preliminary, AI-generated assessment. It is not a diagnosis.',
 };
 

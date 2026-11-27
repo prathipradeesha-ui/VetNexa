@@ -78,6 +78,7 @@ const result = {
     overrides: ['Photos showing a cut (laceration) always need a veterinarian.'],
     fusion: 'reliability',
   },
+  skinCheck: null,
   disclaimer: 'This is a preliminary, AI-generated assessment. It is not a diagnosis.',
   createdAt: '2026-11-21T09:30:00.000Z',
 };
@@ -367,5 +368,51 @@ describe('wound check result', () => {
     expect(screen.getByText(/no breakdown is available/)).toBeInTheDocument();
     expect(screen.queryByRole('meter')).not.toBeInTheDocument();
     expect(screen.getByText(/We recommend a veterinarian/)).toBeInTheDocument();
+  });
+
+  it('shows the advisory skin check without changing the triage', async () => {
+    mockApi({
+      'GET /api/auth/me': signedInOwner,
+      'GET /api/assessments/a-1': {
+        status: 200,
+        body: {
+          assessment: {
+            ...result,
+            skinCheck: {
+              status: 'SUGGESTED',
+              condition: 'ringworm',
+              label: 'Ringworm (fungal, contagious)',
+              confidence: 0.74,
+              advice: 'The skin looks most like ringworm.',
+              probabilities: {
+                ringworm: 0.74,
+                healthy: 0.1,
+                mange: 0.08,
+                fungal_infection: 0.05,
+                dermatitis: 0.03,
+              },
+              modelVersion: 'skin-efficientnetb0-test',
+            },
+          },
+        },
+      },
+    });
+    renderRoute('/dashboard/assessments/a-1');
+
+    const panel = (await screen.findByRole('heading', { name: /Skin check/ })).closest('section')!;
+    expect(within(panel).getByText('Advisory')).toBeInTheDocument();
+    expect(within(panel).getByText(/Ringworm \(fungal, contagious\) \(74%\)/)).toBeInTheDocument();
+    expect(within(panel).getByText(/does not change the advice above/)).toBeInTheDocument();
+    expect(screen.getByText('Veterinary consultation recommended')).toBeInTheDocument();
+  });
+
+  it('hides the skin check when none was made', async () => {
+    mockApi({
+      'GET /api/auth/me': signedInOwner,
+      'GET /api/assessments/a-1': { status: 200, body: { assessment: result } },
+    });
+    renderRoute('/dashboard/assessments/a-1');
+    await screen.findByRole('heading', { name: result.summary });
+    expect(screen.queryByRole('heading', { name: /Skin check/ })).not.toBeInTheDocument();
   });
 });

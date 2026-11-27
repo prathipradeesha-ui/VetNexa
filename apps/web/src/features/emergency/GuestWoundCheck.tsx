@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { DemoModelNotice, percent } from '../assessments/AssessmentBits';
+import { SkinCheckPanel } from '../assessments/SkinCheckPanel';
 import { SymptomEvidencePanel } from '../assessments/SymptomEvidencePanel';
 import { OUTCOME_MEANING, TriageBadge, TriageExplanation } from '../assessments/TriageExplanation';
 import {
@@ -61,6 +62,7 @@ function GuestResult({ result, onAgain }: { result: GuestAssessmentResult; onAga
       </div>
       <TriageExplanation details={result.triageDetails} />
       <SymptomEvidencePanel answers={result.answers} symptoms={result.symptoms} />
+      <SkinCheckPanel skinCheck={result.skinCheck} />
       <div className="guest-result__after">
         <p>
           This result was <strong>not saved</strong>, and your photo was not stored.
