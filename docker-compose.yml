@@ -79,7 +79,8 @@ services:
       # Same shared secret as the API's AI_SERVICE_TOKEN; empty means no token check.
       VETNEXA_AI_TOKEN: ${AI_SERVICE_TOKEN:-}
     volumes:
-      # Trained checkpoint (models/wound-classifier.pt). Read-only; never baked into the image.
+      # Trained checkpoints (models/wound-classifier.pt and models/skin/skin-classifier.pt).
+      # Read-only; never baked into the image.
       - ./services/ai/models:/app/models:ro
     networks: [backend]
 

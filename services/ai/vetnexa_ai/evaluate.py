@@ -7,6 +7,13 @@ Besides ordinary accuracy, it reports what matters for safety:
 - calibration error before and after temperature scaling (is the stated confidence honest?);
 - coverage: how often the model gives an answer instead of "uncertain", and its accuracy then;
 - under-triage: how often a moderate or severe wound would be shown to the owner as minor.
+
+The advisory skin-condition model is evaluated the same way, but its "safety" section reports
+how often it gives a suggestion instead of "unsure", its accuracy then, and how many test photos
+its unfamiliar-photo check flags (it never changes the triage, so there is no under-triage):
+
+    python -m vetnexa_ai.evaluate --model models/skin/skin-classifier.pt \
+        --split models/skin/split.json --report-name skin-evaluation
 """
 
 from __future__ import annotations
@@ -30,11 +37,15 @@ from .calibration import expected_calibration_error
 from .config import CLASS_SEVERITY, SAFETY
 from .dataset import Split, WoundDataset
 from .model import load_checkpoint
+from .ood import OODDetector
 from .preprocessing import eval_transform
+from .skin_check import MIN_CONFIDENCE
 from .train import predict_logits
 
 
-def evaluate(model_path: Path, split_path: Path, report_dir: Path) -> dict:
+def evaluate(
+    model_path: Path, split_path: Path, report_dir: Path, report_name: str = "evaluation"
+) -> dict:
     model, checkpoint = load_checkpoint(model_path)
     classes: list[str] = checkpoint["classes"]
     split = Split.load(split_path)
@@ -50,11 +61,10 @@ def evaluate(model_path: Path, split_path: Path, report_dir: Path) -> dict:
         labels, predicted, labels=range(len(classes)), zero_division=0
     )
 
-    # Run every test image through the same safety rules the app uses.
-    decisions = [apply_safety_rules(dict(zip(classes, map(float, p), strict=True))) for p in probs]
-    answered = np.array([d["status"] == "ASSESSED" for d in decisions])
-    serious = np.array([CLASS_SEVERITY[classes[y]] in ("MODERATE", "SEVERE") for y in labels])
-    shown_minor = np.array([d["severity"] == "MINOR" for d in decisions])
+    if all(name in CLASS_SEVERITY for name in classes):
+        safety = wound_safety(classes, probs, predicted, labels)
+    else:
+        safety = advisory_safety(model, checkpoint, loader, probs, predicted, labels)
 
     report = {
         "model_version": checkpoint["version"],
@@ -82,26 +92,56 @@ def evaluate(model_path: Path, split_path: Path, report_dir: Path) -> dict:
             "ece_before": round(expected_calibration_error(raw, labels), 4),
             "ece_after": round(expected_calibration_error(probs, labels), 4),
         },
-        "safety": {
-            "min_confidence": SAFETY.min_confidence,
-            "coverage": round(float(answered.mean()), 4),
-            "accuracy_when_answered": round(
-                float((predicted[answered] == labels[answered]).mean()) if answered.any() else 0.0,
-                4,
-            ),
-            "serious_cases": int(serious.sum()),
-            "under_triage_rate": round(
-                float((serious & shown_minor).sum() / serious.sum()) if serious.any() else 0.0, 4
-            ),
-        },
+        "safety": safety,
         "training": {k: v for k, v in checkpoint["metrics"].items() if k != "history"},
         "data_summary": checkpoint["data_summary"],
     }
 
     report_dir.mkdir(parents=True, exist_ok=True)
-    (report_dir / "evaluation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-    (report_dir / "evaluation.md").write_text(to_markdown(report), encoding="utf-8")
+    (report_dir / f"{report_name}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    (report_dir / f"{report_name}.md").write_text(to_markdown(report), encoding="utf-8")
     return report
+
+
+def wound_safety(classes, probs, predicted, labels) -> dict:
+    # Run every test image through the same safety rules the app uses.
+    decisions = [apply_safety_rules(dict(zip(classes, map(float, p), strict=True))) for p in probs]
+    answered = np.array([d["status"] == "ASSESSED" for d in decisions])
+    serious = np.array([CLASS_SEVERITY[classes[y]] in ("MODERATE", "SEVERE") for y in labels])
+    shown_minor = np.array([d["severity"] == "MINOR" for d in decisions])
+    return {
+        "min_confidence": SAFETY.min_confidence,
+        "coverage": round(float(answered.mean()), 4),
+        "accuracy_when_answered": round(
+            float((predicted[answered] == labels[answered]).mean()) if answered.any() else 0.0,
+            4,
+        ),
+        "serious_cases": int(serious.sum()),
+        "under_triage_rate": round(
+            float((serious & shown_minor).sum() / serious.sum()) if serious.any() else 0.0, 4
+        ),
+    }
+
+
+@torch.no_grad()
+def advisory_safety(model, checkpoint, loader, probs, predicted, labels) -> dict:
+    """Skin check: suggestion rate, accuracy when it suggests, and unfamiliar-photo flags."""
+    answered = probs.max(1) >= MIN_CONFIDENCE
+    flagged = 0
+    if checkpoint.get("ood"):
+        ood = OODDetector.from_dict(checkpoint["ood"])
+        for images, _ in loader:
+            features = model.features(images)
+            results = ood.familiarity(features, model.head(features))
+            flagged += sum(bool(r["outOfDistribution"]) for r in results)
+    return {
+        "min_confidence": MIN_CONFIDENCE,
+        "coverage": round(float(answered.mean()), 4),
+        "accuracy_when_answered": round(
+            float((predicted[answered] == labels[answered]).mean()) if answered.any() else 0.0, 4
+        ),
+        "flagged_unfamiliar": round(flagged / len(labels), 4),
+    }
 
 
 def to_markdown(report: dict) -> str:
@@ -120,8 +160,17 @@ def to_markdown(report: dict) -> str:
         f"{report['calibration']['ece_after']:.3f} |",
         f"| Coverage (answered, not 'uncertain') | {report['safety']['coverage']:.1%} |",
         f"| Accuracy when answered | {report['safety']['accuracy_when_answered']:.1%} |",
-        f"| Under-triage (serious shown as minor) | {report['safety']['under_triage_rate']:.1%} "
-        f"of {report['safety']['serious_cases']} |",
+    ]
+    if "under_triage_rate" in report["safety"]:
+        lines.append(
+            "| Under-triage (serious shown as minor) | "
+            f"{report['safety']['under_triage_rate']:.1%} of {report['safety']['serious_cases']} |"
+        )
+    if "flagged_unfamiliar" in report["safety"]:
+        lines.append(
+            f"| Test photos flagged as unfamiliar | {report['safety']['flagged_unfamiliar']:.1%} |"
+        )
+    lines += [
         "",
         "## Per class",
         "",
@@ -151,6 +200,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="models/wound-classifier.pt")
     parser.add_argument("--split", default="models/split.json")
     parser.add_argument("--report-dir", default="reports")
+    parser.add_argument("--report-name", default="evaluation", help="file name without extension")
     args = parser.parse_args()
-    result = evaluate(Path(args.model), Path(args.split), Path(args.report_dir))
+    result = evaluate(Path(args.model), Path(args.split), Path(args.report_dir), args.report_name)
     print(json.dumps({k: result[k] for k in ("accuracy", "macro_f1", "safety")}, indent=2))
