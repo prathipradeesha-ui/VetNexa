@@ -37,6 +37,23 @@ python -m vetnexa_ai.train --data-dir data/human-wounds --output-dir models/stag
 python -m vetnexa_ai.train --data-dir data/wounds --init-from models/stage1/wound-classifier.pt
 ```
 
+### Skin-condition check (advisory)
+
+A second model suggests which common skin condition a photo most resembles (healthy,
+ringworm, mange, other fungal infection, dermatitis). It is trained only on the curated real
+dog and cat photos (see `datasets/README.md`) and is advisory: it never changes the triage.
+
+```bash
+# Build data/skin-conditions/<class>/ from the verified and community collections
+python -m vetnexa_ai.skin_dataset
+
+# Train with the same script, choosing the classes, output file and model name
+python -m vetnexa_ai.train --data-dir data/skin-conditions     --classes healthy,ringworm,mange,fungal_infection,dermatitis     --output-dir models/skin --model-file skin-classifier.pt --task skin --epochs 20
+
+# Evaluate on its own test split; writes reports/skin-evaluation.json and .md
+python -m vetnexa_ai.evaluate --model models/skin/skin-classifier.pt     --split models/skin/split.json --report-name skin-evaluation
+```
+
 To try the pipeline without real photos, generate synthetic drawings (only for testing the code,
 never for real use):
 
@@ -56,13 +73,17 @@ python -m vetnexa_ai.service          # http://127.0.0.1:8000
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `VETNEXA_AI_MODEL` | `models/wound-classifier.pt` | Checkpoint to load |
+| `VETNEXA_SKIN_MODEL` | `models/skin/skin-classifier.pt` | Advisory skin-condition checkpoint; optional |
 | `VETNEXA_AI_TOKEN` | – | Shared secret; the API must send the same value (`AI_SERVICE_TOKEN`) |
 | `VETNEXA_AI_HOST` / `VETNEXA_AI_PORT` | `127.0.0.1` / `8000` | Where to listen |
 
 `GET /health` reports whether a model is loaded and whether it is a demo model;
 `POST /assess` takes the raw image bytes and returns the assessment; `POST /chat` answers a
 pet-care question from the knowledge base in `knowledge/` (see `docs/assistant.md`). Without a checkpoint the
-service still starts and `/assess` answers `503`.
+service still starts and `/assess` answers `503`. When a skin model is loaded, every photo that
+passes the quality checks also gets a `skinCheck` (status `SUGGESTED`, `UNSURE` below 55%
+confidence, or `UNFAMILIAR` when the photo looks unlike the training photos); otherwise
+`skinCheck` is `null`.
 
 **Demo model.** Until real veterinary data is available, the feature can be demonstrated with
 a model trained on synthetic drawings. Train it with `--demo` so the checkpoint is marked; the
@@ -83,7 +104,10 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models --epoch
 | `model.py` | EfficientNet-B0 (default) or ResNet-18 with a new head; saving and loading checkpoints with metadata |
 | `calibration.py` | Temperature scaling (only ever softens confidence) and calibration error |
 | `train.py` | Two-phase training, class weighting, early stopping, calibration |
-| `evaluate.py` | Test metrics, confusion matrix, coverage and under-triage rate |
+| `evaluate.py` | Test metrics, confusion matrix, coverage and under-triage rate (skin model: suggestion rate and unfamiliar photos) |
+| `skin_dataset.py` | Builds the skin-condition training folder from the curated photo collections |
+| `skin_check.py` | Advisory skin-condition check added to each assessment |
+| `curation.py` / `review_sheets.py` | Curating the real photo collections; contact sheets for visual review |
 | `assessment.py` | Safety rules and the `Assessor` used by the inference API |
 | `questionnaire.json` | Symptom questions, red flags, weighted rules and thresholds (vet-reviewable) |
 | `symptoms.py` | Validates answers and turns them into rule-weighted symptom evidence |

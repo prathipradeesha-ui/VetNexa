@@ -267,6 +267,19 @@ to the AI service directly.
 | GET    | `/assessments/:id`    | One assessment.                                                             |
 | DELETE | `/assessments/:id`    | Delete an assessment and its stored photo.                                  |
 
+**Follow-up check-ins** (same role; only the pet's owner can see or change them):
+
+| Method | Path                          | Description                                                                                                   |
+| ------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| GET    | `/assessments/follow-ups`     | My follow-ups: open ones first (soonest due), then the 20 latest done.                                        |
+| POST   | `/assessments/:id/follow-ups` | Plan a look again: `{ inDays }`, one of 1, 2, 3 or 7. `409` if one is already open.                           |
+| PATCH  | `/assessments/follow-ups/:id` | Record how it looks: `{ progress, note? }` with `BETTER`, `SAME` or `WORSE`. Answered once; `409` after that. |
+| DELETE | `/assessments/follow-ups/:id` | Cancel a follow-up.                                                                                           |
+
+Each follow-up has `id`, `assessmentId`, `pet`, `dueAt`, `progress`, `note`, `completedAt` and
+`createdAt`; every assessment also returns its `followUps`. The advice shown for each answer is
+`FOLLOW_UP_ADVICE` in `packages/shared/src/schemas/follow-up.ts` ("worse" always means a vet).
+
 **Questionnaire:** optional multipart field `answers`, a JSON string with `redFlags` (list),
 `bodyLocation`, `duration`, `cause`, `signs` (list), `appetite`, `energy` and `pain`; `null`
 means "not sure". Allowed values are defined in `packages/shared/src/schemas/questionnaire.ts`.
@@ -279,7 +292,12 @@ per-class `probabilities`, `summary`, `guidance`, `modelVersion`, `demoModel`, `
 `symptoms` (red flags, triggered rules with reasons and weights, risk, level, completeness and
 missing inputs), `triage` (`ROUTINE`, `CONSULT`, `URGENT` or `UNABLE`), `triageDetails`
 (each input's risk, reliability and weight, safety overrides and fusion mode; `null` for results
-stored before Stage 20) and `disclaimer`.
+stored before Stage 20), `skinCheck` and `disclaimer`.
+
+**Skin check (advisory):** when the AI service has a skin-condition model loaded, `skinCheck`
+holds `status` (`SUGGESTED`, `UNSURE` or `UNFAMILIAR`), `condition` and `label` (only when
+suggested), `confidence`, `advice`, `probabilities` and `modelVersion`. It never changes
+`triage`. It is `null` for older results or when no skin model is loaded.
 
 **Rules**
 

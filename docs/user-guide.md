@@ -152,6 +152,21 @@ less. When in doubt, VetNexa chooses the more cautious outcome.
 
 ![Why this result](images/guide/why-this-result.jpg)
 
+**Skin check (advisory).** Below the explanation, a second check may say which common skin
+condition the photo looks most like: healthy skin, ringworm, mange, another fungal infection,
+or inflamed or allergic skin. It does not change the outcome above and is not a diagnosis. When
+it is not sure, or the photo looks unlike the skin photos it learned from, it says so instead
+of guessing.
+
+### Follow-up check-ins
+
+Wounds can change quickly, so a saved result has a **Follow-up check** card. Choose when to
+look again (tomorrow, in 2 or 3 days, or in a week). The reminder appears on your dashboard in
+the web app and in the installed mobile app. When the time comes (or earlier, if something
+changes), choose **Getting better**, **About the same** or **Getting worse**, add a note if you
+like, and save. **Getting worse** always shows a clear "Please see a vet" message with links to
+nearby clinics and booking. You can also check a new photo straight from the card.
+
 Signed-in owners find past checks under **Wound check**, with notes and the full explanation.
 A dark blue **Demonstration model** box means the current AI model was trained on drawings,
 not real wound photos, so the result shows how the feature works but says nothing about your
