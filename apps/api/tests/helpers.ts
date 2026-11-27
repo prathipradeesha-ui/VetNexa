@@ -22,6 +22,7 @@ export async function resetDatabase() {
   await testPrisma.rescueReport.deleteMany();
   await testPrisma.review.deleteMany();
   await testPrisma.consultation.deleteMany();
+  await testPrisma.woundFollowUp.deleteMany();
   await testPrisma.woundAssessment.deleteMany();
   await testPrisma.healthRecord.deleteMany();
   await testPrisma.pet.deleteMany();

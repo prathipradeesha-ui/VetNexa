@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { SPECIES, type WoundSeverity } from '../enums';
 import { optionalText } from './auth';
+import type { WoundFollowUp } from './follow-up';
 import { symptomAnswersSchema, type SymptomAnswers, type SymptomEvidence } from './questionnaire';
 
 /** Species the wound model was designed for. Other species are refused. */
@@ -143,6 +144,8 @@ export interface WoundAssessmentResult {
   triageDetails: TriageDetails | null;
   /** Null when no skin model is loaded, the photo failed the quality checks, or for older results. */
   skinCheck: SkinCheck | null;
+  /** Check-ins the owner planned after this check, oldest first. */
+  followUps: WoundFollowUp[];
   disclaimer: string;
   createdAt: string;
 }
@@ -150,7 +153,7 @@ export interface WoundAssessmentResult {
 /** Result of an emergency check made without an account (never stored). */
 export type GuestAssessmentResult = Omit<
   WoundAssessmentResult,
-  'id' | 'pet' | 'imageUrl' | 'ownerNotes' | 'createdAt'
+  'id' | 'pet' | 'imageUrl' | 'ownerNotes' | 'createdAt' | 'followUps'
 > & { species: (typeof SPECIES)[number] };
 
 /** Whether the assessment service can be used right now. */

@@ -1,4 +1,11 @@
-import { assessmentRequestSchema, type AssessmentRequest } from '@vetnexa/shared';
+import {
+  assessmentRequestSchema,
+  followUpCreateSchema,
+  followUpUpdateSchema,
+  type AssessmentRequest,
+  type FollowUpCreate,
+  type FollowUpUpdate,
+} from '@vetnexa/shared';
 import { Router, type RequestHandler } from 'express';
 import { z } from 'zod';
 import type { PrismaClient } from '../../generated/prisma/client';
@@ -19,6 +26,12 @@ const listQuery = z.object({ petId: z.string().min(1).max(40).optional() });
  *   POST   /          assess a photo (multipart: "photo", "petId", optional "ownerNotes")
  *   GET    /:id       one assessment
  *   DELETE /:id       delete an assessment and its photo
+ *
+ * Follow-up check-ins after a wound check:
+ *   GET    /follow-ups              my follow-ups, open ones first
+ *   POST   /:id/follow-ups          plan a look again in 1, 2, 3 or 7 days ({ inDays })
+ *   PATCH  /follow-ups/:id          record how it looks now ({ progress, note })
+ *   DELETE /follow-ups/:id          cancel a follow-up
  */
 export function assessmentsRouter(prisma: PrismaClient, ai: AiClient, limiter: RequestHandler) {
   const router = Router();
@@ -49,6 +62,44 @@ export function assessmentsRouter(prisma: PrismaClient, ai: AiClient, limiter: R
         req.file!,
       );
       res.status(201).json({ assessment });
+    },
+  );
+
+  // Follow-up routes come before "/:id" so "follow-ups" is not read as an assessment id.
+  router.get('/follow-ups', async (req, res) => {
+    res.json({ followUps: await service.listFollowUps(currentUser(req).id) });
+  });
+
+  router.patch(
+    '/follow-ups/:id',
+    validate(idParams, 'params'),
+    validate(followUpUpdateSchema),
+    async (req, res) => {
+      const followUp = await service.completeFollowUp(
+        currentUser(req).id,
+        id(res.locals),
+        res.locals['body'] as FollowUpUpdate,
+      );
+      res.json({ followUp });
+    },
+  );
+
+  router.delete('/follow-ups/:id', validate(idParams, 'params'), async (req, res) => {
+    await service.removeFollowUp(currentUser(req).id, id(res.locals));
+    res.status(204).end();
+  });
+
+  router.post(
+    '/:id/follow-ups',
+    validate(idParams, 'params'),
+    validate(followUpCreateSchema),
+    async (req, res) => {
+      const followUp = await service.createFollowUp(
+        currentUser(req).id,
+        id(res.locals),
+        res.locals['body'] as FollowUpCreate,
+      );
+      res.status(201).json({ followUp });
     },
   );
 

@@ -8,16 +8,54 @@ import {
   type SymptomEvidence,
   type SkinCheck,
   type TriageDetails,
+  type FollowUpCreate,
+  type FollowUpUpdate,
   type WoundAssessmentResult,
+  type WoundFollowUp,
 } from '@vetnexa/shared';
-import type { Pet, PrismaClient, WoundAssessment } from '../../generated/prisma/client';
+import type {
+  Pet,
+  PrismaClient,
+  WoundAssessment,
+  WoundFollowUp as WoundFollowUpRow,
+} from '../../generated/prisma/client';
 import type { AiClient } from '../../lib/ai-client';
 import { HttpError } from '../../lib/http-error';
 import { deleteUpload, saveImage } from '../../lib/uploads';
 
-type AssessmentWithPet = WoundAssessment & { pet: Pick<Pet, 'id' | 'name' | 'species'> };
+type AssessmentWithPet = WoundAssessment & {
+  pet: Pick<Pet, 'id' | 'name' | 'species'>;
+  followUps?: WoundFollowUpRow[];
+};
 
-const withPet = { pet: { select: { id: true, name: true, species: true } } } as const;
+const withPet = {
+  pet: { select: { id: true, name: true, species: true } },
+  followUps: { orderBy: { dueAt: 'asc' } },
+} as const;
+
+type FollowUpWithPet = WoundFollowUpRow & {
+  assessment: { pet: Pick<Pet, 'id' | 'name'> };
+};
+
+const followUpWithPet = {
+  assessment: { select: { pet: { select: { id: true, name: true } } } },
+} as const;
+
+export function toFollowUpResponse(
+  row: WoundFollowUpRow,
+  pet: Pick<Pet, 'id' | 'name'>,
+): WoundFollowUp {
+  return {
+    id: row.id,
+    assessmentId: row.assessmentId,
+    pet: { id: pet.id, name: pet.name },
+    dueAt: row.dueAt.toISOString(),
+    progress: row.progress,
+    note: row.note,
+    completedAt: row.completedAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
 
 export function toAssessmentResponse(row: AssessmentWithPet): WoundAssessmentResult {
   return {
@@ -41,6 +79,7 @@ export function toAssessmentResponse(row: AssessmentWithPet): WoundAssessmentRes
     triage: row.triage ?? SEVERITY_TO_TRIAGE[row.severity],
     triageDetails: (row.triageDetails as TriageDetails | null) ?? null,
     skinCheck: (row.skinCheck as SkinCheck | null) ?? null,
+    followUps: (row.followUps ?? []).map((f) => toFollowUpResponse(f, row.pet)),
     disclaimer: ASSESSMENT_DISCLAIMER,
     createdAt: row.createdAt.toISOString(),
   };
@@ -148,6 +187,62 @@ export function assessmentsService(prisma: PrismaClient, ai: AiClient) {
       const row = await findOwned(userId, id);
       await prisma.woundAssessment.delete({ where: { id: row.id } });
       await deleteUpload(row.imageUrl);
+    },
+
+    /** The owner's follow-ups: open ones first (soonest due), then the 20 most recent done. */
+    async listFollowUps(userId: string): Promise<WoundFollowUp[]> {
+      const [open, done] = await Promise.all([
+        prisma.woundFollowUp.findMany({
+          where: { userId, completedAt: null },
+          orderBy: { dueAt: 'asc' },
+          include: followUpWithPet,
+        }),
+        prisma.woundFollowUp.findMany({
+          where: { userId, completedAt: { not: null } },
+          orderBy: { completedAt: 'desc' },
+          include: followUpWithPet,
+          take: 20,
+        }),
+      ]);
+      return [...open, ...done].map((f: FollowUpWithPet) =>
+        toFollowUpResponse(f, f.assessment.pet),
+      );
+    },
+
+    /** Plans a look at the wound again. Only one open follow-up per check. */
+    async createFollowUp(userId: string, assessmentId: string, data: FollowUpCreate) {
+      const assessment = await findOwned(userId, assessmentId);
+      const open = await prisma.woundFollowUp.findFirst({
+        where: { assessmentId, completedAt: null },
+      });
+      if (open) {
+        throw HttpError.conflict('A follow-up is already planned for this wound check');
+      }
+      const dueAt = new Date(Date.now() + data.inDays * 24 * 60 * 60 * 1000);
+      const row = await prisma.woundFollowUp.create({
+        data: { assessmentId, userId, dueAt },
+      });
+      return toFollowUpResponse(row, assessment.pet);
+    },
+
+    /** Records how the wound looks now. A follow-up can be answered once. */
+    async completeFollowUp(userId: string, id: string, data: FollowUpUpdate) {
+      const row = await prisma.woundFollowUp.findFirst({
+        where: { id, userId },
+        include: followUpWithPet,
+      });
+      if (!row) throw HttpError.notFound('Follow-up not found');
+      if (row.completedAt) throw HttpError.conflict('This follow-up has already been answered');
+      const saved = await prisma.woundFollowUp.update({
+        where: { id },
+        data: { progress: data.progress, note: data.note ?? null, completedAt: new Date() },
+      });
+      return toFollowUpResponse(saved, row.assessment.pet);
+    },
+
+    async removeFollowUp(userId: string, id: string) {
+      const { count } = await prisma.woundFollowUp.deleteMany({ where: { id, userId } });
+      if (count === 0) throw HttpError.notFound('Follow-up not found');
     },
   };
 }

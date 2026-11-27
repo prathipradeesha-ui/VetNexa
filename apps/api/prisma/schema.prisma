@@ -44,6 +44,7 @@ model User {
   pets                  Pet[]
   recordsCreated        HealthRecord[]        @relation("RecordAuthor")
   assessments           WoundAssessment[]
+  woundFollowUps        WoundFollowUp[]
   ownerConsultations    Consultation[]        @relation("ConsultationOwner")
   vetConsultations      Consultation[]        @relation("ConsultationVet")
   adoptionListings      AdoptionListing[]
@@ -203,11 +204,37 @@ model WoundAssessment {
   ownerNotes      String?          @db.Text
   createdAt       DateTime         @default(now())
 
-  pet  Pet  @relation(fields: [petId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pet       Pet             @relation(fields: [petId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  followUps WoundFollowUp[]
 
   @@index([petId, createdAt])
   @@index([userId])
+}
+
+enum FollowUpProgress {
+  BETTER
+  SAME
+  WORSE
+}
+
+/// A planned look at the wound again after a check, and how it looked when the owner did.
+model WoundFollowUp {
+  id           String            @id @default(cuid())
+  assessmentId String
+  userId       String
+  dueAt        DateTime
+  /// Null until the owner records how the wound looks.
+  progress     FollowUpProgress?
+  note         String?           @db.Text
+  completedAt  DateTime?
+  createdAt    DateTime          @default(now())
+
+  assessment WoundAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completedAt, dueAt])
+  @@index([assessmentId])
 }
 
 // ─────────────────────────────── Clinics and consultations ───────────────────────────────

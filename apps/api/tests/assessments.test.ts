@@ -369,3 +369,91 @@ describe('HTTP AI client', () => {
     });
   });
 });
+
+describe('wound follow-up check-ins', () => {
+  async function checkedWound() {
+    const { agent, pet, owner } = await ownerWithPet();
+    const res = await agent
+      .post('/api/assessments')
+      .field('petId', pet.id)
+      .attach('photo', await photo(), 'wound.jpg')
+      .expect(201);
+    return { agent, pet, owner, assessmentId: res.body.assessment.id as string };
+  }
+
+  it('plans a follow-up, shows it on the result and records how the wound looks', async () => {
+    const { agent, assessmentId } = await checkedWound();
+    const before = Date.now();
+
+    const created = await agent
+      .post(`/api/assessments/${assessmentId}/follow-ups`)
+      .send({ inDays: 2 })
+      .expect(201);
+    const due = new Date(created.body.followUp.dueAt).getTime();
+    expect(due - before).toBeGreaterThanOrEqual(2 * 24 * 3600 * 1000 - 1000);
+    expect(due - before).toBeLessThan(2 * 24 * 3600 * 1000 + 60_000);
+    expect(created.body.followUp).toMatchObject({ progress: null, pet: { name: 'Bruno' } });
+
+    // Only one open follow-up per check.
+    await agent.post(`/api/assessments/${assessmentId}/follow-ups`).send({ inDays: 1 }).expect(409);
+
+    const result = await agent.get(`/api/assessments/${assessmentId}`).expect(200);
+    expect(result.body.assessment.followUps).toHaveLength(1);
+
+    const done = await agent
+      .patch(`/api/assessments/follow-ups/${created.body.followUp.id}`)
+      .send({ progress: 'WORSE', note: 'More swollen today' })
+      .expect(200);
+    expect(done.body.followUp).toMatchObject({ progress: 'WORSE', note: 'More swollen today' });
+    expect(done.body.followUp.completedAt).not.toBeNull();
+
+    await agent
+      .patch(`/api/assessments/follow-ups/${created.body.followUp.id}`)
+      .send({ progress: 'BETTER' })
+      .expect(409);
+
+    // Once answered, a new follow-up can be planned; open ones are listed first.
+    await agent.post(`/api/assessments/${assessmentId}/follow-ups`).send({ inDays: 7 }).expect(201);
+    const list = await agent.get('/api/assessments/follow-ups').expect(200);
+    expect(list.body.followUps.map((f: { progress: string | null }) => f.progress)).toEqual([
+      null,
+      'WORSE',
+    ]);
+  });
+
+  it('accepts only the offered days and a known progress answer', async () => {
+    const { agent, assessmentId } = await checkedWound();
+    await agent
+      .post(`/api/assessments/${assessmentId}/follow-ups`)
+      .send({ inDays: 30 })
+      .expect(422);
+    const { body } = await agent
+      .post(`/api/assessments/${assessmentId}/follow-ups`)
+      .send({ inDays: 1 })
+      .expect(201);
+    await agent
+      .patch(`/api/assessments/follow-ups/${body.followUp.id}`)
+      .send({ progress: 'HEALED' })
+      .expect(422);
+  });
+
+  it("keeps follow-ups private to the pet's owner", async () => {
+    const { agent, assessmentId } = await checkedWound();
+    const { body } = await agent
+      .post(`/api/assessments/${assessmentId}/follow-ups`)
+      .send({ inDays: 3 })
+      .expect(201);
+
+    const other = await signedInAgent((await createUser('OWNER')).email, { aiClient: fakeAi() });
+    await other.post(`/api/assessments/${assessmentId}/follow-ups`).send({ inDays: 1 }).expect(404);
+    await other
+      .patch(`/api/assessments/follow-ups/${body.followUp.id}`)
+      .send({ progress: 'BETTER' })
+      .expect(404);
+    await other.delete(`/api/assessments/follow-ups/${body.followUp.id}`).expect(404);
+    expect((await other.get('/api/assessments/follow-ups').expect(200)).body.followUps).toEqual([]);
+
+    await agent.delete(`/api/assessments/follow-ups/${body.followUp.id}`).expect(204);
+    expect(await testPrisma.woundFollowUp.count()).toBe(0);
+  });
+});
