@@ -1,4 +1,9 @@
-import type { AssessmentServiceStatus, WoundAssessmentResult } from '@vetnexa/shared';
+import type {
+  AssessmentServiceStatus,
+  FollowUpUpdate,
+  WoundAssessmentResult,
+  WoundFollowUp,
+} from '@vetnexa/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, apiForm, ApiError } from '../../lib/api';
 
@@ -76,4 +81,55 @@ export function photoQualityProblems(error: unknown): string[] | null {
   if (!(error instanceof ApiError) || error.code !== 'PHOTO_QUALITY') return null;
   const problems = (error.data as { problems?: unknown } | undefined)?.problems;
   return Array.isArray(problems) ? problems.map(String) : [];
+}
+
+export const followUpKeys = { all: ['assessments', 'follow-ups'] as const };
+
+export function useFollowUps() {
+  return useQuery({
+    queryKey: followUpKeys.all,
+    queryFn: () =>
+      api<{ followUps: WoundFollowUp[] }>('/assessments/follow-ups').then((r) => r.followUps),
+  });
+}
+
+/** After any follow-up change, the result page and the dashboard list are refreshed. */
+function useRefreshFollowUps() {
+  const queryClient = useQueryClient();
+  return (assessmentId: string) => {
+    void queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(assessmentId) });
+    void queryClient.invalidateQueries({ queryKey: followUpKeys.all });
+  };
+}
+
+export function useCreateFollowUp(assessmentId: string) {
+  const refresh = useRefreshFollowUps();
+  return useMutation({
+    mutationFn: (inDays: number) =>
+      api<{ followUp: WoundFollowUp }>(`/assessments/${assessmentId}/follow-ups`, {
+        method: 'POST',
+        body: { inDays },
+      }).then((r) => r.followUp),
+    onSuccess: () => refresh(assessmentId),
+  });
+}
+
+export function useCompleteFollowUp(assessmentId: string) {
+  const refresh = useRefreshFollowUps();
+  return useMutation({
+    mutationFn: ({ id, ...body }: { id: string } & FollowUpUpdate) =>
+      api<{ followUp: WoundFollowUp }>(`/assessments/follow-ups/${id}`, {
+        method: 'PATCH',
+        body,
+      }).then((r) => r.followUp),
+    onSuccess: () => refresh(assessmentId),
+  });
+}
+
+export function useCancelFollowUp(assessmentId: string) {
+  const refresh = useRefreshFollowUps();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/assessments/follow-ups/${id}`, { method: 'DELETE' }),
+    onSuccess: () => refresh(assessmentId),
+  });
 }

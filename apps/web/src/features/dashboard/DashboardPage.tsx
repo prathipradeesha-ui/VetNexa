@@ -9,6 +9,7 @@ import { MyPetsCard } from './MyPetsCard';
 import { PendingVetsCard } from './PendingVetsCard';
 import { RescuerOverview } from './RescuerOverview';
 import { UpcomingConsultationsCard } from './UpcomingConsultationsCard';
+import { WoundFollowUpsCard } from './WoundFollowUpsCard';
 import { VetOverview } from './VetOverview';
 import './dashboard.css';
 
@@ -129,6 +130,7 @@ export function DashboardPage() {
           </section>
         )}
 
+        {user.role === 'OWNER' && <WoundFollowUpsCard />}
         {user.role === 'OWNER' && <UpcomingConsultationsCard />}
         {user.role === 'OWNER' && <CareRemindersCard />}
         {user.role === 'OWNER' && <MyPetsCard />}

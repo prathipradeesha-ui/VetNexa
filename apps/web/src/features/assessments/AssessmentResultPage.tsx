@@ -6,6 +6,7 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { PageLoader } from '../../components/ui/PageLoader';
 import { DemoModelNotice, EmergencyNotice, formatDateTime, percent } from './AssessmentBits';
+import { FollowUpCard } from './FollowUpCard';
 import { SkinCheckPanel } from './SkinCheckPanel';
 import { SymptomEvidencePanel } from './SymptomEvidencePanel';
 import { OUTCOME_MEANING, TriageBadge, TriageExplanation } from './TriageExplanation';
@@ -133,6 +134,8 @@ export function AssessmentResultPage() {
       <SymptomEvidencePanel answers={result.answers} symptoms={result.symptoms} />
 
       <SkinCheckPanel skinCheck={result.skinCheck} />
+
+      <FollowUpCard result={result} />
 
       <EmergencyNotice />
 

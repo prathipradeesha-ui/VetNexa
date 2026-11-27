@@ -79,6 +79,7 @@ const result = {
     fusion: 'reliability',
   },
   skinCheck: null,
+  followUps: [] as object[],
   disclaimer: 'This is a preliminary, AI-generated assessment. It is not a diagnosis.',
   createdAt: '2026-11-21T09:30:00.000Z',
 };
@@ -414,5 +415,88 @@ describe('wound check result', () => {
     renderRoute('/dashboard/assessments/a-1');
     await screen.findByRole('heading', { name: result.summary });
     expect(screen.queryByRole('heading', { name: /Skin check/ })).not.toBeInTheDocument();
+  });
+});
+
+describe('wound follow-up check-ins', () => {
+  const inTwoDays = new Date(Date.now() + 2 * 86_400_000).toISOString();
+  const followUp = {
+    id: 'f-1',
+    assessmentId: 'a-1',
+    pet: { id: 'pet-1', name: 'Bruno' },
+    dueAt: inTwoDays,
+    progress: null,
+    note: null,
+    completedAt: null,
+    createdAt: '2026-11-21T09:31:00.000Z',
+  };
+
+  it('plans a follow-up from the result', async () => {
+    let planned = false;
+    const fetchMock = mockApi({
+      'GET /api/auth/me': signedInOwner,
+      'GET /api/assessments/a-1': () => ({
+        status: 200,
+        body: { assessment: { ...result, followUps: planned ? [followUp] : [] } },
+      }),
+      'POST /api/assessments/a-1/follow-ups': () => {
+        planned = true;
+        return { status: 201, body: { followUp } };
+      },
+    });
+    renderRoute('/dashboard/assessments/a-1');
+
+    const card = (await screen.findByRole('heading', { name: /Follow-up check/ })).closest(
+      'section',
+    )!;
+    await userEvent.click(within(card).getByRole('button', { name: 'In 2 days' }));
+
+    expect(await within(card).findByText('Due in 2 days')).toBeInTheDocument();
+    const call = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/follow-ups'))!;
+    expect(JSON.parse(String(call[1]!.body))).toEqual({ inDays: 2 });
+  });
+
+  it('records a worse wound and tells the owner to see a vet', async () => {
+    let answered = false;
+    const fetchMock = mockApi({
+      'GET /api/auth/me': signedInOwner,
+      'GET /api/assessments/a-1': () => ({
+        status: 200,
+        body: {
+          assessment: {
+            ...result,
+            followUps: [
+              answered
+                ? { ...followUp, progress: 'WORSE', note: 'More swollen', completedAt: inTwoDays }
+                : followUp,
+            ],
+          },
+        },
+      }),
+      'PATCH /api/assessments/follow-ups/f-1': () => {
+        answered = true;
+        return { status: 200, body: { followUp: { ...followUp, progress: 'WORSE' } } };
+      },
+    });
+    renderRoute('/dashboard/assessments/a-1');
+
+    const card = (await screen.findByRole('heading', { name: /Follow-up check/ })).closest(
+      'section',
+    )!;
+    await userEvent.click(within(card).getByRole('button', { name: 'Save how it looks' }));
+    expect(within(card).getByText('Please choose how the wound looks now')).toBeInTheDocument();
+
+    await userEvent.click(within(card).getByRole('radio', { name: 'Getting worse' }));
+    await userEvent.type(within(card).getByLabelText(/Anything you noticed/), 'More swollen');
+    await userEvent.click(within(card).getByRole('button', { name: 'Save how it looks' }));
+
+    expect(await within(card).findByText('Please see a vet')).toBeInTheDocument();
+    expect(within(card).getByRole('link', { name: /Find a clinic/ })).toHaveAttribute(
+      'href',
+      '/clinics',
+    );
+    expect(within(card).getByText('More swollen')).toBeInTheDocument();
+    const call = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')!;
+    expect(JSON.parse(String(call[1]!.body))).toEqual({ progress: 'WORSE', note: 'More swollen' });
   });
 });
