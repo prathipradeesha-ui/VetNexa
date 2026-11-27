@@ -15,6 +15,8 @@ Run it with:
 Settings (environment variables):
 
     VETNEXA_AI_MODEL   checkpoint path (default models/wound-classifier.pt)
+    VETNEXA_SKIN_MODEL optional skin-condition model (default models/skin/skin-classifier.pt);
+                       when present, /assess also returns an advisory `skinCheck`
     VETNEXA_AI_TOKEN   shared secret; when set, requests must send it in X-Service-Token
     VETNEXA_AI_HOST    default 127.0.0.1
     VETNEXA_AI_PORT    default 8000
@@ -37,7 +39,8 @@ from fastapi.responses import JSONResponse
 
 from .assessment import Assessor
 from .chat import Assistant
-from .quality import InvalidImageError
+from .quality import InvalidImageError, decode_image
+from .skin_check import SkinChecker
 from .symptoms import Answers, InvalidAnswersError, parse_answers
 
 logger = logging.getLogger("vetnexa_ai.service")
@@ -46,6 +49,9 @@ logger = logging.getLogger("vetnexa_ai.service")
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
 MAX_MESSAGE_CHARS = 500
 DEFAULT_MODEL = Path(__file__).resolve().parent.parent / "models" / "wound-classifier.pt"
+DEFAULT_SKIN_MODEL = (
+    Path(__file__).resolve().parent.parent / "models" / "skin" / "skin-classifier.pt"
+)
 
 
 def error(status: int, code: str, message: str) -> JSONResponse:
@@ -62,10 +68,20 @@ def load_assessor(path: Path) -> Assessor | None:
     return assessor
 
 
+def load_skin_checker(path: Path) -> SkinChecker | None:
+    if not path.is_file():
+        logger.info("No skin-condition model at %s; the skin check is switched off.", path)
+        return None
+    checker = SkinChecker.from_checkpoint(path)
+    logger.info("Loaded skin-condition model %s", checker.version)
+    return checker
+
+
 def create_app(
     assessor: Assessor | None,
     token: str | None = None,
     assistant: Assistant | None = None,
+    skin: SkinChecker | None = None,
 ) -> FastAPI:
     """Builds the app. Model and assistant are passed in so tests can use small versions."""
     app = FastAPI(title="VetNexa AI service", docs_url=None, redoc_url=None, openapi_url=None)
@@ -86,6 +102,7 @@ def create_app(
             "modelVersion": assessor.version if assessor else None,
             "demoModel": assessor.demo if assessor else None,
             "chatArticles": len(assistant.articles) if assistant else 0,
+            "skinModelVersion": skin.version if skin else None,
         }
 
     @app.post("/chat")
@@ -102,6 +119,15 @@ def create_app(
         if len(message) > MAX_MESSAGE_CHARS:
             return error(422, "INVALID_MESSAGE", "Please keep questions under 500 characters.")
         return assistant.reply(message)
+
+    def assess_photo(data: bytes, answers: Answers | None) -> dict:
+        result = assessor.assess(data, answers)
+        # The advisory skin check only runs on photos that passed the quality checks.
+        if skin is not None and result.get("status") != "REJECTED_QUALITY":
+            result["skinCheck"] = skin.check(decode_image(data))
+        else:
+            result["skinCheck"] = None
+        return result
 
     @app.post("/assess")
     async def assess(request: Request):
@@ -133,7 +159,7 @@ def create_app(
             return error(413, "TOO_LARGE", "The image is too large.")
         try:
             # Inference is CPU-bound, so it runs in a worker thread and does not block others.
-            return await run_in_threadpool(assessor.assess, data, answers)
+            return await run_in_threadpool(assess_photo, data, answers)
         except InvalidImageError:
             return error(422, "INVALID_IMAGE", "The file is not a valid image.")
 
@@ -147,8 +173,12 @@ def main() -> None:
     model_path = Path(os.environ.get("VETNEXA_AI_MODEL", DEFAULT_MODEL))
     assistant = Assistant()
     logger.info("Pet-care assistant ready with %d articles", len(assistant.articles))
+    skin_path = Path(os.environ.get("VETNEXA_SKIN_MODEL", DEFAULT_SKIN_MODEL))
     app = create_app(
-        load_assessor(model_path), os.environ.get("VETNEXA_AI_TOKEN") or None, assistant
+        load_assessor(model_path),
+        os.environ.get("VETNEXA_AI_TOKEN") or None,
+        assistant,
+        load_skin_checker(skin_path),
     )
     uvicorn.run(
         app,

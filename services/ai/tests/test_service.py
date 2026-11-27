@@ -9,6 +9,8 @@ from vetnexa_ai.chat import Assistant
 from vetnexa_ai.config import CLASSES, DISCLAIMER
 from vetnexa_ai.model import build_model
 from vetnexa_ai.service import create_app
+from vetnexa_ai.skin_check import SkinChecker
+from vetnexa_ai.skin_dataset import SKIN_CLASSES
 
 from .conftest import encode
 
@@ -33,6 +35,7 @@ def test_health_reports_the_loaded_model(client):
         "modelVersion": "wound-test-1",
         "demoModel": True,
         "chatArticles": 0,
+        "skinModelVersion": None,
     }
 
 
@@ -107,3 +110,36 @@ def test_chat_rejects_invalid_messages(chat_client, payload):
 
 def test_chat_without_assistant_is_unavailable(client):
     assert client.post("/chat", json={"message": "hi"}).status_code == 503
+
+
+@pytest.fixture(scope="module")
+def skin_checker():
+    model = build_model(len(SKIN_CLASSES), pretrained=False).eval()
+    return SkinChecker(model, list(SKIN_CLASSES), 1.0, "skin-test-1")
+
+
+def test_skin_check_is_added_to_photos_that_pass_quality(assessor, skin_checker, good_image):
+    client = TestClient(create_app(assessor, skin=skin_checker))
+    assert client.get("/health").json()["skinModelVersion"] == "skin-test-1"
+    body = client.post("/assess", content=encode(good_image)).json()
+    skin = body["skinCheck"]
+    assert skin["status"] in {"SUGGESTED", "UNSURE", "UNFAMILIAR"}
+    assert set(skin["probabilities"]) == set(SKIN_CLASSES)
+    assert skin["advice"]
+    # The skin check is advisory: it never changes the triage outcome.
+    assert body["triage"] == client.post("/assess", content=encode(good_image)).json()["triage"]
+
+
+def test_skin_check_is_skipped_for_poor_photos(assessor, skin_checker):
+    client = TestClient(create_app(assessor, skin=skin_checker))
+    dark = np.full((320, 320, 3), 5, dtype=np.uint8)
+    assert client.post("/assess", content=encode(dark)).json()["skinCheck"] is None
+
+
+def test_skin_check_reports_unsure_instead_of_guessing(skin_checker, good_image):
+    from vetnexa_ai.quality import decode_image
+
+    flat = SkinChecker(skin_checker.model, skin_checker.classes, 1000.0, "skin-test-1")
+    result = flat.check(decode_image(encode(good_image)))
+    assert result["status"] == "UNSURE"
+    assert result["condition"] is None
