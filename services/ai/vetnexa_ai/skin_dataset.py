@@ -12,8 +12,10 @@ and closely related categories are combined:
     fungal_infection  fungal_infection
     dermatitis        dermatitis, allergic_dermatitis, flea_allergy, bacterial_dermatosis, hot_spot
 
-Each photo is copied as <species>__<source file name>, so its origin stays visible, and
-SKIN_SOURCES.csv lists where every photo came from.
+Each photo is copied as <species>-<source file name>, so its origin stays visible, and
+SKIN_SOURCES.csv lists where every photo came from. The name has no "__", because the training
+split treats the text before "__" as a case id; near-identical photos of one case were already
+removed during curation, so each photo is its own group.
 """
 
 from __future__ import annotations
@@ -67,7 +69,8 @@ def build(out: Path = OUT) -> Counter:
                 source = folder / row["file"]
                 if target_class is None or not source.exists():
                     continue
-                target = out / target_class / f"{row['species']}__{Path(row['file']).name}"
+                name = Path(row["file"]).name.replace("__", "-")
+                target = out / target_class / f"{row['species']}-{name}"
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, target)
                 counts[target_class] += 1
