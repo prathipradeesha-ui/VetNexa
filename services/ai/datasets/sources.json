@@ -481,6 +481,25 @@
       "decision": "included in the community tier; each file's licence and author recorded",
       "provenance": "uploader-asserted",
       "inspection_notes": "Searched 31 terms on 2026-11-25; 764 results, 576 with a free licence, 93 likely relevant by title and categories, 18 chosen after viewing each photo. Second search on 2026-11-27: 98 condition searches (ear, paw, tumour, acne, pemphigus, leishmaniasis and others), 169 likely relevant, 25 more chosen after viewing each photo."
+    },
+    {
+      "id": "open-access-case-reports",
+      "name": "Open-access veterinary case reports (figures)",
+      "provider": "Europe PMC / PubMed Central",
+      "url": "https://europepmc.org/",
+      "licence": "CC BY (per article)",
+      "species": [
+        "dog",
+        "cat"
+      ],
+      "task": "Clinical photos from published case reports",
+      "labels": [
+        "from the figure caption, written by the authors"
+      ],
+      "access": "free",
+      "decision": "searched; no photo used – the only two clear natural-wound photos were too small (under 224 px) for the clear-photos rule",
+      "provenance": "uploader-asserted",
+      "inspection_notes": "2026-11-27: 477 CC BY/CC0 articles on dog and cat wounds; 167 veterinary; 48 wound figures by caption; 34 downloaded and viewed; only 2 were clear single photos of a natural wound (the rest were surgery, charts, microscopy or multi-panel figures)."
     }
   ],
   "provenance_levels": {

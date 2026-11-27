@@ -1,7 +1,7 @@
 {
   "tier": "community",
   "kept_images": 779,
-  "excluded_images": 9881,
+  "excluded_images": 9883,
   "by_category_and_species": {
     "acne/dog": 1,
     "allergic_dermatitis/dog": 15,
@@ -61,7 +61,7 @@
     "label '' not used": 149,
     "near-duplicate": 142,
     "exact duplicate": 142,
-    "too small": 135,
+    "too small": 137,
     "not clear: blurry": 115,
     "copy of a photo rejected in the visual check: not clear: blurry or soft, skin not visible": 97,
     "visual check: not clear: blurry or soft, skin not visible": 89,

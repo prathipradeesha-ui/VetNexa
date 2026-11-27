@@ -9672,6 +9672,8 @@ wikimedia-commons,wikimedia-commons\Canine_otitis_externa_-_reddened_scaly_skin_
 wikimedia-commons,wikimedia-commons\Otitis_dog.jpg,otitis externa,same case as a kept photo (similarity 0.76),ringworm/dog/kaggle-youssefmohmmed-dogs-skin-diseases__1000010642_x16_jpg.rf.268e206b302b0b2b3e003c0431b445eb.jpg
 wikimedia-commons,wikimedia-commons\Canlm2.jpg,leishmaniasis,same case as a kept photo (similarity 0.79),leishmaniasis/dog/wikimedia-commons__Canlm1.jpg
 wikimedia-commons,wikimedia-commons\Hotspot-buldog.jpg,hot spot,"near-duplicate (same photo, possibly flipped/rotated/re-coloured)",dermatitis/dog/kaggle-youssefmohmmed-dogs-skin-diseases__hotspot-112-_jpg.rf.460b8d7fc89bdba5ee47d9deb6b0046d.jpg
+open-access-case-reports,open-access-case-reports\PMC9122447_VMS3-8-1001-g009.jpg,injured dog,too small (392x222),
+open-access-case-reports,open-access-case-reports\PMC9122447_VMS3-8-1001-g001.jpg,injured dog,too small (388x219),
 roboflow-commission-cat-infections,roboflow-commission-cat-infections\test\mites37_jpg.rf.70b474a0a499a84cd8e46038f884d2da.jpg,mites,"visual check: not clear: blurry, dark or skin not visible (checked at full size)",
 roboflow-commission-cat-infections,roboflow-commission-cat-infections\test\dand-39-_jpg.rf.58cd0a359c646ba713c6c9ffb60e24f7.jpg,dandruff,"multispectral band frame, not a normal photo",
 roboflow-commission-cat-infections,roboflow-commission-cat-infections\test\mites16_png.rf.35127bb0fcc50dd2c18a93c3244aa545.jpg,mites,"visual check: not clear: blurry, dark or skin not visible (checked at full size)",

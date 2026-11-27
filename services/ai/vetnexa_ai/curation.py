@@ -383,6 +383,7 @@ READERS = [
     ("roboflow-imtired-injured-animal-detector-new", lambda d, s: read_coco(d, s, None)),
     ("roboflow-fyp-cat-skin-disease", lambda d, s: read_coco(d, s, "cat")),
     ("wikimedia-commons", lambda d, s: read_listed_files(d, s)),
+    ("open-access-case-reports", lambda d, s: read_listed_files(d, s)),
     ("roboflow-commission-cat-infections", lambda d, s: read_coco(d, s, "cat")),
 ]
 
@@ -534,7 +535,7 @@ CURATION_MIN_SHARPNESS = 35.0
 
 #: Single photos chosen and checked one by one from their original pages. They are originals,
 #: never augmented copies, so the speckle-noise rule (aimed at augmented datasets) is not used.
-HAND_PICKED_SOURCES = {"wikimedia-commons"}
+HAND_PICKED_SOURCES = {"wikimedia-commons", "open-access-case-reports"}
 
 #: Share of pixels that differ sharply from their 3x3 median. Augmented copies with added
 #: "salt and pepper" speckles score 0.24 % or more; real photos checked on contact sheets scored
