@@ -123,6 +123,22 @@ Nothing private is saved for offline use. Health records, wound photos and accou
 always come from the server; the only things kept on the phone are the public clinic list and,
 until it is sent, a rescue report the person wrote themselves.
 
+### Sharing a demo link (free, from this computer)
+
+For a viva or a supervisor meeting, the Docker stack can be shared through a free Cloudflare
+quick tunnel. It gives a public HTTPS address, so phones can install the app. The link works
+only while this computer is on and running VetNexa, and it changes every time the tunnel starts.
+
+```powershell
+docker compose up -d
+& "C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://localhost:8088
+```
+
+The `https://….trycloudflare.com` address printed by the second command is the link to share;
+press Ctrl+C to stop sharing. Before sharing, give the demo accounts a private password: the
+seed password above is public on GitHub. Nginx reads the visitor's real address from
+Cloudflare, so each visitor gets their own rate limits.
+
 ## Development setup
 
 Requirements: Node.js 24 (20 or newer), Docker Desktop, and Python 3.11 for the AI service.
