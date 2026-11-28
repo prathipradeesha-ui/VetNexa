@@ -183,17 +183,18 @@ pip, GitHub Actions and Docker base images; each update must pass CI before it i
 
 All 26 planned stages are complete (see the [project plan](docs/project-plan.md) and the
 [development history](docs/development-history.md)), and every idea from the project poster is
-built and tested ([poster alignment](docs/poster-alignment.md)). The AI results so far come from
-a demonstration model and simulated answers; the
-[AI evaluation report](docs/ai-evaluation-report.md) explains what they show and what they do
-not. Still to do before real use:
+built and tested ([poster alignment](docs/poster-alignment.md)). Owners can also plan follow-up
+check-ins after a wound check, on the web and in the installed mobile app. The wound results so
+far come from a demonstration model and simulated answers. The advisory skin check is trained
+on 767 of the 841 collected real dog and cat photos (macro-F1 0.62 on held-out photos). The
+[AI evaluation report](docs/ai-evaluation-report.md) explains what these results show and what
+they do not. Still to do before real use:
 
 - train and evaluate on real, veterinarian-labelled dog and cat wound photos (PetWound and a
   partner clinic have been asked), after ethics approval;
 - veterinary review of the symptom rules, the knowledge base and the triage thresholds;
 - the deployment steps in the [security review](docs/security-accessibility-review.md)
-  (HTTPS, secrets, ending sessions on sign-out);
-- follow-up check-ins after a wound check, and skin conditions as separate model classes.
+  (HTTPS, secrets, ending sessions on sign-out).
 
 ## Documentation
 

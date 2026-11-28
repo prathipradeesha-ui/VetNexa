@@ -16,8 +16,9 @@
 ## Out of scope
 
 - Diagnosis, prescribing or replacing an examination by a veterinarian.
-- Internal injuries, fractures, eye injuries, burns, skin diseases, or species other than dogs
-  and cats.
+- Internal injuries, fractures, eye injuries, burns, or species other than dogs and cats.
+- Naming skin diseases. A separate, advisory skin-condition check (below) suggests the closest
+  common condition, but it never changes the triage.
 - Emergency triage. The app tells owners to contact a clinic immediately for heavy bleeding,
   breathing difficulty or collapse, whatever the model says.
 
@@ -177,6 +178,22 @@ the method works as designed; they say nothing about real wounds.
   but matter clinically.
 - **Domain shift.** Human wound photos used for pre-training differ from animal skin and fur.
 - **Labels.** Wound type from a photo is sometimes ambiguous even for veterinarians.
+
+## Companion model: advisory skin-condition check
+
+|              |                                                                                                                            |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Model        | `skin-efficientnetb0` – EfficientNet-B0, same training script, calibration and OOD detector                                |
+| Classes      | Healthy skin, ringworm, mange or scabies, other fungal infection, dermatitis (allergic, flea allergy, bacterial, hot spot) |
+| Data         | 767 real, curated dog and cat photos from the verified and community collections; split 547 / 110 / 110                    |
+| Test results | Accuracy 67.3 %, macro-F1 0.621, ECE 0.076; suggests a condition for 68 % of photos and is right 77 % of the time then     |
+| Output       | `SUGGESTED` (confidence ≥ 0.55), `UNSURE`, or `UNFAMILIAR` (OOD); advice per condition                                     |
+
+It runs on every photo that passes the quality checks and is shown below the main result as
+"advisory". It never changes the triage outcome, because its accuracy is too low to rely on:
+ringworm, other fungal infections and dermatitis are often confused, and vets normally confirm
+them with a skin scrape or culture. Labels come from the photo sources, not from a vet. Full
+results: [AI evaluation report, section 5.5](ai-evaluation-report.md).
 
 ## Before any clinical use
 

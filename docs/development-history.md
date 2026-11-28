@@ -41,6 +41,14 @@ every push was also checked by GitHub Actions.
 | 25 Security and accessibility  | Dependency and API review, fixes, access tests, contrast and screen reader fixes, axe in CI            | `9ec3b25`, `3af7d87`, `7e8d60a`, `cc5cb04`, `0dbcdb1`, `a7567a4` (21 Nov)                     |
 | 26 Final documentation         | User guide with screenshots, setup guide, AI evaluation report; database port limited to this computer | `32e60c6`, `2aabb20`, `3daa944`, `16e378d` and the final README update (21 Nov)               |
 
+After the 26 stages:
+
+| Work                  | What was built                                                                                                                                              | Commits (date)                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Real photo collection | Community photo tier with clarity, duplicate, watermark and species checks; 841 clear dog and cat photos in 22 categories, each with its source and licence | `eb8c922`, `0bbee5d`, `e65c3cb`, `5159a39`, `9758cc6`, `4a20662`, `5e25fae`, `01c30bd` (22–27 Nov) |
+| Skin check            | Advisory skin-condition model trained and evaluated on the real photos, saved with each check and shown on web and phone                                    | `6e8fd91`, `dbdd7a3`, `51cb601`, `af1d719`, `7d53204`, `3599970` (27–28 Nov)                       |
+| Follow-up check-ins   | Plan a look again after a wound check, answer better, same or worse, reminders on the dashboard                                                             | `6c45a67`, `4c79637` (27 Nov)                                                                      |
+
 Stage 22 (maps) was finished before Stage 21 (evaluation) because the maps and emergency mode
 were requested during Stage 20; the table follows the real order of the commits.
 
@@ -69,9 +77,7 @@ were requested during Stage 20; the table follows the real order of the commits.
 
 ## Not finished yet
 
-| Item                                       | Why                                                                                                      | Plan                                         |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Follow-up check-ins after a wound check    | Not built                                                                                                | Next                                         |
-| Skin conditions as separate model classes  | The model knows wound types and healthy skin; skin problems are covered by the symptom questions         | Needs labelled skin photos                   |
-| Training and evaluation on real wounds     | No labelled dog and cat wound photos yet; results so far use a demonstration model and simulated answers | When PetWound or partner-clinic data arrives |
-| Ethics approval for collecting real photos | Needed from the university before using clinic data                                                      | Before any real-world data collection        |
+| Item                                       | Why                                                                                                                                          | Plan                                         |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Training and evaluation on real wounds     | Only 19 real wound photos so far (the skin check uses the other real photos); results so far use a demonstration model and simulated answers | When PetWound or partner-clinic data arrives |
+| Ethics approval for collecting real photos | Needed from the university before using clinic data                                                                                          | Before any real-world data collection        |
