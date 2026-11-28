@@ -11,6 +11,10 @@ Pradeesha Baskaran · final evaluation, 21 November 2026
 > show whether the _method_ behaves as designed; they are **not** a measure of how well
 > VetNexa assesses real wounds. Section 8 sets out how the same evaluation will be repeated on
 > real, veterinarian-labelled cases.
+>
+> **One exception: real photos.** The advisory skin-condition check (section 5.5) was trained
+> and tested on **767 real, curated dog and cat photos**. Its results do describe real photos,
+> but with the limits in section 7 (labels come from the photo sources, not from a vet).
 
 ## 1. Aim and questions
 
@@ -44,17 +48,18 @@ ResNet-18 trained the same way. Full method: [model card](ai-model.md).
 
 ## 3. Data
 
-| Set                 | Content                                                                                                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Training data       | Synthetic drawings of the five classes (`vetnexa_ai.synthetic`), group-aware split                                                                          |
-| Test photos         | **44** held-out drawings: 8 abrasion, 8 laceration, 12 puncture, 8 abscess or infection, 8 healthy skin; never used for training, calibration or thresholds |
-| Unfamiliar images   | 60 generated non-wound images (patterns, gradients, noise, shapes)                                                                                          |
-| Owner answers       | Simulated from each photo's true class with a fixed, documented protocol                                                                                    |
-| Real data collected | 62 photos of dog skin (healthy skin and three skin diseases, Mendeley, CC BY 4.0); no wound photos                                                          |
-| Real data requested | PetWound (290 wound photos of 208 dogs and 82 cats) and clinical photos from a partner clinic                                                               |
+| Set                 | Content                                                                                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Training data       | Synthetic drawings of the five classes (`vetnexa_ai.synthetic`), group-aware split                                                                                            |
+| Test photos         | **44** held-out drawings: 8 abrasion, 8 laceration, 12 puncture, 8 abscess or infection, 8 healthy skin; never used for training, calibration or thresholds                   |
+| Unfamiliar images   | 60 generated non-wound images (patterns, gradients, noise, shapes)                                                                                                            |
+| Owner answers       | Simulated from each photo's true class with a fixed, documented protocol                                                                                                      |
+| Real data collected | **841** clear, real dog and cat photos (62 verified Mendeley photos plus 779 curated community photos: 474 dog, 305 cat) in 22 skin and wound categories; only 19 show wounds |
+| Real data requested | PetWound (290 wound photos of 208 dogs and 82 cats) and clinical photos from a partner clinic                                                                                 |
 
-The real skin photos are not used in this evaluation because they do not contain wounds and
-are too few to train on. The data policy and its evidence are in
+The real photos are not used for the wound evaluation because only 19 of them show wounds. They
+are used for the separate skin-condition check (section 5.5). Every photo was checked for
+duplicates, clarity, watermarks and species, and its source and licence are recorded. The data policy and its evidence are in
 [services/ai/datasets/README.md](../services/ai/datasets/README.md).
 
 ## 4. Method
@@ -152,6 +157,36 @@ Share of cases that needed a vet but were shown as routine:
 
 ![Risk–coverage curves](images/evaluation-risk-coverage.svg)
 
+### 5.5 Skin-condition check on real photos
+
+A second EfficientNet-B0 (`skin-efficientnetb0-20261128-0613`) was trained with the same
+script on five classes built from the curated photos: healthy skin (232), ringworm (138),
+mange or scabies (137), other fungal infection (101) and dermatitis (159: allergic, flea
+allergy, bacterial, hot spot). Split 547 / 110 / 110, stratified; the 110 test photos were
+never used for training, calibration or thresholds.
+
+| Measure                                           | Value           |
+| ------------------------------------------------- | --------------- |
+| Accuracy / balanced accuracy                      | 67.3 % / 61.5 % |
+| Macro-F1                                          | 0.621           |
+| ECE (temperature 1.05)                            | 0.076           |
+| Suggestion rate (confidence ≥ 0.55, not "unsure") | 68.2 %          |
+| Accuracy when it gives a suggestion               | 77.3 %          |
+| Test photos flagged as unfamiliar                 | 8.2 %           |
+
+| Class            | Precision | Recall | F1   | Test photos |
+| ---------------- | --------- | ------ | ---- | ----------- |
+| Healthy          | 0.76      | 0.94   | 0.84 | 34          |
+| Ringworm         | 0.56      | 0.45   | 0.50 | 20          |
+| Mange or scabies | 0.80      | 0.63   | 0.71 | 19          |
+| Other fungal     | 0.50      | 0.36   | 0.42 | 14          |
+| Dermatitis       | 0.59      | 0.70   | 0.64 | 23          |
+
+Healthy skin is recognised well (32 of 34). Most errors are between the skin diseases:
+ringworm, other fungal infections and dermatitis look alike in photos, and vets usually confirm
+them with a skin scrape, culture or Wood's lamp. Below 0.55 confidence the app says "not sure"
+rather than guessing, which raises accuracy from 67 % to 77 % on the photos it answers.
+
 ## 6. Discussion
 
 **Question 1, safety.** Reliability weighting found the most urgent cases: 80.0 % against
@@ -183,6 +218,12 @@ consultation. A veterinarian should review those weights.
 clean photos, on which it is almost always right; its coverage (66.7 %) and urgent sensitivity
 (41.7 %) show why AURC must be read together with coverage.
 
+**Skin check on real photos.** The real-photo model is useful but not reliable enough to
+name a condition on its own: 77 % accuracy when it answers, and only 0.42–0.50 F1 for the
+fungal classes. This is why it is advisory: it never changes the triage, it is shown below the
+main result with a clear "not a diagnosis" note, and it refuses to answer when unsure or when
+the photo looks unfamiliar.
+
 ## 7. Threats to validity
 
 - Synthetic photos and simulated answers. Real photos (fur, lighting, coat colour, phone
@@ -194,6 +235,11 @@ clean photos, on which it is almost always right; its coverage (66.7 %) and urge
   individual animal.
 - Rule weights, class risks and thresholds are the developer's drafts and have not been
   validated by a veterinarian.
+- Skin-check labels come from the photo sources (public datasets and case reports), not from a
+  veterinarian, and some community photos may be mislabelled. The test set is small (110
+  photos, 14–34 per class), so per-class figures can move by ten points or more.
+- Near-identical photos of the same animal were removed during curation, but photos from the
+  same source can still share a camera, background or lighting, which may flatter the scores.
 - The demonstration model reaches 100 % on drawings, so the evaluation cannot show how the
   fusion behaves when the photo model is often wrong, which it will be on real photos.
 
@@ -231,7 +277,16 @@ python -m vetnexa_ai.train --data-dir data/synthetic --output-dir models/baselin
 python -m vetnexa_ai.evaluate --model models/wound-classifier.pt
 python -m vetnexa_ai.evaluate_triage --model models/wound-classifier.pt \
   --baseline-model models/baseline-resnet18/wound-classifier.pt --draws 3 --seed 7
+
+# Skin-condition check on the curated real photos (section 5.5)
+python -m vetnexa_ai.skin_dataset
+python -m vetnexa_ai.train --data-dir data/skin-conditions \
+  --classes healthy,ringworm,mange,fungal_infection,dermatitis \
+  --output-dir models/skin --model-file skin-classifier.pt --task skin \
+  --epochs 20 --frozen-epochs 3 --patience 5
+python -m vetnexa_ai.evaluate --model models/skin/skin-classifier.pt \
+  --split models/skin/split.json --report-name skin-evaluation
 ```
 
-Outputs: `reports/evaluation.md`, `reports/triage-evaluation.md` and `.json`, and the two SVG
+Outputs: `reports/evaluation.md`, `reports/skin-evaluation.md`, `reports/triage-evaluation.md` and `.json`, and the two SVG
 charts. The scenario tables and further interpretation are in [evaluation.md](evaluation.md).
